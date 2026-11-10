@@ -34,7 +34,7 @@ The Security Data Model (field schema, GIM infomodels, reserved values) and its 
 - Pydantic v2.
 - Changes to output content or format beyond the optional path.
 - Carrying over git history.
-- Actually changing skills, governance settings, or Claude/Copilot settings. These get proposal docs only.
+- Actually changing skills, governance settings, or Claude/Copilot settings. These get proposal docs only. The one exception is the GitHub CLI permissions in `.claude/settings.json`, which setup PR #2 adds before this plan starts.
 
 ## Target layout
 ```

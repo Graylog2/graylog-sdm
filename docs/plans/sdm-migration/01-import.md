@@ -19,12 +19,22 @@ Constraints:
 - Standards must serve both Claude (dev + review) and GitHub Copilot (review). Copilot code review reads `.github/copilot-instructions.md` and path-scoped `.github/instructions/*.instructions.md`, and does not reliably follow links to other files, so review rules must be written out inline in those files. `CLAUDE.md` imports files with `@path`.
 
 ## Starting state
-`docs/plans/sdm-migration/` (this plan) and `docs/plans/archive/.gitkeep` are on `main`, merged from PR #2.
+**Prerequisite:** setup PR #2 is merged. This section describes `main` at the moment PR 1 starts.
 
-These are uncommitted in the working tree, from earlier setup:
-- `.gitignore` additions: `.claude/settings.local.json`, `.claude/.cc-writes/`, `CLAUDE.local.md`
-- `CLAUDE.md`: a starter with TODOs. Its content moves to `AGENTS.md` in commit 1.
-- `.claude/settings.json`: allows git status/diff/log and denies reading `.env`. Keep it unchanged; changes go to the PR 5 proposal.
+Already on `main`:
+- From setup PR #1:
+  - `.gitignore` additions: `.claude/settings.local.json`, `.claude/.cc-writes/`, `CLAUDE.local.md`
+  - `CLAUDE.md`: a starter with TODOs. Its content moves to `AGENTS.md` in commit 1.
+- From setup PR #2:
+  - this plan (`docs/plans/sdm-migration/`)
+  - `docs/plans/archive/.gitkeep`
+  - the GitHub CLI permissions in `.claude/settings.json`:
+    - read-only `gh` commands are allowed
+    - `gh pr comment` and `gh api` ask first
+    - `gh pr merge`, `gh pr review` and `gh pr ready` are denied
+    - reading `.env` is denied
+
+  Keep `.claude/settings.json` as is in PR 1. Further changes go to the PR 5 proposal.
 
 ## Steps
 1. Branch `migration/01-import` off `main`.
