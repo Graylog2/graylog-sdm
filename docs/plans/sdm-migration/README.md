@@ -4,16 +4,14 @@ Status: active
 Created: 2026-11-09
 Tracking: (issue link)
 
-In the repo, this plan is the directory `docs/plans/sdm-migration/`:
+This plan lives in `docs/plans/sdm-migration/`:
 
-| Here | In repo |
-|---|---|
-| `i-want-to-plan-melodic-wreath.md` (this file) | `docs/plans/sdm-migration/README.md` |
-| `-01.md` | `docs/plans/sdm-migration/01-import.md` |
-| `-02.md` | `docs/plans/sdm-migration/02-package.md` |
-| `-03.md` | `docs/plans/sdm-migration/03-lint.md` |
-| `-04.md` | `docs/plans/sdm-migration/04-ci.md` |
-| `-05.md` | `docs/plans/sdm-migration/05-docs.md` |
+- `README.md`: this overview, with the status table
+- `01-import.md`: PR 1
+- `02-package.md`: PR 2
+- `03-lint.md`: PR 3
+- `04-ci.md`: PR 4
+- `05-docs.md`: PR 5
 
 ## Context
 The Security Data Model (field schema, GIM infomodels, reserved values) and its generator `build_gim` live in `graylog-project-illuminate` today (`_meta/gim/`, `scripts/build_gim/`). Nothing validates the data automatically. Several authoring rules exist only as prose in the `sdm-build` skill. graylog-sdm becomes the source of truth. Its output feeds a MadCap Flare project that lives in a separate repo. The repo is worked on with Claude (development and review) and GitHub Copilot (review), so its standards must work for both.
@@ -93,7 +91,8 @@ build/sdm_artifacts/<Plugin>/    # gitignored
 
 ## Verification (end to end)
 After PR 5:
-- In a fresh clone, `uv sync && uv run build-sdm build && uv run build-sdm validate && uv run build-sdm check-generated && uv run pytest` passes.
+- In a fresh clone, `uv sync && uv run build-sdm build && uv run build-sdm validate --base-ref HEAD && uv run build-sdm check-generated && uv run pytest` passes.
+- `uv run build-sdm validate` without `--base-ref` lists the known existing violations and exits 1. That's expected: without a base ref, every violation is reported as an error (see `03-lint.md`).
 - CI is green on `main`.
 - `docs/plans/sdm-migration/` no longer exists.
 - `docs/plans/archive/20261109-sdm-migration/` contains the six files, all `Status: done`.

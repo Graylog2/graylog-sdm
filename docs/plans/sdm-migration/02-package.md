@@ -59,7 +59,7 @@ It is tied to the Illuminate layout in these places:
    - key `gim_source_dir` → `sdm_source_dir` = `"src/sdm"`
    - `output_dir = "build/sdm_artifacts"`, with the code defaults at `runner.py:49,86` updated to match
    - README, docstrings, log strings and the argparse prog name
-   - grep for `build_gim` and `gim_artifacts` until both return nothing
+   - `grep -rn "build_gim\|gim_artifacts\|_meta/gim" tools/ tests/ src/ pyproject.toml` until it returns nothing. Docs (`docs/`, ADRs, plans) are left out of this search on purpose, because they mention the old names as history.
 6. Find the repo root without counting parent directories:
    - add `build_sdm.utils.paths.find_repo_root()`, which walks up from the current working directory and then from `__file__` until it finds a `pyproject.toml` with `name = "build-sdm"`
    - use it in place of `main.py:49` and in both tests (or add a `repo_root` fixture in `tests/conftest.py`)
@@ -102,4 +102,4 @@ It is tied to the Illuminate layout in these places:
 - With the config `output_dir` set to another path and no flag, output goes to that path. With both set, the flag wins.
 - A test plugin that raises makes the CLI exit 1.
 - `uv run build-sdm check-generated` exits 0 on a clean tree, and exits 1 after one generated file has been hand-edited.
-- `grep -rn "build_gim\|gim_artifacts\|_meta/gim" --exclude-dir=.git .` returns no hits, except history notes in docs.
+- `grep -rn "build_gim\|gim_artifacts\|_meta/gim" tools/ tests/ src/ pyproject.toml` returns no hits. This is the same scope as step 5; docs are excluded.

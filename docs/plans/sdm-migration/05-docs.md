@@ -89,5 +89,5 @@ The proposals are markdown only. No settings, skills or GitHub configuration cha
 - `docs/plans/` contains only `README.md` and `archive/`.
 - `docs/plans/archive/20261109-sdm-migration/` holds all six files, all with `Status: done`.
 - `git log --follow docs/plans/archive/20261109-sdm-migration/README.md` shows history from before the move.
-- `grep -rn "docs/plans/sdm-migration/"` returns no stale links.
+- `grep -rn "docs/plans/sdm-migration/" --exclude-dir=.git --exclude-dir=archive .` returns no stale links. The archived plan is excluded because it contains this check and other references to its old path.
 - A Claude session and a Copilot review on a sample data PR both apply the data rules (for example, both flag a non-ASCII description).

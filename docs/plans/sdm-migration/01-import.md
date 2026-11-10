@@ -19,6 +19,8 @@ Constraints:
 - Standards must serve both Claude (dev + review) and GitHub Copilot (review). Copilot code review reads `.github/copilot-instructions.md` and path-scoped `.github/instructions/*.instructions.md`, and does not reliably follow links to other files, so review rules must be written out inline in those files. `CLAUDE.md` imports files with `@path`.
 
 ## Starting state
+`docs/plans/sdm-migration/` (this plan) and `docs/plans/archive/.gitkeep` are on `main`, merged from PR #2.
+
 These are uncommitted in the working tree, from earlier setup:
 - `.gitignore` additions: `.claude/settings.local.json`, `.claude/.cc-writes/`, `CLAUDE.local.md`
 - `CLAUDE.md`: a starter with TODOs. Its content moves to `AGENTS.md` in commit 1.
@@ -91,7 +93,7 @@ These are uncommitted in the working tree, from earlier setup:
        - the archive is history only and has no authority
    - Add `docs/plans/README.md`: the plan conventions from the overview (header fields, step files, how and when to archive, date = Created, the authority rules), plus a template header block.
    - Add `docs/plans/archive/.gitkeep`.
-   - Copy this plan into `docs/plans/sdm-migration/`, using the file mapping table in the overview. Fix the cross-references between the files so they use the in-repo names.
+   - `docs/plans/sdm-migration/` and `docs/plans/archive/.gitkeep` were already added in the setup PR (#2) before this PR. Commit 2 only adds `docs/plans/README.md`.
 4. In Illuminate, run `git fetch origin develop`, then `SHA=$(git rev-parse origin/develop)`.
 5. Export from that ref: `git archive "$SHA" _meta/gim scripts/build_gim | tar -x -C "$TMPDIR/sdm-import"`.
 6. **Commit 3: verbatim import**, from the export:
