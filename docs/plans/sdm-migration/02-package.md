@@ -35,6 +35,19 @@ It is tied to the Illuminate layout in these places:
 - Tests live in `tests/` at the repo root.
 - One CLI with subcommands.
 
+## Commit order (review commit by commit)
+This PR combines a pure refactor with behavior changes. To keep the parity check meaningful, structure the commits like this:
+
+1. **Refactor, no behavior change:** steps 2–7 and 12 (packaging, imports, rename, repo-root discovery, config loading, moving tests).
+   - The parity check runs **at this commit**. Every plugin's output must be byte-identical to Illuminate's at the PR 1 SHA (see Verification).
+   - Record the result in the PR description, because a squash merge loses this intermediate state on `main`.
+2. **Fatal plugin failures:** step 9. If parity at commit 1 revealed a plugin that was failing silently, this commit surfaces it.
+3. **Optional MadCap output path:** step 8. It's additive, and the default output is unchanged.
+4. **CLI:** step 11.
+5. **`allowed_field_types` fix:** step 10. This is the only commit expected to change output. List any output differences in the PR description.
+6. **Generated output and determinism:** steps 13–14. Commit `generated/MadcapHtmlOutput/` from the final state.
+7. **Standards and plan status:** steps 15–16.
+
 ## Steps
 1. Branch `migration/02-package`.
 2. Root `pyproject.toml`:
@@ -94,10 +107,13 @@ It is tied to the Illuminate layout in these places:
 ## Verification
 - `uv sync && uv run pytest`: everything passes, about 174 tests plus new ones for path precedence and failure exit codes.
 - `uv run ruff check`, `uv run mypy`: no new errors.
-- Parity check:
-  1. In Illuminate at the PR 1 SHA (from an exported tree, not the working tree), run the original tool: `cd scripts/build_gim && uv run python3 main.py`.
-  2. Diff its `MadcapHtmlOutput/` against `generated/MadcapHtmlOutput/`.
-  3. Expected result: identical, or every difference explained in the PR. Watch for the type-list change and the new sub-fields and applies-to output that the stale Illuminate build didn't have.
+- Parity check, **covering all plugins**, run at commit 1 of the commit order:
+  1. In Illuminate at the PR 1 SHA, run the original tool from an exported tree, not the working tree: `cd scripts/build_gim && uv run python3 main.py`.
+  2. Run `uv run build-sdm build` here. Temporarily point the MadCap output at the same build directory, or diff the two locations separately.
+  3. Diff each plugin directory, old against new: `CategoryDataCSVOutput/`, `FieldMappingCSVOutput/`, `JsonFileOutput/`, `MessageSummariesOutput/`, `MadcapHtmlOutput/`.
+  4. Expected result at commit 1: **byte-identical for every plugin**. Any difference is a refactor regression; fix it before continuing.
+  5. Re-run the parity check after commit 5 (`allowed_field_types`). Differences are allowed only where that change explains them, and each one is listed in the PR description.
+  6. Separately, note in the PR how the freshly built `category_data.csv` and `message_summaries.json` differ from the copies checked in to Illuminate (`illuminate/core/data/`, `illuminate/core/spotlight/`). That difference already exists and isn't caused by this PR. Record it in the Illuminate SDM-removal issue.
 - `uv run build-sdm build --madcap-output-dir "$TMPDIR/x"` writes only to `$TMPDIR/x`, and `generated/` is unchanged.
 - With the config `output_dir` set to another path and no flag, output goes to that path. With both set, the flag wins.
 - A test plugin that raises makes the CLI exit 1.
