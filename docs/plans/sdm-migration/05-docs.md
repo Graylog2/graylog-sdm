@@ -17,7 +17,7 @@ The proposals are markdown only. No settings, skills or GitHub configuration cha
 2. `README.md` (expand the current two lines):
    - purpose: the SDM source of truth; Illuminate keeps its own copy until a later cutover
    - repo layout table
-   - quick start: `uv sync`, `uv run build-sdm build`, `uv run build-sdm validate`
+   - quick start: `uv sync`, `uv run build-sdm build`, `uv run build-sdm validate --base-ref origin/main`. This is the same check CI runs: violations that are new relative to `main` fail, and existing ones only warn. Add a note that plain `uv run build-sdm validate`, with no base ref, lists the known existing violations and exits 1. That is expected, not a broken checkout (see ADR 0004).
    - links to `docs/contributing.md`, `docs/decisions/` and `AGENTS.md`
 3. `docs/contributing.md`:
    - **editing data:**

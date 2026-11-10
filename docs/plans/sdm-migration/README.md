@@ -68,7 +68,7 @@ build/sdm_artifacts/<Plugin>/    # gitignored
 ```
 
 ## Plan conventions (applied to this migration)
-- **Header.** A plan's `README.md` starts with `Status: active | done | abandoned`, `Created: YYYY-MM-DD`, and `Tracking: <issue/PR>`. Step files carry only `Status`.
+- **Header.** A plan's `README.md` starts with `Status: active | done | abandoned`, `Created: YYYY-MM-DD`, and `Tracking: <issue/PR>`. Step files carry `Status` and `Tracking`, plus a navigation line: `Overview`, `Depends on`, `Next`.
 - **While active.** Each PR that completes a step marks that step file `Status: done` and updates the status table below. Nothing is deleted.
 - **Completion.** The final PR:
   1. Records any lasting decisions in ADRs.

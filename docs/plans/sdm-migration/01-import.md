@@ -105,7 +105,7 @@ Already on `main`:
    - Add `docs/plans/archive/.gitkeep`.
    - `docs/plans/sdm-migration/` and `docs/plans/archive/.gitkeep` were already added in the setup PR (#2) before this PR. Commit 2 only adds `docs/plans/README.md`.
 4. In Illuminate, run `git fetch origin develop`, then `SHA=$(git rev-parse origin/develop)`.
-5. Export from that ref: `git archive "$SHA" _meta/gim scripts/build_gim | tar -x -C "$TMPDIR/sdm-import"`.
+5. Export from that ref. `tar -C` needs the directory to exist already, so create it first: `mkdir -p "$TMPDIR/sdm-import" && git archive "$SHA" _meta/gim scripts/build_gim | tar -x -C "$TMPDIR/sdm-import"`.
 6. **Commit 3: verbatim import**, from the export:
    - `_meta/gim/infomodels/*.toml` → `src/sdm/infomodels/`
    - `_meta/gim/schema/*.toml` → `src/sdm/schema/`
