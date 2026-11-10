@@ -86,7 +86,7 @@ The proposals are markdown only. No settings, skills or GitHub configuration cha
 ## Verification
 - Follow `docs/contributing.md` step by step in a fresh clone: `uv sync`, build, validate, check-generated. Every command works as written.
 - All file paths and rule IDs mentioned in the docs and instruction files exist (grep them).
-- `docs/plans/` contains only `README.md` and `archive/`.
+- `docs/plans/sdm-migration/` no longer exists. Other active plans, such as `docs/plans/sdm-follow-ups/`, are unaffected; this check concerns only the migration plan.
 - `docs/plans/archive/20261109-sdm-migration/` holds all six files, all with `Status: done`.
 - `git log --follow docs/plans/archive/20261109-sdm-migration/README.md` shows history from before the move.
 - `grep -rn "docs/plans/sdm-migration/" --exclude-dir=.git --exclude-dir=archive .` returns no stale links. The archived plan is excluded because it contains this check and other references to its old path.

@@ -38,12 +38,12 @@ It is tied to the Illuminate layout in these places:
 ## Commit order (review commit by commit)
 This PR combines a pure refactor with behavior changes. To keep the parity check meaningful, structure the commits like this:
 
-1. **Refactor, no behavior change:** steps 2–7 and 12 (packaging, imports, rename, repo-root discovery, config loading, moving tests).
+1. **Refactor, no behavior change:** steps 2–7, 11a and 12 (packaging, imports, rename, repo-root discovery, config loading, a CLI with only the `build` subcommand, moving tests). Step 11a has to be in this commit because the `build-sdm` console script from step 2 points at `build_sdm.cli:main`. Without it, `uv run build-sdm build` can't run the parity check.
    - The parity check runs **at this commit**. Every plugin's output must be byte-identical to Illuminate's at the PR 1 SHA (see Verification).
    - Record the result in the PR description, because a squash merge loses this intermediate state on `main`.
 2. **Fatal plugin failures:** step 9. If parity at commit 1 revealed a plugin that was failing silently, this commit surfaces it.
-3. **Optional MadCap output path:** step 8. It's additive, and the default output is unchanged.
-4. **CLI:** step 11.
+3. **Optional MadCap output path:** step 8, including the `--madcap-output-dir` flag on `build`. It's additive, and the default output is unchanged.
+4. **CLI additions:** step 11b.
 5. **`allowed_field_types` fix:** step 10. This is the only commit expected to change output. List any output differences in the PR description.
 6. **Generated output and determinism:** steps 13–14. Commit `generated/MadcapHtmlOutput/` from the final state.
 7. **Standards and plan status:** steps 15–16.
@@ -91,10 +91,12 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
     - load that config before the schema files are validated, or pass it in via a validator context
     - add `long`, `boolean` and `byte` to the config list
     - delete the hard-coded set
-11. Replace `main.py` with `cli.py` (argparse subcommands):
-    - `build [--madcap-output-dir PATH] [--dry-run] [-ll LEVEL] [-c CONFIG_DIR]`
-    - `check-generated`: build MadCap into a temporary dir, then do a recursive byte-for-byte diff against `generated/MadcapHtmlOutput/`; print the differing files and exit 1 on any difference
-    - leave a placeholder for `validate` (implemented in PR 3)
+11. CLI, in two parts:
+    - **11a (commit 1).** Replace `main.py` with `cli.py` (argparse subcommands). Add only `build [--dry-run] [-ll LEVEL] [-c CONFIG_DIR]`, with exactly the old `main.py` flags and behavior.
+    - **11b (commit 4).** Add:
+      - `check-generated`: build MadCap into a temporary dir, then run a recursive byte-for-byte diff against `generated/MadcapHtmlOutput/`. Print the differing files and exit 1 on any difference.
+      - a placeholder for `validate` (implemented in PR 3)
+    - Commit 3 adds `--madcap-output-dir PATH` to `build`, as part of step 8.
 12. Move `tools/build_sdm/tests/` → `tests/`. Update the imports and the two tests that read real data so they use `src/sdm`; one of them still asserts `7.1.0`.
 13. Add a determinism check: run `build` twice and diff the results. If anything nondeterministic shows up (timestamps, dict or set ordering), fix it.
 14. Run `uv run build-sdm build` and commit `generated/MadcapHtmlOutput/`. Add `build/` to `.gitignore` if it isn't there.
