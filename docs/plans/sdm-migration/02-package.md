@@ -51,7 +51,7 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
 ## Steps
 1. Branch `migration/02-package`.
 2. Root `pyproject.toml`:
-   - `name = "build-sdm"`, `requires-python = ">=3.13"`
+   - `name = "build-sdm"`, `requires-python = ">=3.13,<3.14"`
    - dependencies copied from `tools/build_sdm/pyproject.toml`: `pydantic>=1.10,<2.0`, `jinja2>=3.1`, `markdown>=3.4`, `tomlkit>=0.12`
    - dev dependency group: pytest, pytest-mock, ruff, mypy
    - build backend (hatchling) with package dir `tools/build_sdm` mapped to `build_sdm`, and package data for `html_templates/**` and `configs/*.toml`
