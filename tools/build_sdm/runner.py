@@ -15,9 +15,21 @@ from build_sdm import output_plugins
 
 logger = logging.getLogger(__name__)
 
-def run_build(repo_dir: Path, config_dir: Path, dry_run: bool = False) -> None:
+def run_build(
+        repo_dir: Path,
+        config_dir: Path,
+        dry_run: bool = False,
+        output_dir_overrides: Optional[Dict[str, Path]] = None
+    ) -> None:
     '''
     Main entry point for building GIM documentation and artifacts.
+
+    Args:
+        repo_dir: Repository root.
+        config_dir: Script config directory.
+        dry_run: Log what would be generated without writing files.
+        output_dir_overrides: Output directory per plugin class name (e.g. from a CLI
+            flag). Takes precedence over the plugin's configured and default directory.
     '''
     _scan_and_import_plugins()
     script_config = _load_script_config(config_dir)
@@ -25,8 +37,14 @@ def run_build(repo_dir: Path, config_dir: Path, dry_run: bool = False) -> None:
     output_dir = _ensure_output_dir(repo_dir, script_config)
     gim_config = _load_and_transform_gim_config(repo_dir, script_config, config_dir)
 
-    #_run_plugins(script_config, gim_config, output_dir)
-    _run_plugins(script_config, gim_config, output_dir, dry_run=dry_run)
+    _run_plugins(
+        script_config,
+        gim_config,
+        output_dir,
+        dry_run=dry_run,
+        repo_dir=repo_dir,
+        output_dir_overrides=output_dir_overrides
+    )
 
 # --- Helper functions below ---
 
@@ -122,20 +140,24 @@ def _run_plugins(
         script_config: Dict[str, Any],
         gim_config: Dict[str, Any],
         output_dir: Path,
-        dry_run: bool=False
+        dry_run: bool=False,
+        repo_dir: Optional[Path] = None,
+        output_dir_overrides: Optional[Dict[str, Path]] = None
     ) -> None:
     logger.debug('Scanning and loading output plugin modules')
     plugins = load_plugins_with_config(script_config['plugins'], mode='default_only')
 
     logger.debug('Invoking output plugins')
     for plugin, validated_plugin_config in plugins:
+        plugin_output_dir = _plugin_output_dir(
+            plugin, validated_plugin_config, output_dir, repo_dir, output_dir_overrides
+        )
         if dry_run:
             plugin.logger.info(
-                '[DRY RUN] Would generate output using plugin: %s',
-                plugin.__class__.__name__
+                '[DRY RUN] Would generate output using plugin: %s into %s',
+                plugin.__class__.__name__, plugin_output_dir
                 )
         else:
-            plugin_output_dir = output_dir / plugin.__class__.__name__
             plugin_output_dir.mkdir(parents=True, exist_ok=True)
 
             plugin.generate(
@@ -143,3 +165,30 @@ def _run_plugins(
                 output_dir=plugin_output_dir,
                 plugin_config=validated_plugin_config
             )
+
+
+def _plugin_output_dir(
+        plugin: Any,
+        plugin_config: Any,
+        output_dir: Path,
+        repo_dir: Optional[Path],
+        output_dir_overrides: Optional[Dict[str, Path]]
+    ) -> Path:
+    '''Choose where a plugin writes: CLI override > plugin config > <output_dir>/<Plugin>/.
+
+    Args:
+        plugin: The plugin instance.
+        plugin_config: The plugin's validated config, if any.
+        output_dir: The build's output directory.
+        repo_dir: Repository root, for relative configured paths; defaults to the
+            current working directory.
+        output_dir_overrides: Output directory per plugin class name.
+
+    Returns:
+        The plugin's output directory. Output goes only there.
+    '''
+    name = plugin.__class__.__name__
+    override = (output_dir_overrides or {}).get(name)
+    if override is not None:
+        return override
+    return plugin.resolve_output_dir(output_dir / name, repo_dir or Path.cwd(), plugin_config)

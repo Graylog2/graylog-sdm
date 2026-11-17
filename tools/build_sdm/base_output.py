@@ -109,6 +109,31 @@ class OutputPlugin(ABC, Generic[PluginConfigT]):
             'Subclasses of OutputPlugin must implement generate().'
         )
 
+    def resolve_output_dir(
+        self,
+        default_dir: Path,
+        repo_dir: Path,
+        plugin_config: Optional[PluginConfigT] = None
+    ) -> Path:
+        '''
+        Return the directory this plugin writes its output to.
+
+        The runner calls this before generate(). The default is the runner's
+        per-plugin directory, ``<output_dir>/<PluginClassName>/``. A plugin can
+        override it to let its own config choose another location; when it does,
+        output goes only there (it replaces the default, it doesn't add a copy).
+        A CLI override passed to the runner takes precedence over this method.
+
+        Args:
+            default_dir: The runner's per-plugin default directory.
+            repo_dir: Repository root, for resolving relative configured paths.
+            plugin_config: This plugin's validated config, if any.
+
+        Returns:
+            The directory to pass to generate() as output_dir.
+        '''
+        return default_dir
+
     @classmethod
     def load_plugin_config(cls, config_dict: Dict[str, Any]) -> Optional[BaseModel]:
         '''

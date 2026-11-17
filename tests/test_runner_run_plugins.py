@@ -12,6 +12,10 @@ class DummyPlugin:
         # Capture log messages for dry-run test
         self.logger.addHandler(self._make_log_handler())
 
+    def resolve_output_dir(self, default_dir, repo_dir, plugin_config=None):
+        # Same default as OutputPlugin.resolve_output_dir.
+        return default_dir
+
     def generate(self, gim_config, output_dir, plugin_config=None):
         self.generated = True
 

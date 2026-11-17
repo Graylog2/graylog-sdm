@@ -31,7 +31,8 @@ uv run build-sdm build
 |---|---|---|
 | `-ll`, `--loglevel` | `debug`, `info`, `warning`, `error`, or `critical` | `info` |
 | `-c`, `--config_dir` | Directory of script config files; a relative path resolves against the current directory | the package's `configs/` |
-| `--dry-run` | Log what each enabled plugin would generate without writing any files | off |
+| `--dry-run` | Log what each enabled plugin would generate, and where, without writing any files | off |
+| `--madcap-output-dir PATH` | Write the MadCap HTML only to `PATH` (relative to the current directory), instead of its configured location | unset |
 
 Example:
 
@@ -45,7 +46,7 @@ uv run build-sdm build -ll debug --dry-run
 - **`configs/plugin.config.madcap.toml`** — MadCap presentation config (`type = "config_output_plugin"`), kept here rather than with the SDM data (ADR 0001). Files of this type in the config directory are loaded alongside the source data.
 - **`configs/<plugin_name>.toml`** — one file per output plugin, each with a `[plugin]` table (`name`, `enabled`, plus that plugin's own options). Set `enabled = 0`/`1` to toggle a plugin without touching code. A plugin with no config file falls back to its `enabled_by_default` class attribute.
 
-By default, output is written to `build/sdm_artifacts/<PluginClassName>/` at the repository root.
+By default, output is written to `build/sdm_artifacts/<PluginClassName>/` at the repository root. A plugin can choose its own directory through its config, which replaces the default rather than adding a copy. `MadcapHtmlOutput` does this with `output_dir = "generated/MadcapHtmlOutput"` in `configs/madcap_html_output.toml`, a path relative to the repository root. The `--madcap-output-dir` flag takes precedence over that setting.
 
 ## Output plugins
 
