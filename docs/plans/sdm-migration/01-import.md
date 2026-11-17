@@ -1,6 +1,6 @@
 # SDM Migration — PR 1 of 5: Scaffold, AI standards, ADRs, verbatim import
 
-Status: active
+Status: done
 Tracking: (PR link)
 Overview: `docs/plans/sdm-migration/README.md`. Depends on: nothing. Next: `02-package.md`.
 
