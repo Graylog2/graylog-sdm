@@ -4,11 +4,28 @@
     "allow": [
       "Bash(git status:*)",
       "Bash(git diff:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr status:*)",
+      "Bash(gh run view:*)",
+      "Bash(gh run list:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh repo view:*)"
+    ],
+    "ask": [
+      "Bash(gh pr comment:*)",
+      "Bash(gh api:*)"
     ],
     "deny": [
       "Read(./.env)",
-      "Read(./.env.*)"
+      "Read(./.env.*)",
+      "Bash(gh pr merge:*)",
+      "Bash(gh pr review:*)",
+      "Bash(gh pr ready:*)"
     ]
   }
 }
