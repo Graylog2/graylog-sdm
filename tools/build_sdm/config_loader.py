@@ -207,7 +207,9 @@ def load_gim_config_files(
         ValueError: If any file fails to parse or validate.
     '''
     directory = Path(directory).expanduser().resolve()
-    toml_files = list(directory.rglob('*.toml')) + list(directory.rglob('*.tml'))
+    # Sorted so that load order, and with it the order of every output, does not depend
+    # on the order the filesystem lists files in.
+    toml_files = sorted([*directory.rglob('*.toml'), *directory.rglob('*.tml')])
     if not toml_files:
         raise FileNotFoundError(f'No .toml or .tml files found in {directory}')
 
@@ -267,7 +269,7 @@ def load_script_config_files(config_dir: Path) -> dict:
         dict containing merged or per-file parsed TOML data.
     '''
     config_dir = Path(config_dir).expanduser().resolve()
-    config_files = list(config_dir.rglob('*.toml')) + list(config_dir.rglob('*.tml'))
+    config_files = sorted([*config_dir.rglob('*.toml'), *config_dir.rglob('*.tml')])
 
     try:
         config = {'plugins': {}, 'global': {}}
