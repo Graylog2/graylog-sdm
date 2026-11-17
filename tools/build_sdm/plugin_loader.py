@@ -1,10 +1,10 @@
 import functools
 import logging
 import importlib
-import output_plugins
+from build_sdm import output_plugins
 import pkgutil
 import traceback
-from base_output import OutputPlugin
+from build_sdm.base_output import OutputPlugin
 from pydantic import ValidationError
 
 #from output_plugins import __path__ as plugin_path
@@ -52,7 +52,7 @@ def load_plugins_with_config(plugin_config: dict, mode='default_only'):
     plugins = []
 
     for _, module_name, _ in pkgutil.iter_modules(output_plugins.__path__):
-        module = importlib.import_module(f'output_plugins.{module_name}')
+        module = importlib.import_module(f'{output_plugins.__name__}.{module_name}')
         for attr in dir(module):
             cls = getattr(module, attr)
             if isinstance(cls, type) and issubclass(cls, OutputPlugin) and cls is not OutputPlugin:

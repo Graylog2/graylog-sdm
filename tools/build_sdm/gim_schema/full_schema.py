@@ -1,7 +1,7 @@
 from typing import Dict, Union, Any
 from pydantic import BaseModel, root_validator
 from .atomic_fields import GIMCategory
-from base_output import OutputPlugin
+from build_sdm.base_output import OutputPlugin
 
 
 class GIMFileWrapper(BaseModel):

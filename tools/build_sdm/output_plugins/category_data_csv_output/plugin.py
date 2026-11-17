@@ -4,8 +4,8 @@ from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional, List
 
-from base_output import OutputPlugin
-from utils.file import write_file
+from build_sdm.base_output import OutputPlugin
+from build_sdm.utils.file import write_file
 
 class CategoryDataCSVOutputConfig(BaseModel):
     output_filename: str = 'category_data.csv'

@@ -1,11 +1,11 @@
 import logging
-from base_output import OutputPlugin
+from build_sdm.base_output import OutputPlugin
 from pathlib import Path
 from tomlkit import parse, items
-from typing import Union, Dict, Any
+from typing import Union, Dict, Any, Optional, Set
 from pydantic import ValidationError
-from gim_schema.full_schema import GIMFileWrapper
-from gim_schema.field_schema_model import FieldSchemaDocument, ConfigDocument
+from build_sdm.gim_schema.full_schema import GIMFileWrapper
+from build_sdm.gim_schema.field_schema_model import FieldSchemaDocument, ConfigDocument
 
 logger = logging.getLogger(__name__)
 
@@ -183,7 +183,11 @@ def _merge_or_store(result: dict, file: Path, data: dict, merge: bool) -> None:
         result[file.name] = data
 
 
-def load_gim_config_files(directory: Union[str, Path], merge: bool = False) -> dict:
+def load_gim_config_files(
+        directory: Union[str, Path],
+        merge: bool = False,
+        only_types: Optional[Set[str]] = None
+    ) -> dict:
     '''
     Load and validate all GIM config files in a directory.
 
@@ -192,6 +196,9 @@ def load_gim_config_files(directory: Union[str, Path], merge: bool = False) -> d
     Args:
         directory: Path to the config folder.
         merge: Whether to merge all valid data into a single dict.
+        only_types: If given, load only files whose `type` is in this set and skip
+            all other files silently (e.g. to read config_output_plugin files from
+            a directory that also holds untyped script config files).
 
     Returns:
         Dictionary of validated data.
@@ -217,6 +224,8 @@ def load_gim_config_files(directory: Union[str, Path], merge: bool = False) -> d
             continue
 
         entry_type = raw_data.get('type')
+        if only_types is not None and entry_type not in only_types:
+            continue
         if not entry_type:
             logger.warning('No type defined in file %s, skipping file', file.name)
             continue
@@ -249,7 +258,7 @@ def load_gim_config_files(directory: Union[str, Path], merge: bool = False) -> d
 def load_script_config_files(config_dir: Path) -> dict:
     '''
     Load and parse all .toml/.tml script configuration files. These are the configuration files that
-    will manage how the build_gim script operates, including the plugins.
+    will manage how build-sdm operates, including the plugins.
 
     Args:
         config_dir: Directory path as Path.

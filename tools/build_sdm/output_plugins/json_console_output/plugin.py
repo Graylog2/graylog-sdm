@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from base_output import OutputPlugin
+from build_sdm.base_output import OutputPlugin
 from pydantic import BaseModel
 from typing import Optional
 

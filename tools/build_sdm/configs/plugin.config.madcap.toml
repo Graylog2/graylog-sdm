@@ -1,7 +1,7 @@
 type = "config_output_plugin"
 
 [base]
-plugin_name = "output_plugins.madcap_html_output.plugin.MadcapHtmlOutput"
+plugin_name = "build_sdm.output_plugins.madcap_html_output.plugin.MadcapHtmlOutput"
 
 [gim]
 title = "Graylog Information Model (GIM) Categories Reference"

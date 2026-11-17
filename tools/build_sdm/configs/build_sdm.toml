@@ -1,0 +1,6 @@
+[global]
+# Directories in this configuration are relative to the repository root, which build-sdm finds by
+# walking up from the current working directory (then from the package location) to the
+# pyproject.toml with name = "build-sdm".
+sdm_source_dir = "src/sdm"
+output_dir = "build/sdm_artifacts"

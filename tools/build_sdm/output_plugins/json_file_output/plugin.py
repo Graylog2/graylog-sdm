@@ -5,8 +5,8 @@ from pathlib import Path
 from pydantic import BaseModel
 from typing import Optional
 
-from base_output import OutputPlugin
-from utils.file import write_file
+from build_sdm.base_output import OutputPlugin
+from build_sdm.utils.file import write_file
 
 class JsonFileOutputConfig(BaseModel):
     '''
@@ -29,7 +29,7 @@ class JsonFileOutput(OutputPlugin[JsonFileOutputConfig]):
     config_schema = JsonFileOutputConfig
 
     def generate(self, gim_config: dict, output_dir: Path, plugin_config: Optional[JsonFileOutputConfig] = None) -> None:
-        self.logger.info('Generating GIM configuruation JSON output file')
+        self.logger.info('Generating GIM configuration JSON output file')
 
         if isinstance(plugin_config, JsonFileOutputConfig):
             self.logger.info('Validated plugin config provided')

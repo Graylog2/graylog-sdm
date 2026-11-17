@@ -1,6 +1,7 @@
 type = "gim"
 
 [category_name]
+name = "category_name"
 code = XX
 description = "Description"
 required_fields = []
@@ -12,7 +13,7 @@ validation_file = "category_name.json"
 
 # Per-category custom settings can be defined here if the plugins support
 # customization. 
-#[network.meta.plugin_config.'output_plugins.madcap_html_output.MadcapHtmlOutput']
+#[category_name.meta.plugin_config.'build_sdm.output_plugins.madcap_html_output.plugin.MadcapHtmlOutput']
 # Provide the name of the template used to generate the documentation HTML file
 #category_template_filename = "gim_category_template_network.j2"
 
@@ -69,7 +70,7 @@ optional_fields = []
 summary.title = "category_name default"
 summary.description = "Messages related to category_name"
 summary.summary_template = "summaryTemplate.templateName"
-summary.indicator_template = "indicatorTemplate.indicatorName"
+#summary.indicator_template = "indicatorTemplate.indicatorName"
 summary.default_indicator = "info"
 
 [category_name.subcategories.99.event_type_codes]

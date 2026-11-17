@@ -3,14 +3,14 @@ import logging
 import importlib
 import pkgutil
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
-from config_loader import load_gim_config_files, load_script_config_files
-from gim_schema.sub_fields import validate_applies_to
-from plugin_loader import load_plugins_with_config
-from utils.serialization import to_serializable
-from utils.transform import restructure_gim_config
-import output_plugins
+from build_sdm.config_loader import load_gim_config_files, load_script_config_files
+from build_sdm.gim_schema.sub_fields import validate_applies_to
+from build_sdm.plugin_loader import load_plugins_with_config
+from build_sdm.utils.serialization import to_serializable
+from build_sdm.utils.transform import restructure_gim_config
+from build_sdm import output_plugins
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ def run_build(repo_dir: Path, config_dir: Path, dry_run: bool = False) -> None:
     script_config = _load_script_config(config_dir)
 
     output_dir = _ensure_output_dir(repo_dir, script_config)
-    gim_config = _load_and_transform_gim_config(repo_dir, script_config)
+    gim_config = _load_and_transform_gim_config(repo_dir, script_config, config_dir)
 
     #_run_plugins(script_config, gim_config, output_dir)
     _run_plugins(script_config, gim_config, output_dir, dry_run=dry_run)
@@ -46,7 +46,7 @@ def _load_script_config(config_dir: Path) -> Dict[str, Any]:
 
 
 def _ensure_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
-    output_subdir = script_config.get('global', {}).get('output_dir') or 'build/generated_outputs'
+    output_subdir = script_config.get('global', {}).get('output_dir') or 'build/sdm_artifacts'
     output_dir = repo_dir / Path(output_subdir)
 
     try:
@@ -59,7 +59,11 @@ def _ensure_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
     return output_dir
 
 
-def _load_and_transform_gim_config(repo_dir: Path, script_config: Dict[str, Any]) -> Dict[str, Any]:
+def _load_and_transform_gim_config(
+        repo_dir: Path,
+        script_config: Dict[str, Any],
+        config_dir: Optional[Path] = None
+    ) -> Dict[str, Any]:
     '''Load, validate, and restructure the GIM source TOML tree into gim_config.
 
     Resolves the GIM source directory from script_config, loads and validates
@@ -69,9 +73,12 @@ def _load_and_transform_gim_config(repo_dir: Path, script_config: Dict[str, Any]
     applies_to list references a real "top" entity.
 
     Args:
-        repo_dir: Repository root, used to resolve a relative gim_source_dir.
+        repo_dir: Repository root, used to resolve a relative sdm_source_dir.
         script_config: Loaded script configuration; script_config['global']
-            may set 'gim_source_dir' (defaults to '_meta/gim').
+            may set 'sdm_source_dir' (defaults to 'src/sdm').
+        config_dir: Script config directory. Files in it with
+            type = "config_output_plugin" (presentation config such as
+            plugin.config.madcap.toml) are loaded alongside the SDM source data.
 
     Returns:
         The restructured gim_config dict (keys like 'gim', 'field_schema',
@@ -83,7 +90,7 @@ def _load_and_transform_gim_config(repo_dir: Path, script_config: Dict[str, Any]
             entity's applies_to references an entity that isn't a known "top"
             entity.
     '''
-    gim_dir = Path(script_config['global'].get('gim_source_dir') or '_meta/gim')
+    gim_dir = Path(script_config['global'].get('sdm_source_dir') or 'src/sdm')
     gim_dir = repo_dir / gim_dir
 
     if not gim_dir.is_dir():
@@ -95,6 +102,11 @@ def _load_and_transform_gim_config(repo_dir: Path, script_config: Dict[str, Any]
     except Exception as e:
         logger.fatal('Unable to load GIM source data from %s, error: %s', gim_dir, e)
         raise
+
+    if config_dir is not None:
+        gim_config.update(
+            load_gim_config_files(config_dir, merge=False, only_types={'config_output_plugin'})
+        )
 
     gim_config['settings'] = {'type': 'config', 'gim_dir': str(gim_dir)}
 

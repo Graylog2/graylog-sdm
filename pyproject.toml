@@ -1,0 +1,125 @@
+[project]
+name = "build-sdm"
+version = "0.1.0"
+description = "Builds Graylog Security Data Model (SDM) schema, config, and documentation artifacts from src/sdm source files"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "tomlkit>=0.12.0",
+    "pydantic>=1.10,<2.0",
+    "jinja2>=3.1",
+    "markdown>=3.4",
+]
+
+[project.scripts]
+build-sdm = "build_sdm.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+# The package lives at tools/build_sdm and is installed as build_sdm. Non-Python
+# package data (html_templates/**, configs/*.toml) is included with the package.
+packages = ["tools/build_sdm"]
+
+[dependency-groups]
+dev = ["pytest>=7.0", "pytest-mock>=3.6", "ruff>=0.8", "mypy>=1.13"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py313"
+# build_sdm lives under tools/; list it so imports of it sort as first-party.
+src = ["tools", "."]
+
+# Pre-existing code imported from Illuminate, grandfathered wholesale so the first
+# run is clean; only output_plugins/field_mapping_csv_output/, gim_schema/sub_fields.py,
+# new modules and their tests are held to the full standard.
+extend-exclude = [
+    "tools/build_sdm/runner.py",
+    "tools/build_sdm/config_loader.py",
+    "tools/build_sdm/plugin_loader.py",
+    "tools/build_sdm/base_output.py",
+    "tools/build_sdm/gim_schema/atomic_fields.py",
+    "tools/build_sdm/gim_schema/field_schema_model.py",
+    "tools/build_sdm/gim_schema/full_schema.py",
+    "tools/build_sdm/gim_schema/plugin_config_schema.py",
+    "tools/build_sdm/gim_schema/__init__.py",
+    "tools/build_sdm/utils/file.py",
+    "tools/build_sdm/utils/sanitize.py",
+    "tools/build_sdm/utils/serialization.py",
+    "tools/build_sdm/utils/transform.py",
+    "tools/build_sdm/output_plugins/category_data_csv_output",
+    "tools/build_sdm/output_plugins/json_console_output",
+    "tools/build_sdm/output_plugins/json_file_output",
+    "tools/build_sdm/output_plugins/message_summaries_output",
+    "tools/build_sdm/output_plugins/sample_plaintext_output",
+    "tools/build_sdm/output_plugins/madcap_html_output",
+    "tests/test_base_output.py",
+    "tests/test_category_csv_*.py",
+    "tests/test_config_loader_*.py",
+    "tests/test_field_schema_model.py",
+    "tests/test_json_output.py",
+    "tests/test_msg_summaries_output.py",
+    "tests/test_runner_*.py",
+    "tests/test_sample_plaintext_output.py",
+    "tests/test_utils_*.py",
+    "tests/output_madcap",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "ANN", "D", "Q", "B", "SIM"]
+ignore = ["D200", "D203", "D212", "ANN401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["tools/build_sdm", "tests"]
+
+# Same grandfathering as ruff above, expressed as mypy overrides.
+[[tool.mypy.overrides]]
+module = [
+    "build_sdm.runner", "build_sdm.config_loader", "build_sdm.plugin_loader", "build_sdm.base_output",
+    "build_sdm.gim_schema.atomic_fields", "build_sdm.gim_schema.field_schema_model",
+    "build_sdm.gim_schema.full_schema", "build_sdm.gim_schema.plugin_config_schema", "build_sdm.gim_schema",
+    "build_sdm.utils.file", "build_sdm.utils.sanitize", "build_sdm.utils.serialization",
+    "build_sdm.utils.transform",
+    "build_sdm.output_plugins.category_data_csv_output.*",
+    "build_sdm.output_plugins.json_console_output.*",
+    "build_sdm.output_plugins.json_file_output.*",
+    "build_sdm.output_plugins.message_summaries_output.*",
+    "build_sdm.output_plugins.sample_plaintext_output.*",
+    "build_sdm.output_plugins.madcap_html_output.*",
+    "tests.test_base_output",
+    "tests.test_category_csv_missing_category_data",
+    "tests.test_category_csv_missing_event_data",
+    "tests.test_category_csv_missing_gim_type",
+    "tests.test_category_csv_missing_subcat_data",
+    "tests.test_category_csv_valid_path",
+    "tests.test_config_loader_field_schema_parsing",
+    "tests.test_field_schema_model",
+    "tests.test_json_output",
+    "tests.test_msg_summaries_output",
+    "tests.test_runner_ensure_output_dir",
+    "tests.test_runner_load_and_transform_gim_config",
+    "tests.test_runner_load_config",
+    "tests.test_runner_run_build",
+    "tests.test_runner_run_plugins",
+    "tests.test_runner_scan_and_import_plugins",
+    "tests.test_runner_script_config",
+    "tests.test_sample_plaintext_output",
+    "tests.test_utils_file_write",
+    "tests.test_utils_sanitize",
+    "tests.output_madcap.*",
+]
+ignore_errors = true

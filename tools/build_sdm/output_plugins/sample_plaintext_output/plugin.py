@@ -8,7 +8,7 @@ import logging
 from pathlib import Path
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, Extra, Field, ValidationError
-from base_output import OutputPlugin
+from build_sdm.base_output import OutputPlugin
 
 # STEP 1: Define GLOBAL plugin configuration schema
 # This class validates the [plugin] TOML config defined in `configs/`.

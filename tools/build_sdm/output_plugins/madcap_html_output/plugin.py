@@ -15,10 +15,10 @@ from pathlib import Path
 from pydantic import BaseModel, ValidationError
 from typing import Optional, Dict, List
 
-from base_output import OutputPlugin
-from gim_schema.sub_fields import SubFieldRow, expand_sub_fields
-from utils.file import write_file
-from utils.sanitize import check_string, sanitize_string
+from build_sdm.base_output import OutputPlugin
+from build_sdm.gim_schema.sub_fields import SubFieldRow, expand_sub_fields
+from build_sdm.utils.file import write_file
+from build_sdm.utils.sanitize import check_string, sanitize_string
 
 from .markdown_ext import InlineCodeClassExtension
 from .models import (
