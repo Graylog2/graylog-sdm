@@ -1,6 +1,6 @@
 # SDM Migration — PR 2 of 5: Package, rename, path decoupling, optional MadCap output path
 
-Status: active
+Status: done
 Tracking: (PR link)
 
 Overview: `docs/plans/sdm-migration/README.md`. Depends on PR 1 (`01-import.md`). Next: `03-lint.md`.

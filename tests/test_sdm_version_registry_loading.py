@@ -24,9 +24,7 @@ def test_sdm_version_registry_loads_from_isolated_config_file(tmp_path: Path) ->
     gim_dir = tmp_path / "_meta" / "gim"
     gim_dir.mkdir(parents=True)
     (gim_dir / "sdm_version.config.toml").write_text(
-        'type = "config"\n\n'
-        '[sdm_version]\n'
-        'current_version = "7.1.0"\n'
+        'type = "config"\n\n[sdm_version]\ncurrent_version = "7.1.0"\n'
     )
 
     gim_config = load_gim_config_files(gim_dir, merge=False)

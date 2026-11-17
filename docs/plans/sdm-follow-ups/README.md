@@ -29,6 +29,7 @@ Not covered here:
 | F13 | Fix the field-schema index stylesheet path | Low | After migration | No |
 | F14 | Replace non-ASCII characters in SDM meta text | Low | After PR 3 | No |
 | F15 | Review `system_time` required `user_name` | Medium | After migration | Yes: field classification |
+| F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | After migration | Yes: key format |
 
 ---
 
@@ -124,6 +125,8 @@ Not covered here:
 
 **Decision needed:** the target date or release for v2.
 
+**Status:** the first activity is done (2026-11-17): `pydantic>=1.10,<2` resolves to 1.10.26 on Python 3.13.2, and the test suite passes with `-W error::DeprecationWarning` (on the imported tool before PR 2, and on `build_sdm` in PR 2). Still open: the v2 issue and its date.
+
 ## F8. Semantic validation rules
 
 **Problem:** the PR 3 rules check naming and references. They miss semantic errors that would produce wrong data downstream.
@@ -208,3 +211,21 @@ Not covered here:
 - If `user_name` is not reliably present, move it to recommended.
 
 **Decision needed:** keep `user_name` required, or move it to recommended. The SDM owners decide; record the change classification (relaxing a requirement) and whether it needs an `sdm_version` bump.
+
+## F16. Per-entity MadCap config is keyed by module path
+
+**Problem:** `MadcapHtmlOutput` reads per-entity config from `meta.plugin_config.<key>`, where `<key>` is its full module path (`build_sdm.output_plugins.madcap_html_output.plugin.MadcapHtmlOutput`). The data uses the short key `MadcapHtmlOutput`, so it never matches:
+- `src/sdm/schema/alert.toml` has an active `[alert.meta.plugin_config.MadcapHtmlOutput]` block with `field_column_order`. The plugin ignores it, so the alert entity page uses the default column order. This was already the case in Illuminate.
+- 21 other files carry commented-out examples with the short key; `12.network.toml` has one with the old `output_plugins.` module path.
+
+Keying data by a Python module path also couples the SDM source to the tool's package layout: the PR 2 rename changed the key.
+
+Found while implementing PR 2.
+
+**Activity:**
+- Decide the key format. The short class name (`MadcapHtmlOutput`) matches the data and survives refactors.
+- Make the plugin read that key (optionally also the module path, with a warning, for a transition).
+- Regenerate `generated/`; the alert entity page changes column order. Update the commented examples to the chosen key.
+- Add a rule in `build-sdm validate` that flags `plugin_config` keys no plugin recognizes.
+
+**Decision needed:** the key format.

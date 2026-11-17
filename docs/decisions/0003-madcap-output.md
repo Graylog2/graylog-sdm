@@ -8,8 +8,8 @@ The MadCap HTML generated from the SDM feeds a MadCap Flare project in a separat
 
 ## Decision
 - MadCap HTML is committed to `generated/MadcapHtmlOutput/`.
-- The MadCap output plugin accepts an optional output path. When set, it replaces the default location (it does not add a second copy). Precedence: CLI flag > config key > default.
-- CI checks on every PR that the committed output is up to date. CI does not auto-commit; the contributor runs `build-sdm build` and commits the result.
+- The MadCap output plugin accepts an optional output path. When set, it replaces the default location (it does not add a second copy). Precedence: CLI flag (`build --madcap-output-dir`, relative to the current directory) > config key (`output_dir` in `configs/madcap_html_output.toml`, relative to the repo root) > default (`build/sdm_artifacts/MadcapHtmlOutput/`).
+- CI checks on every PR that the committed output is up to date (`build-sdm check-generated`). The check compares both ways: changed, stale (no longer built) and missing files all fail, because the build never deletes files. CI does not auto-commit; the contributor runs `build-sdm build` and commits the result.
 - How output is delivered to Flare is out of scope.
 
 ## Consequences
