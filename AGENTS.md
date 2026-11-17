@@ -48,11 +48,13 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 
 ## Commands
 
-- Build: `uv run build-sdm build` (available after PR 2)
-- Check generated output is fresh: `uv run build-sdm check-generated` (available after PR 2)
+- Set up: `uv sync`
+- Build: `uv run build-sdm build`. Writes `generated/MadcapHtmlOutput/` (committed) and `build/sdm_artifacts/<Plugin>/` (gitignored).
+- Check generated output is fresh: `uv run build-sdm check-generated`. If it reports stale files, run `rm -rf generated/MadcapHtmlOutput && uv run build-sdm build`.
+- Tests: `uv run pytest`. If a change alters plugin output on purpose, refresh the snapshots with `uv run pytest tests/test_golden_outputs.py --update-golden` and commit `tests/golden/` with the change.
+- Lint and types: `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`
 - Validate SDM data: `uv run build-sdm validate --base-ref origin/main` (available after PR 3)
 - Format TOML: `uv run taplo fmt` (available after PR 3)
-- Tests: `uv run pytest` (available after PR 2)
 
 Before claiming work is done, run the commands above that are available and confirm they pass.
 
