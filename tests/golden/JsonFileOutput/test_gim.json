@@ -7,11 +7,24 @@
         "keyword/lowercase",
         "integer",
         "long",
+        "short",
         "byte",
-        "boolean",
+        "double",
+        "float",
+        "half_float",
+        "scaled_float",
         "date",
+        "boolean",
+        "binary",
+        "integer_range",
+        "float_range",
+        "long_range",
+        "double_range",
+        "date_range",
         "ip",
-        "double"
+        "object",
+        "nested",
+        "alias"
       ],
       "documentation": {
         "sections": [

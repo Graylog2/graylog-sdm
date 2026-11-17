@@ -79,3 +79,21 @@ def test_load_rejects_type_not_in_config(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match='alert.count: "long"'):
         _load_and_transform_gim_config(tmp_path, {"global": {"sdm_source_dir": "src/sdm"}})
+
+
+PREVIOUSLY_ACCEPTED_TYPES = {
+    "text", "keyword", "keyword/lowercase", "integer", "long", "short",
+    "byte", "double", "float", "half_float", "scaled_float", "date",
+    "boolean", "binary", "integer_range", "float_range", "long_range",
+    "double_range", "date_range", "ip", "object", "nested", "alias",
+}  # fmt: skip
+
+
+def test_allowlist_keeps_every_previously_accepted_type(repo_root: Path) -> None:
+    """The configured allowlist is the set the tool hard-coded, so nothing that built before is rejected.
+
+    Narrowing it is a deliberate SDM change policy decision (follow-up F17); update this test then.
+    """
+    result = _load_and_transform_gim_config(repo_root, {"global": {"sdm_source_dir": "src/sdm"}})
+
+    assert set(result["config"]["field_schema_config"]["allowed_field_types"]) == PREVIOUSLY_ACCEPTED_TYPES

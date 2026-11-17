@@ -2,8 +2,14 @@ type = "config"
 
 [field_schema_config]
 
+# OpenSearch and Graylog-specific field mapping types a schema field may use. This is the
+# set build_gim accepted (hard-coded) before the list moved here; narrowing it is an SDM
+# change policy decision (see docs/plans/sdm-follow-ups/README.md, F17).
 allowed_field_types = [
-    "text", "keyword", "keyword/lowercase", "integer", "long", "byte", "boolean", "date", "ip", "double"
+    "text", "keyword", "keyword/lowercase", "integer", "long", "short",
+    "byte", "double", "float", "half_float", "scaled_float", "date",
+    "boolean", "binary", "integer_range", "float_range", "long_range",
+    "double_range", "date_range", "ip", "object", "nested", "alias"
 ]
 
 [field_schema_config.documentation]

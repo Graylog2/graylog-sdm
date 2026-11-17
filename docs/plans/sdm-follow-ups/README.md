@@ -30,6 +30,7 @@ Not covered here:
 | F14 | Replace non-ASCII characters in SDM meta text | Low | After PR 3 | No |
 | F15 | Review `system_time` required `user_name` | Medium | After migration | Yes: field classification |
 | F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | After migration | Yes: key format |
+| F17 | Decide whether to narrow `allowed_field_types` | Low | After migration | Yes: SDM change policy |
 
 ---
 
@@ -229,3 +230,16 @@ Found while implementing PR 2.
 - Add a rule in `build-sdm validate` that flags `plugin_config` keys no plugin recognizes.
 
 **Decision needed:** the key format.
+
+## F17. Decide whether to narrow `allowed_field_types`
+
+**Problem:** PR 2 moved field-type validation from a hard-coded set in the tool to `allowed_field_types` in `src/sdm/config/field_schema.config.toml`. To keep the rule unchanged, the config list holds all 23 types the tool accepted before (several OpenSearch types such as `half_float`, `*_range`, `object`, `nested` and `alias`). Before PR 2 the config list had 7 types, but nothing enforced them. The data uses 9 types: `text`, `keyword`, `keyword/lowercase`, `integer`, `long`, `byte`, `boolean`, `date`, `ip`.
+
+Narrowing the list rejects definitions that build today. The PR 2 Copilot review (PR #4) raised this. It needs a deliberate decision, not a side effect of the migration.
+
+**Activity:**
+- Decide which types the SDM should allow, e.g. only those Graylog's index mappings support for normalized fields.
+- Classify the change under the SDM change policy (it restricts authors, not consumers) and decide whether it needs an `sdm_version` bump.
+- Update the list and `tests/test_field_types.py::test_allowlist_keeps_every_previously_accepted_type`.
+
+**Decision needed:** the allowed set, and its change classification.
