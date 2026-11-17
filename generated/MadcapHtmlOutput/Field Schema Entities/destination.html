@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd">
+    <head>
+        <title>Destination Fields</title>
+    </head>
+    <body>
+        <h1>Destination Fields</h1>
+        <h2>Overview</h2>
+        <p>The <code class="linecode">destination</code> fields describe the target system, device, or endpoint involved in a network transaction, system interaction, or event correlation. These fields represent the entity that receives, hosts, or processes the action initiated by a source within telemetry data.</p>
+        <h2>Design and Usage</h2>
+        <p><code class="linecode">destination</code> represents the endpoint context of an event and is used to capture identifying, network, and system-level attributes of the target environment. It provides a normalized view of where data, connections, or operations are directed — whether to a physical host, virtual machine, cloud service, or logical network zone. These fields are typically modeled symmetrically with the <code class="linecode">source</code> entity to describe bidirectional communication or relational event structures.</p>
+        <h2>Common Use Cases</h2>
+        <ul>
+            <li>Identifying the target host, application, or service involved in a network or system event.</li>
+            <li>Associating traffic or actions with specific regions, zones, or virtual systems.</li>
+            <li>Analyzing directional flow in network telemetry (for example, from <code class="linecode">source</code> to <code class="linecode">destination</code>).</li>
+            <li>Correlating activity across multi-tenant or segmented environments by destination IP, hostname, or virtual context.</li>
+        </ul>
+        <h2>Implementation Notes</h2>
+        <p>As a top-level entity, <code class="linecode">destination</code> defines a coherent object representing the receiving endpoint of a communication or operation.  It should be modeled independently of vendor-specific naming conventions and supports hierarchical mappings, including NAT, virtual system, and region metadata. <code class="linecode">destination</code> fields commonly appear in conjunction with <code class="linecode">source</code> to provide complete directional context for events within normalized telemetry schemas.  If a <code class="linecode">source</code> is implied but not explicitly defined, corresponding <code class="linecode">source</code> fields should be included to clarify event semantics and ensure consistent bidirectional modeling.</p>
+        <table cellspacing="21" style="width: 100%; mc-table-style: url('../../Resources/TableStyles/Alternate-Row-Color.css');" class="TableStyle-Alternate-Row-Color">
+        <colgroup>
+            <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+            <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+            <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+            <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+        </colgroup>
+        <thead>
+            <tr class="TableStyle-Alternate-Row-Color-Head-Header1">
+                <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field</th>
+                <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field_type</th>
+                <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">description</th>
+                <th class="TableStyle-Alternate-Row-Color-HeadD-Column1-Header1">example_values</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_application_name</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Name of the application that is the target of the action defined in an event.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>facebook, twitter</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_bytes_sent</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>long</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Network bytes sent by destination to the source. Some sources may present this as source bytes received, bytes received, or similar.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>204235</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_category</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>The category assigned to the destination device.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"></td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_device_model</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Name of device model.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>iPad</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_device_vendor</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Device vendor name.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>Apple, ASUS</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_domain</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Domain name associated with the destination system, such as a hostname, fully qualified domain name, or other host naming value. May originate from the original event or be added through enrichment.</p>
+    <p>When Illuminate is installed, this field is processed by the core domain enrichment pipeline: the value is normalized (ASCII-lowercased, with any trailing dot stripped, and punycode labels decoded to Unicode) before destination_registered_domain, destination_subdomain, and destination_top_level_domain are derived from it.</p>
+    <p>Some event sources instead populate this field with an authentication domain context, such as a Windows or Kerberos domain (for example, "corp.local"). In that case the value is not a DNS domain and the derived subfields do not apply.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>www.example.com, mail.corp.local</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_hostname</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword/lowercase</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Hostname of the destination device/system.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>corpdc01, vplaptop10</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_id</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Identifying value for the destination such as a serial number</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>09VX93DD</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_ip</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>ip</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>IPv4 or IPv6 address of the destination device.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>10.1.2.3, fe80:5cc3:11:4::2c</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_location_name</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Field is derived either from an internal enterprise network definition or the Geo location fields if available.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>Chicago, US, Datacenter 01, Bismark - Finance</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_mac</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>MAC address of the destination device.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>a0:b4:44:01:a9:d1</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_nat_ip</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>ip</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>translated IP address assigned by a network device performing the NAT function.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>10.1.2.3, fe80:5cc3:11:4::2c</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_nat_port</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>integer</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Translated network port assigned by a network device performing the NAT function.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>80, 443, 3389</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_os_name</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Operating system type name of the destination device.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>IOS, Android</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_os_version</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Operating system version number of the destination device.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>10.0, 22.04</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_packets_sent</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>long</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Number of packets delivered to the destination endpoint from the source endpoint.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>230929</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_port</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>integer</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Network service port, represented as a value between 0 and 65535.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>45392</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_port_iana_name</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>The IANA-registered service name associated with the network application. Illuminate Core will use this value to define destination_port in events that have destination_ip defined, if destination_port is not already defined</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>ssh, ftp</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_priority</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Text value representing the priority of the destination device.
+    This will be added to all messages processed by Illuminate Core if destination_priority_level is defined and this value does not exist.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>critical, high, medium, low, informational</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_priority_level</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>byte</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Numeric value representing the priority of the destination device, 1 = informational, 2 = low, 3 = medium, 4 = high, 5 = critical.
+    This will be added to all messages processed by Illuminate Core if destination_priority is defined and this value does not exist.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>4</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_reference</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword/lowercase</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>This is a derived field, added by Illuminate Core, that is selected from a list of fields, in order: destination_ip, destination_hostname, destination_vm_name, destination_mac. This can be defined in a parsing pack if a different order, or different fields, are preferred. It is defined to provide a field that can be used in aggregations as a single identifier that should be defined when aggregating over different event log types.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>IPv4, IPv6, corpdc01, corpdc01.east.local</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_region</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Name of region source device is located in</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>us-east-1</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_registered_domain</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Highest registered domain of destination_domain, stripped of any subdomain, determined using the public suffix list. For example, the registered domain of "mail.example.com" is "example.com". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>example.com</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_subdomain</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Subdomain portion of destination_domain, containing all labels below destination_registered_domain, with no trailing period. For example, the subdomain of "mail.corp.example.com" is "mail.corp". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>mail</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_top_level_domain</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Effective top-level domain (eTLD), also known as the domain suffix, of destination_domain, determined using the public suffix list. For example, the top-level domain of "example.co.uk" is "co.uk". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently.</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>com</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_type</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Destination device information such as model number</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"></td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_vm_name</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Virtual system name (not to be confused with the hostname)</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>vsys01</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_vsys_uuid</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Destination virtual system UUID</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>1f5398c7-4d84-4499-84ee-d5e9246c52f8</p>
+    </td>
+            </tr>
+            <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>destination_zone</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>keyword</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>Network zone for the destination</p>
+    </td>
+                <td class="TableStyle-Alternate-Row-Color-BodyA-Column1-Body1"><p>internal</p>
+    </td>
+            </tr>
+        </tbody>
+    </table>
+        <h2>Sub-fields</h2>
+        <p>Fields composed from <a href="as.html">as</a>:</p>
+        <MadCap:dropDown>
+        <MadCap:dropDownHead>
+            <MadCap:dropDownHotspot>as <span style="font-size: 8pt;">▼</span></MadCap:dropDownHotspot>
+        </MadCap:dropDownHead>
+        <MadCap:dropDownBody>
+            <table cellspacing="21" style="width: 100%; mc-table-style: url('../../Resources/TableStyles/Alternate-Row-Color.css');" class="TableStyle-Alternate-Row-Color">
+                <colgroup>
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                </colgroup>
+                <thead>
+                    <tr class="TableStyle-Alternate-Row-Color-Head-Header1">
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field_type</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">description</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadD-Column1-Header1">example_values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_as_domain</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Domain associated with the IP address resolved to this autonomous system.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"></td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_as_isp</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Internet service provider associated with the IP address resolved to this autonomous system.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"></td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_as_number</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Autonomous System Number (ASN) uniquely identifying the network on the internet.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>15169</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body2"><p>destination_as_organization</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body2"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body2"><p>Organization name registered to the autonomous system.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyA-Column1-Body2"><p>Graylog</p>
+            </td>
+                    </tr>
+                </tbody>
+            </table>
+        </MadCap:dropDownBody>
+    </MadCap:dropDown>
+        <p>Fields composed from <a href="geo.html">geo</a>:</p>
+        <MadCap:dropDown>
+        <MadCap:dropDownHead>
+            <MadCap:dropDownHotspot>geo <span style="font-size: 8pt;">▼</span></MadCap:dropDownHotspot>
+        </MadCap:dropDownHead>
+        <MadCap:dropDownBody>
+            <table cellspacing="21" style="width: 100%; mc-table-style: url('../../Resources/TableStyles/Alternate-Row-Color.css');" class="TableStyle-Alternate-Row-Color">
+                <colgroup>
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                    <col class="TableStyle-Alternate-Row-Color-Column-Column1" />
+                </colgroup>
+                <thead>
+                    <tr class="TableStyle-Alternate-Row-Color-Head-Header1">
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">field_type</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadE-Column1-Header1">description</th>
+                        <th class="TableStyle-Alternate-Row-Color-HeadD-Column1-Header1">example_values</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_geo_city</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>City name associated with the resolved geolocation.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>Hamburg, Houston</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_geo_continent</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Continent name associated with the resolved geolocation.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>America</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_geo_coordinates</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>Latitude and longitude of the resolved geolocation, expressed as a comma-separated decimal coordinate pair.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>34.1186,-118.3004</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_geo_country</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Full country name associated with the resolved geolocation.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>USA, Canada</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>destination_geo_country_iso</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body1"><p>ISO 3166-1 alpha-2 country code associated with the resolved geolocation.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body1"><p>US, DE, CA</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body2">
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>destination_geo_name</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyE-Column1-Body2"><p>Human-readable location label associated with the resolved geolocation. May be derived by combining other geo field values.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyD-Column1-Body2"><p>Hamburg, DE</p>
+            </td>
+                    </tr>
+                    <tr class="TableStyle-Alternate-Row-Color-Body-Body1">
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>destination_geo_state</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>keyword</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyB-Column1-Body1"><p>State, province, or equivalent administrative subdivision associated with the resolved geolocation.</p>
+            </td>
+                        <td class="TableStyle-Alternate-Row-Color-BodyA-Column1-Body1"><p>Hamburg</p>
+            </td>
+                    </tr>
+                </tbody>
+            </table>
+        </MadCap:dropDownBody>
+    </MadCap:dropDown>
+    </body>
+</html>
