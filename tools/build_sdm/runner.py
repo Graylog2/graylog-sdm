@@ -110,12 +110,17 @@ def _load_and_transform_gim_config(
 
     Raises:
         NotADirectoryError: If the resolved GIM source directory doesn't exist.
-        ValueError: If any GIM TOML file fails validation, a sub-field
+        ValueError: If sdm_source_dir is an absolute path, any GIM TOML file fails validation, a sub-field
             entity's applies_to references an entity that isn't a known "top"
             entity, or a field's field_type isn't in
             config.field_schema_config.allowed_field_types.
     '''
     source_dir_setting = Path(script_config['global'].get('sdm_source_dir') or 'src/sdm')
+    if source_dir_setting.is_absolute():
+        # The setting is recorded in the output, which must not depend on the checkout location.
+        raise ValueError(
+            f'sdm_source_dir must be relative to the repository root, got absolute path: {source_dir_setting}'
+        )
     gim_dir = repo_dir / source_dir_setting
 
     if not gim_dir.is_dir():

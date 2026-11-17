@@ -49,7 +49,7 @@ Other commands:
 
 ## Configuration
 
-- **`configs/build_sdm.toml`** — global settings: `sdm_source_dir` (where `src/sdm/` lives) and `output_dir` (where generated artifacts are written), both resolved relative to the repository root.
+- **`configs/build_sdm.toml`** — global settings: `sdm_source_dir` (where `src/sdm/` lives; must be a relative path, because it is recorded in the output) and `output_dir` (where generated artifacts are written), both resolved relative to the repository root.
 - **`configs/plugin.config.madcap.toml`** — MadCap presentation config (`type = "config_output_plugin"`), kept here rather than with the SDM data (ADR 0001). Files of this type in the config directory are loaded alongside the source data.
 - **`configs/<plugin_name>.toml`** — one file per output plugin, each with a `[plugin]` table (`name`, `enabled`, plus that plugin's own options). Set `enabled = 0`/`1` to toggle a plugin without touching code. A plugin with no config file falls back to its `enabled_by_default` class attribute.
 
