@@ -102,9 +102,10 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         self,
         raw_config: Optional[Dict],
         category: str
-    ) -> Optional[MadcapHtmlOutputPluginConfig]:
+    ) -> MadcapHtmlOutputPluginConfig:
         '''
-        Validate the plugin configuration for a specific category or entity. Log and skip on validation failure.
+        Validate the plugin configuration for a specific category or entity. Log and re-raise
+        on validation failure (plugin failures are fatal).
         '''
         try:
             return MadcapHtmlOutputPluginConfig(**raw_config or {})
@@ -113,7 +114,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 'Validation failed for plugin config in category/entity [%s]: %s',
                 category, e.errors()
             )
-            return None
+            raise
 
     def _initialize_jinja_environment(self, template_dir: Path | None = None) -> None:
         '''
@@ -142,21 +143,22 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
 
         self._env = env
 
-    def _load_template(self, template_name: str, category: str) -> Optional[Template]:
+    def _load_template(self, template_name: str, category: str) -> Template:
         '''
-        Load and return the Jinja2 template for a given category. Log and return None on failure.
+        Load and return the Jinja2 template for a given category. Log and re-raise on failure
+        (plugin failures are fatal).
         '''
         try:
             template = self._env.get_template(template_name)
         except TemplateNotFound:
             self.logger.error('Template not found [%s] for category [%s]', template_name, category)
-            return None
+            raise
         except TemplateSyntaxError as e:
             self.logger.error('Syntax error in [%s] line %s: %s', template_name, e.lineno, e.message)
-            return None
+            raise
         except TemplateError as e:
             self.logger.error('Template error while loading [%s]: %s', template_name, e)
-            return None
+            raise
         else:
             self.logger.debug('Using HTML template [%s] for category [%s]', template_name, category)
             return template
@@ -168,10 +170,11 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         category_data: Dict,
         config: Dict,
         extra_context: Optional[Dict] = None
-    ) -> Optional[str]:
+    ) -> str:
         '''
         Render the provided Jinja2 template using context variables.
         Additional variables may be injected via `extra_context`.
+        Log and re-raise on failure (plugin failures are fatal).
         '''
         try:
             context = {
@@ -189,7 +192,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 'Failed to render template for entry type [%s]: %s',
                 category, e
             )
-            return None
+            raise
 
     def _indent_list_items(self, html: str, indent_width: int = 4) -> str:
         '''
@@ -316,9 +319,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 continue
 
             template = self._load_template(template_name, section)
-            if not template:
-                self.logger.warning('Unable to load teplate for section %s, skipping', section)
-                continue
 
             self.logger.debug('Top-level page template loaded for section %s', section)
             section_data = gim_config.get(section, {})
@@ -339,9 +339,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                     'section_cfg': section_cfg
                 }
             )
-
-            if html is None:
-                continue
 
             postprocessor = DocumentPostprocessor()
 
@@ -368,7 +365,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 write_file(output_file, postprocessor.clean(html))
             except OSError as e:
                 self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-                continue
+                raise
 
     def _generate_category_pages(
         self,
@@ -409,22 +406,9 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             self.logger.debug('Generatin page for GIM category [%s]', category)
 
             validated_config = self._validate_category_plugin_config(raw_config, category)
-            if not validated_config:
-                self.logger.warning(
-                    'Invalid config detected for GIM category[%s], skipping',
-                    category
-                )
-                continue
-
             self.logger.debug('Valid config loaded for GIM category [%s]', category)
 
             template = self._load_template(validated_config.category_template_filename, category)
-            if not template:
-                self.logger.warning(
-                    'Unable to load template for GIM category [%s], skipping',
-                    category
-                )
-                continue
 
             # Build the columns that wil be used by the Jinja template to generate
             # subcategory tables for documentation.
@@ -438,8 +422,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             category_data = self._build_category_data_with_columns(category_data, subcat_rows)
 
             html = self._render_template(template, category, category_data, gim_config.get('config', {}))
-            if html is None:
-                continue
 
             output_file = gim_output_dir / f'{category}.html'
 
@@ -449,7 +431,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 write_file(output_file, postprocessor.clean(html))
             except OSError as e:
                 self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-                continue
+                raise
 
     def _merge_field_lists(self, category: dict, subcat_code: dict) -> dict[str, list[str]]:
         '''
@@ -608,13 +590,9 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             )
 
             validated_config = self._validate_category_plugin_config(raw_config, entity_name)
-            if not validated_config:
-                continue
 
             template_name = validated_config.entity_template_filename
             template = self._load_template(template_name, entity_name)
-            if not template:
-                continue
 
             column_order = (
                 validated_config.field_column_order or
@@ -664,8 +642,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                     'subfield_column_order': subfield_column_keys
                 }
             )
-            if html is None:
-                continue
 
             output_file = schema_output_dir / f'{entity_name}.html'
 
@@ -680,7 +656,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                     output_file,
                     e
                 )
-                continue
+                raise
 
             self.logger.debug('Wrote field schema entity [%s] page [%s]', entity_name, output_file)
 
@@ -729,12 +705,14 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         schema_entity_lines = []
         for line in fields:
             if not isinstance(line, dict):
-                self.logger.warning('Skipping invalid schema line in [%s]: not a dict: %s', entity_name, line)
-                continue
+                error_msg = f'Invalid schema line in [{entity_name}]: not a dict: {line}'
+                self.logger.error(error_msg)
+                raise ValueError(error_msg)
 
             if not line.get('field_suffix'):
-                self.logger.warning('Skipping schema line in [%s]: missing field_suffix: %s', entity_name, line)
-                continue
+                error_msg = f'Invalid schema line in [{entity_name}]: missing field_suffix: {line}'
+                self.logger.error(error_msg)
+                raise ValueError(error_msg)
 
             if entity_type == 'reserved':
                 field_name = line['field_suffix']

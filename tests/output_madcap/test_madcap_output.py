@@ -1,5 +1,6 @@
 import logging
 
+import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
@@ -57,7 +58,7 @@ def test_generate_real_world(tmp_path: Path):
 def test_generate_template_not_found(caplog):
     '''
     Simulate a generate() run where the template file is missing.
-    Ensures graceful failure and no output written.
+    Ensures the failure is logged and raised (plugin failures are fatal), and no output is written.
     '''
     plugin = MadcapHtmlOutput()
     plugin.logger.setLevel(logging.ERROR)
@@ -88,7 +89,8 @@ def test_generate_template_not_found(caplog):
                           side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
                               plugin, template_dir=template_dir
                           )):
-            plugin.generate(gim_config=gim_config, output_dir=output_dir, plugin_config=plugin_config)
+            with pytest.raises(RuntimeError, match='Failed during GIM category page generation'):
+                plugin.generate(gim_config=gim_config, output_dir=output_dir, plugin_config=plugin_config)
 
         expected_error = f'Template not found [missing_template.j2] for category [network]'
 

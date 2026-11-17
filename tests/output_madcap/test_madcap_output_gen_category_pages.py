@@ -1,6 +1,7 @@
 import pytest
 
 from jinja2 import TemplateNotFound
+from pydantic import ValidationError
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 from copy import deepcopy
@@ -121,24 +122,31 @@ def test_generate_category_pages_success(
 # FAILURE AND EDGE CASES
 # ----------------------------------------------------------------------
 
-def test_generate_category_pages_invalid_config_skips(
+def _written_pages(output_dir: Path) -> list[Path]:
+    '''Return the HTML pages written under output_dir.'''
+    return sorted(output_dir.rglob('*.html'))
+
+
+def test_generate_category_pages_invalid_config_raises(
     tmp_path: Path,
     mock_plugin: MadcapHtmlOutput,
     gim_config: callable
 ) -> None:
     '''
-    Should skip a category if plugin config is invalid (e.g., bad type).
+    Should raise, without writing pages, if a category's plugin config is invalid (e.g., bad type).
+    Plugin failures are fatal.
     '''
+    del mock_plugin._validate_category_plugin_config  # use the real validator
     cfg = gim_config()
     cfg['gim']['network']['meta']['plugin_config']['build_sdm.output_plugins.madcap_html_output.plugin.MadcapHtmlOutput'][
         'category_template_filename'
     ] = 123  # invalid type
 
-    mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, tmp_path)
+    with pytest.raises(ValidationError):
+        mock_plugin._generate_category_pages(cfg, tmp_path)
 
     mock_plugin._env.get_template.assert_not_called()
-    mock_plugin._write_output_file.assert_not_called()
+    assert _written_pages(tmp_path) == []
 
 
 def test_generate_category_pages_template_load_fails(
@@ -147,15 +155,16 @@ def test_generate_category_pages_template_load_fails(
     gim_config: callable
 ) -> None:
     '''
-    Should skip a category if template fails to load.
+    Should raise, without writing pages, if a category's template fails to load.
     '''
+    del mock_plugin._load_template  # use the real loader against the mocked environment
     cfg = gim_config()
     mock_plugin._env.get_template.side_effect = TemplateNotFound('missing_template.j2')
 
-    mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, tmp_path)
+    with pytest.raises(TemplateNotFound):
+        mock_plugin._generate_category_pages(cfg, tmp_path)
 
-    mock_plugin._write_output_file.assert_not_called()
+    assert _written_pages(tmp_path) == []
 
 
 def test_generate_category_pages_render_fails(
@@ -164,18 +173,20 @@ def test_generate_category_pages_render_fails(
     gim_config: callable
 ) -> None:
     '''
-    Should skip category if template rendering raises an exception.
+    Should raise, without writing pages, if template rendering raises an exception.
     '''
+    del mock_plugin._load_template
+    del mock_plugin._render_template  # use the real loader and renderer
     mock_template = MagicMock()
     mock_template.render.side_effect = Exception('Render error')
     mock_plugin._env.get_template.return_value = mock_template
 
     cfg = gim_config()
 
-    mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, tmp_path)
+    with pytest.raises(Exception, match='Render error'):
+        mock_plugin._generate_category_pages(cfg, tmp_path)
 
-    mock_plugin._write_output_file.assert_not_called()
+    assert _written_pages(tmp_path) == []
 
 
 def test_generate_category_pages_output_dir_creation_fails(
@@ -204,7 +215,7 @@ def test_generate_category_pages_handles_write_errors(
     monkeypatch: pytest.MonkeyPatch
 ) -> None:
     '''
-    Should log an error and continue if write_file raises OSError.
+    Should log an error and re-raise if write_file raises OSError (plugin failures are fatal).
     '''
     cfg = gim_config()
 
@@ -213,5 +224,6 @@ def test_generate_category_pages_handles_write_errors(
 
     monkeypatch.setattr('build_sdm.output_plugins.madcap_html_output.plugin.write_file', exploding_write_file)
 
-    mock_plugin._generate_category_pages(cfg, tmp_path)
+    with pytest.raises(OSError, match='Disk full'):
+        mock_plugin._generate_category_pages(cfg, tmp_path)
     mock_plugin.logger.error.assert_called()

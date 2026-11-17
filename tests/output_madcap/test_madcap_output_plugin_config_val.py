@@ -1,4 +1,7 @@
 import logging
+
+import pytest
+from pydantic import ValidationError
 from pathlib import Path
 from sys import path
 from build_sdm.output_plugins.madcap_html_output import (
@@ -48,14 +51,13 @@ def test_validate_category_plugin_config_coercion_behavior():
 
     This verifies that the schema now uses strict typing (StrictStr), and that
     values like integers are *not* coerced into strings. The plugin should log
-    an error and return None when invalid types are encountered.
+    an error and re-raise when invalid types are encountered (plugin failures are fatal).
     '''
     plugin = MadcapHtmlOutput()
     raw_config = {'category_template_filename': 123}
 
-    result = plugin._validate_category_plugin_config(raw_config, 'network')
-
-    assert result is None
+    with pytest.raises(ValidationError):
+        plugin._validate_category_plugin_config(raw_config, 'network')
 
 
 def test_gim_top_level_config_valid():

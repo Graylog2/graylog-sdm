@@ -1,4 +1,7 @@
 import logging
+
+import pytest
+from jinja2 import UndefinedError
 from jinja2 import Environment, DictLoader, Template
 from build_sdm.output_plugins.madcap_html_output import MadcapHtmlOutput
 
@@ -27,7 +30,7 @@ def test_render_template_success(caplog):
 
 def test_render_template_failure(caplog):
     '''
-    Verify that _render_template logs an error and returns None
+    Verify that _render_template logs an error and re-raises
     when rendering fails due to a template logic error (e.g. undefined variable).
     '''
     plugin = MadcapHtmlOutput()
@@ -42,7 +45,7 @@ def test_render_template_failure(caplog):
     category_data = {}
     config = {}
 
-    result = plugin._render_template(template, category, category_data, config)
+    with pytest.raises(UndefinedError):
+        plugin._render_template(template, category, category_data, config)
 
-    assert result is None
     assert f'Failed to render template for entry type [{category}]' in caplog.text

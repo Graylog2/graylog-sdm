@@ -244,5 +244,6 @@ class MessageSummariesOutput(OutputPlugin[MessageSummaryOutputConfig]):
             write_file(output_file, json.dumps(summary_data, indent=plugin_config.json_indent))
         except OSError as e:
             self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
+            raise
 
         self.logger.debug('Plugin processing completed.')

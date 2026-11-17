@@ -47,9 +47,10 @@ def test_build_schema_table_lines_basic(plugin):
     assert result == expected
 
 
-def test_missing_field_suffix_skipped(plugin, caplog):
+def test_missing_field_suffix_raises(plugin, caplog):
     """
-    Ensure entries without a field_suffix are skipped and a warning is logged.
+    Ensure an entry without a field_suffix raises and an error is logged
+    (plugin failures are fatal).
     """
     entity_name = 'threat'
     entity_data = [
@@ -67,26 +68,23 @@ def test_missing_field_suffix_skipped(plugin, caplog):
         }
     ]
 
-    caplog.set_level(logging.WARNING, logger=plugin.logger.name)
+    caplog.set_level(logging.ERROR, logger=plugin.logger.name)
 
-    result = plugin._build_schema_table_lines(entity_name, 'top', entity_data)
+    with pytest.raises(ValueError, match='missing field_suffix'):
+        plugin._build_schema_table_lines(entity_name, 'top', entity_data)
 
-    assert len(result) == 1
-    assert result[0]['field'] == 'threat_source'
-
-    warnings = [rec for rec in caplog.records if rec.levelname == 'WARNING']
-    assert any('missing field_suffix:' in rec.getMessage().lower() for rec in warnings)
+    errors = [rec for rec in caplog.records if rec.levelname == 'ERROR']
+    assert any('missing field_suffix:' in rec.getMessage().lower() for rec in errors)
 
 
-def test_unexpected_entry_shape_skipped(plugin, caplog):
+@pytest.mark.parametrize('bad_entry', ['this is not a dict', 123, None])
+def test_unexpected_entry_shape_raises(plugin, caplog, bad_entry):
     """
-    Ensure completely invalid or malformed entries don't crash the method.
+    Ensure a malformed (non-dict) entry raises instead of being silently dropped.
     """
     entity_name = 'asset'
     entity_data = [
-        'this is not a dict',
-        123,
-        None,
+        bad_entry,
         {
             'field_suffix': 'hostname',
             'field_type': 'keyword',
@@ -95,17 +93,13 @@ def test_unexpected_entry_shape_skipped(plugin, caplog):
         }
     ]
 
-    caplog.set_level(logging.WARNING, logger=plugin.logger.name)
+    caplog.set_level(logging.ERROR, logger=plugin.logger.name)
 
-    result = plugin._build_schema_table_lines(entity_name, 'top', entity_data)
+    with pytest.raises(ValueError, match='not a dict'):
+        plugin._build_schema_table_lines(entity_name, 'top', entity_data)
 
-    # Only the valid one should be returned
-    assert len(result) == 1
-    assert result[0]['field'] == 'asset_hostname'
-
-    # Ensure at least one warning was logged
-    warnings = [rec for rec in caplog.records if rec.levelname == 'WARNING']
-    assert any('Skipping invalid schema line ' in rec.getMessage() for rec in warnings)
+    errors = [rec for rec in caplog.records if rec.levelname == 'ERROR']
+    assert any('Invalid schema line ' in rec.getMessage() for rec in errors)
 
 
 def test_build_schema_table_lines_reserved_no_prefix(plugin):
