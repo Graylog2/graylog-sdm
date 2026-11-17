@@ -1,4 +1,6 @@
 import logging
+
+import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from build_sdm.output_plugins.sample_plaintext_output import (
@@ -63,7 +65,7 @@ def test_plugin_generate_without_config(tmp_path: Path):
 
 def test_plugin_generate_write_error(monkeypatch):
     '''
-    Simulate a file write failure and confirm the plugin handles the error.
+    Simulate a file write failure and confirm the plugin re-raises it (plugin failures are fatal).
     '''
     plugin = PlainTextOutput()
     plugin.logger.setLevel(logging.CRITICAL)
@@ -80,6 +82,6 @@ def test_plugin_generate_write_error(monkeypatch):
 
     with TemporaryDirectory() as tmp_dir:
         output_dir = MockPath()
-        plugin.generate(gim_config, output_dir, plugin_config)
-        # No assertion necessary — test will fail if an exception propagates
+        with pytest.raises(OSError, match='Simulated write failure'):
+            plugin.generate(gim_config, output_dir, plugin_config)
 

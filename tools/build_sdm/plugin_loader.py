@@ -13,7 +13,10 @@ logger = logging.getLogger(__name__)
 
 def safe_execute(method):
     '''
-    Decorator to safely execute a plugin method, catching and logging any unexpected errors.
+    Decorator that logs a plugin method's failure with the plugin name, then re-raises it.
+
+    Plugin failures are fatal (ADR 0002): the error propagates so the build exits non-zero
+    instead of finishing without the plugin's output.
     '''
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
@@ -22,11 +25,11 @@ def safe_execute(method):
             return method(*args, **kwargs)
         except Exception as e:
             logger.error(f'[{plugin_instance.__class__.__name__}] Plugin execution failed: {str(e)}')
-            logger.warning(f'[{plugin_instance.__class__.__name__}] Skipping this plugin due to runtime error.')
 
             if logger.isEnabledFor(logging.DEBUG):
                 tb = traceback.format_exc()
                 logger.debug(f'[{plugin_instance.__class__.__name__}] Full traceback:\n{tb}')
+            raise
 
     return wrapper
 
@@ -38,7 +41,7 @@ def load_plugins_with_config(plugin_config: dict, mode='default_only'):
     - Searches for subclasses of OutputPlugin in the output_plugins package.
     - Uses each plugin's `enabled_by_default` flag or config override.
     - Validates plugin-specific config using its declared `config_schema`, if provided.
-    - If validation fails for a plugin, logs the error and skips loading that plugin.
+    - If validation fails for an enabled plugin, logs the errors and raises (plugin failures are fatal).
 
     Args:
         plugin_configs: A dictionary mapping plugin names to their config snippets.
@@ -82,8 +85,7 @@ def load_plugins_with_config(plugin_config: dict, mode='default_only'):
                                     '[%s] Field [%s]: %s',
                                     plugin_name, field, error['msg']
                                     )
-                            logger.error('[%s] Skipping this plugin', plugin_name)
-                            continue
+                            raise
                     else:
                         logger.debug('[%s] has no config_schema defined', plugin_name)
                         validated_config = config

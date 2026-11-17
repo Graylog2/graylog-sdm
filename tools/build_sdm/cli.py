@@ -75,7 +75,12 @@ def _cmd_build(args: argparse.Namespace) -> int:
         logger.fatal("Config directory %s is not a directory or does not exist", config_dir)
         return 1
 
-    run_build(find_repo_root(), config_dir, dry_run=args.dry_run)
+    try:
+        run_build(find_repo_root(), config_dir, dry_run=args.dry_run)
+    except Exception:
+        # Plugin and loader failures are fatal (ADR 0002); report once at the boundary.
+        logger.critical("Build failed", exc_info=True)
+        return 1
     return 0
 
 

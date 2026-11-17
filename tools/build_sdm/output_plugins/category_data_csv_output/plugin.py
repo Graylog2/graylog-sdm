@@ -54,11 +54,9 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
             if cat_lines:
                 lookup_data.extend(cat_lines)
             else:
-                self.logger.error(
-                    'Unable to generate lookup data for category %s',
-                        category
-                        )
-                return
+                error_msg = f'Unable to generate lookup data for category {category}'
+                self.logger.error(error_msg)
+                raise RuntimeError(error_msg)
 
         lookup_data.sort()
 
@@ -66,6 +64,7 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
             write_file(output_file, '\n'.join(lookup_data))
         except OSError as e:
             self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
+            raise
 
         self.logger.info('Saved CSV to file %s', output_file)
         self.logger.debug('Plugin processing completed.')
