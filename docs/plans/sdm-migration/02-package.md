@@ -90,6 +90,12 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
    - path resolution: a relative CLI path resolves against the current working directory; a relative config path resolves against the repo root
    - when a path is set, write only there (replace); create the directory if missing
 9. Make failures fatal: `safe_execute` logs, then re-raises. `cli.main` catches the error and exits 1. Update the tests that asserted skip behavior.
+   - `safe_execute` alone is not enough: several paths log and carry on before an error can reach it (found in the PR 1 Copilot review, PR #3). Make each of these fail the build:
+     - `plugin_loader.py:86`: invalid config for an enabled plugin logs and `continue`s; raise instead
+     - write errors caught inside plugins and only logged: `category_data_csv_output/plugin.py:68`, `json_file_output/plugin.py:46`, `message_summaries_output/plugin.py:246`, `madcap_html_output/plugin.py:371,450,676`; re-raise after logging, or remove the handler
+     - `category_data_csv_output/plugin.py:~61`: logs and returns early when a category's lookup data can't be generated; raise instead
+   - Audit every remaining `except`, `continue` and early `return` under `output_plugins/` and `plugin_loader.py` for the same log-and-continue pattern. Line numbers are as imported in PR 1.
+   - Tests: a plugin whose write raises `OSError` makes `build` exit 1, and an enabled plugin with invalid config makes `build` exit 1.
 10. Fix `allowed_field_types`:
     - `field_schema_model.py` validates against the list in `src/sdm/config/field_schema.config.toml`
     - load that config before the schema files are validated, or pass it in via a validator context
@@ -127,6 +133,6 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
   6. Separately, note in the PR how the freshly built `category_data.csv` and `message_summaries.json` differ from the copies checked in to Illuminate (`illuminate/core/data/`, `illuminate/core/spotlight/`). That difference already exists and isn't caused by this PR. Record it in the Illuminate SDM-removal issue.
 - `uv run build-sdm build --madcap-output-dir "$TMPDIR/x"` writes only to `$TMPDIR/x`, and `generated/` is unchanged.
 - With the config `output_dir` set to another path and no flag, output goes to that path. With both set, the flag wins.
-- A test plugin that raises makes the CLI exit 1.
+- A test plugin that raises makes the CLI exit 1. So do a plugin write failure and an enabled plugin with invalid config.
 - `uv run build-sdm check-generated` exits 0 on a clean tree, and exits 1 after one generated file has been hand-edited.
 - `grep -rn "build_gim\|gim_artifacts\|_meta/gim" tools/ tests/ src/ pyproject.toml` returns no hits. This is the same scope as step 5; docs are excluded.
