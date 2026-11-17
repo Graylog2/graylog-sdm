@@ -6,8 +6,8 @@ from pathlib import Path
 from pydantic import BaseModel, root_validator, ValidationError
 from typing import Optional, List
 
-from base_output import OutputPlugin
-from utils.file import write_file
+from build_sdm.base_output import OutputPlugin
+from build_sdm.utils.file import write_file
 
 class IndicatorLevel(str, Enum):
     info = 'info'

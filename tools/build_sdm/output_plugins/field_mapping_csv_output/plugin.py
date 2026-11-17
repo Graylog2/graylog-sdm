@@ -10,9 +10,9 @@ from typing import Any, TypedDict
 
 from pydantic import BaseModel
 
-from base_output import OutputPlugin
-from gim_schema.sub_fields import expand_sub_fields
-from utils.file import write_file
+from build_sdm.base_output import OutputPlugin
+from build_sdm.gim_schema.sub_fields import expand_sub_fields
+from build_sdm.utils.file import write_file
 
 # Strictest first: lower rank means stricter, and is used both to sort CSV
 # rows (required rows before recommended/optional) and to detect a
