@@ -17,7 +17,7 @@ def test_run_build_success(monkeypatch):
     monkeypatch.setattr('build_sdm.runner._load_script_config', lambda path: called.setdefault('load_config', dummy_script_config))
     monkeypatch.setattr('build_sdm.runner._ensure_output_dir', lambda repo, config: called.setdefault('output_dir', Path('/fake/out')))
     monkeypatch.setattr('build_sdm.runner._load_and_transform_gim_config', lambda repo, config, config_dir=None: called.setdefault('gim_config', {'gim': {}, 'settings': {}}))
-    monkeypatch.setattr('build_sdm.runner._run_plugins', lambda cfg, gim, out, dry_run=False: called.setdefault('ran_plugins', dry_run))
+    monkeypatch.setattr('build_sdm.runner._run_plugins', lambda cfg, gim, out, dry_run=False, **_kwargs: called.setdefault('ran_plugins', dry_run))
 
     run_build(Path('/repo'), Path('/config'), dry_run=True)
 

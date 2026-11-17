@@ -7,9 +7,10 @@ from pathlib import Path
 from build_sdm.runner import run_build
 from build_sdm.utils.paths import find_repo_root
 
-__all__ = ["DEFAULT_CONFIG_DIR", "build_parser", "main"]
+__all__ = ["DEFAULT_CONFIG_DIR", "MADCAP_PLUGIN", "build_parser", "main"]
 
 DEFAULT_CONFIG_DIR = Path(__file__).resolve().parent / "configs"
+MADCAP_PLUGIN = "MadcapHtmlOutput"
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +46,14 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument(
         "--dry-run", action="store_true", help="Simulate output generation without writing files"
     )
+    build.add_argument(
+        "--madcap-output-dir",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Write the MadCap HTML only to PATH (relative paths resolve against the current "
+        "directory). Overrides the MadCap plugin's output_dir config.",
+    )
     return parser
 
 
@@ -75,8 +84,12 @@ def _cmd_build(args: argparse.Namespace) -> int:
         logger.fatal("Config directory %s is not a directory or does not exist", config_dir)
         return 1
 
+    overrides = {}
+    if args.madcap_output_dir is not None:
+        overrides[MADCAP_PLUGIN] = args.madcap_output_dir.resolve()
+
     try:
-        run_build(find_repo_root(), config_dir, dry_run=args.dry_run)
+        run_build(find_repo_root(), config_dir, dry_run=args.dry_run, output_dir_overrides=overrides)
     except Exception:
         # Plugin and loader failures are fatal (ADR 0002); report once at the boundary.
         logger.critical("Build failed", exc_info=True)

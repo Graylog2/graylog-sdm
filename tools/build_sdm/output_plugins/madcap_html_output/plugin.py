@@ -88,6 +88,21 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
 
         self.logger.debug('Plugin processing completed.')
 
+    def resolve_output_dir(
+        self,
+        default_dir: Path,
+        repo_dir: Path,
+        plugin_config: Optional[MadcapHtmlOutputConfig] = None
+    ) -> Path:
+        '''
+        Use the configured output_dir when set, resolving a relative path against the
+        repository root; otherwise the runner's default directory.
+        '''
+        if isinstance(plugin_config, MadcapHtmlOutputConfig) and plugin_config.output_dir:
+            configured = Path(plugin_config.output_dir)
+            return configured if configured.is_absolute() else repo_dir / configured
+        return default_dir
+
     def _resolve_plugin_config(self, config: Optional[MadcapHtmlOutputConfig]) -> MadcapHtmlOutputConfig:
         '''
         Resolve and return the top-level plugin configuration, using default values if not provided.

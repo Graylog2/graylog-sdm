@@ -18,6 +18,12 @@ class MadcapHtmlOutputConfig(BaseModel):
     MadcapHtmlOutputPluginConfig's field_column_order/subfield_column_order.
     '''
     enabled: bool = False
+    output_dir: Optional[str] = Field(
+        None,
+        description='Optional output directory for the HTML. Replaces the default '
+                    '<output_dir>/MadcapHtmlOutput/; a relative path resolves against the '
+                    'repository root. The build-sdm --madcap-output-dir flag overrides it.'
+    )
     default_field_columns: Optional[List[str]] = Field(
         default_factory=lambda: ['field_suffix', 'field_type', 'description', 'example_values'],
         description='Default column order for rendering field rows in entity templates'
