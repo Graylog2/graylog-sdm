@@ -3,28 +3,17 @@ from pydantic import BaseModel, conlist, Field, StrictStr, validator
 from typing import List, Literal, Dict, Optional, Any
 
 
-# Allowed OpenSearch and Graylog-specific field mapping types
-ALLOWED_FIELD_TYPES = {
-    'text', 'keyword', 'keyword/lowercase', 'integer', 'long', 'short',
-    'byte', 'double', 'float', 'half_float', 'scaled_float', 'date',
-    'boolean', 'binary', 'integer_range', 'float_range', 'long_range',
-    'double_range', 'date_range', 'ip', 'object', 'nested', 'alias'
-}
-
-
 class FieldSchemaField(BaseModel):
+    '''
+    One field of a field_schema entity. field_type is checked against
+    config.field_schema_config.allowed_field_types after all files are loaded
+    (gim_schema.field_types.validate_field_types), since that list lives in the
+    SDM source rather than in code.
+    '''
     field_suffix: StrictStr
     field_type: StrictStr
     description: StrictStr
     example_values: Optional[StrictStr] = None
-
-    @validator('field_type')
-    def validate_field_type(cls, v):
-        if v not in ALLOWED_FIELD_TYPES:
-            raise ValueError(
-                f'Invalid field_type: {v}. Must be one of {ALLOWED_FIELD_TYPES}'
-            )
-        return v
 
 class FieldSchemaEntity(BaseModel):
     '''

@@ -6,6 +6,9 @@
         "keyword",
         "keyword/lowercase",
         "integer",
+        "long",
+        "byte",
+        "boolean",
         "date",
         "ip",
         "double"

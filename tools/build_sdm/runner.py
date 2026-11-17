@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 
 from build_sdm.config_loader import load_gim_config_files, load_script_config_files
+from build_sdm.gim_schema.field_types import validate_field_types
 from build_sdm.gim_schema.sub_fields import validate_applies_to
 from build_sdm.plugin_loader import load_plugins_with_config
 from build_sdm.utils.serialization import to_serializable
@@ -109,9 +110,10 @@ def _load_and_transform_gim_config(
 
     Raises:
         NotADirectoryError: If the resolved GIM source directory doesn't exist.
-        ValueError: If any GIM TOML file fails validation, or a sub-field
+        ValueError: If any GIM TOML file fails validation, a sub-field
             entity's applies_to references an entity that isn't a known "top"
-            entity.
+            entity, or a field's field_type isn't in
+            config.field_schema_config.allowed_field_types.
     '''
     source_dir_setting = Path(script_config['global'].get('sdm_source_dir') or 'src/sdm')
     gim_dir = repo_dir / source_dir_setting
@@ -138,6 +140,7 @@ def _load_and_transform_gim_config(
     serialized = to_serializable(gim_config)
     restructured = restructure_gim_config(serialized)
     validate_applies_to(restructured.get('field_schema', {}))
+    validate_field_types(restructured)
     return restructured
 
 
