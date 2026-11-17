@@ -38,9 +38,10 @@ It is tied to the Illuminate layout in these places:
 ## Commit order (review commit by commit)
 This PR combines a pure refactor with behavior changes. To keep the parity check meaningful, structure the commits like this:
 
-1. **Refactor, no behavior change:** steps 2–7, 11a and 12 (packaging, imports, rename, repo-root discovery, config loading, a CLI with only the `build` subcommand, moving tests). Step 11a has to be in this commit because the `build-sdm` console script from step 2 points at `build_sdm.cli:main`. Without it, `uv run build-sdm build` can't run the parity check.
+1. **Refactor, no behavior change:** steps 2–7, 11a and 12a (packaging, imports, rename, repo-root discovery, config loading, a CLI with only the `build` subcommand, moving tests). Step 11a has to be in this commit because the `build-sdm` console script from step 2 points at `build_sdm.cli:main`. Without it, `uv run build-sdm build` can't run the parity check.
    - The parity check runs **at this commit**. Every plugin's output must be byte-identical to Illuminate's at the PR 1 SHA (see Verification).
    - Record the result in the PR description, because a squash merge loses this intermediate state on `main`.
+1b. **Imported test fixes:** step 12b. Test-only; kept out of commit 1 so the move stays a pure move. Tool output is unchanged.
 2. **Fatal plugin failures:** step 9. If parity at commit 1 revealed a plugin that was failing silently, this commit surfaces it.
 3. **Optional MadCap output path:** step 8, including the `--madcap-output-dir` flag on `build`. It's additive, and the default output is unchanged.
 4. **CLI additions:** step 11b.
@@ -67,6 +68,9 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
 4. Update the module-path references in data and config:
    - `tools/build_sdm/configs/plugin.config.madcap.toml` → `plugin_name = "build_sdm.output_plugins.madcap_html_output.plugin.MadcapHtmlOutput"`
    - the commented example in `docs/templates/category.toml.template`, which also fixes its old inconsistent key
+   - while editing the template, also fix two defects found in the PR 1 Copilot review (PR #3), so a category created from it loads and builds:
+     - add `name = "category_name"` next to `code` in `[category_name]`; `GIMCategory` requires it (`atomic_fields.py:86`)
+     - in the default subcategory, comment out `summary.indicator_template` and keep `summary.default_indicator`; `SummaryViewModel` requires exactly one (`message_summaries_output/plugin.py:58-65`), and `default_indicator` is the more common choice in the data
 5. Rename (tool names only):
    - `configs/build_gim.toml` → `configs/build_sdm.toml`
    - key `gim_source_dir` → `sdm_source_dir` = `"src/sdm"`
@@ -97,7 +101,11 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
       - `check-generated`: build MadCap into a temporary dir, then run a recursive byte-for-byte diff against `generated/MadcapHtmlOutput/`. Print the differing files and exit 1 on any difference.
       - a placeholder for `validate` (implemented in PR 3)
     - Commit 3 adds `--madcap-output-dir PATH` to `build`, as part of step 8.
-12. Move `tools/build_sdm/tests/` → `tests/`. Update the imports and the two tests that read real data so they use `src/sdm`; one of them still asserts `7.1.0`.
+12. Tests, in two parts:
+    - **12a (commit 1).** Move `tools/build_sdm/tests/` → `tests/`. Update the imports and the two tests that read real data so they use `src/sdm`; one of them still asserts `7.1.0`.
+    - **12b (commit 1b).** Fix two imported test defects found in the PR 1 Copilot review (PR #3):
+      - `test_category_csv_missing_event_data.py`: `test_missing_event_type_codes_raises_runtime_error` is defined twice (lines 5 and 91 at import), so the first definition never runs. Rename the second to describe its case (empty `event_type_codes` dict vs. missing key). The restored test has never run; if it fails, fix the test or record the underlying bug, don't delete it.
+      - `output_madcap/test_madcap_output_html_subdir.py`: has no test functions or assertions; it validates a local copy of the model in import-time loops. Replace it with parametrized tests against the real `TopLevelGimSectionMetadata` and `TopLevelFieldSchemaSectionMetadata` (`madcap_html_output/models.py`, `SafeSubdir`), asserting acceptance or `ValidationError` per the real contract. Check that contract in the code; don't copy the local model's regex.
 13. Add a determinism check: run `build` twice and diff the results. If anything nondeterministic shows up (timestamps, dict or set ordering), fix it.
 14. Run `uv run build-sdm build` and commit `generated/MadcapHtmlOutput/`. Add `build/` to `.gitignore` if it isn't there.
 15. Update the standards files:
@@ -107,7 +115,8 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
 16. Plan status: set `docs/plans/sdm-migration/02-package.md` to `Status: done` and mark PR 2 done in the `README.md` status table.
 
 ## Verification
-- `uv sync && uv run pytest`: everything passes, about 174 tests plus new ones for path precedence and failure exit codes.
+- `uv sync && uv run pytest`: everything passes, about 174 tests plus new ones for path precedence and failure exit codes, the restored duplicate-named test, and the parametrized subdir tests.
+- A category created from `docs/templates/category.toml.template` (placeholders filled in) loads and passes message-summary generation.
 - `uv run ruff check`, `uv run mypy`: no new errors.
 - Parity check, **covering all plugins**, run at commit 1 of the commit order:
   1. In Illuminate at the PR 1 SHA, run the original tool from an exported tree, not the working tree: `cd scripts/build_gim && uv run python3 main.py`.
