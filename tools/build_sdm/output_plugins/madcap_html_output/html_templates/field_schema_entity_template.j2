@@ -1,0 +1,40 @@
+{% import "macros/tables.html.j2" as tables %}
+{% import "macros/descriptions_mdsf.html.j2" as descriptions_mdsf %}
+{% set resources_path = '../Resources' %}
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd">
+    <head>
+        <title>{{ category_data.title if category_data.title else (category | title) + ' Fields' }}</title>
+    </head>
+    <body>
+        <h1>{{ category_data.title if category_data.title else (category | title) + ' Fields' }}</h1>
+        {% filter trim | indent(width=8, first=True) %}
+        {{ descriptions_mdsf.render_description(category_data.description) | trim }}
+        {% endfilter %}
+
+        {% if category_data.table_rows|length > 0 %}
+        {% filter indent(width=4, first=False) %}
+        {{ tables.render_table(field_column_order or category_data.table_rows[0].keys(), category_data.table_rows) }}
+        {% endfilter %}
+        {% endif %}
+
+        {% if category_data.applies_to %}
+        <p><strong>Applies to:</strong></p>
+        <ul>
+        {% for parent in category_data.applies_to %}
+            <li><a href="{{ parent | regex_replace('[^A-Za-z0-9_]', '_') }}.html">{{ parent }}</a></li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if category_data.subfield_groups|length > 0 %}
+        <h2>Sub-fields</h2>
+        {% for group in category_data.subfield_groups %}
+        <p>Fields composed from <a href="{{ group.source_entity | regex_replace('[^A-Za-z0-9_]', '_') }}.html">{{ group.source_entity }}</a>:</p>
+        {% filter indent(width=4, first=False) %}
+        {{ tables.render_table(subfield_column_order or group.rows[0].keys(), group.rows, type="dropdown", label=group.source_entity) }}
+        {% endfilter %}
+        {% endfor %}
+        {% endif %}
+    </body>
+</html>

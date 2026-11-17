@@ -1,0 +1,70 @@
+type = "field_schema"
+
+[group]
+description = """
+## Overview
+
+The **group** fields describe logical group constructs used to organize identities, accounts, or principals within an operating system, directory service, or application platform.  
+Groups are commonly used to assign permissions, privileges, or access policies to multiple members collectively.  
+This entity provides a normalized representation of group identifiers, names, membership relationships, and contextual attributes.
+
+## Design and Usage
+
+The `group` entity models group objects independently of the specific identity system or directory implementation.  
+It supports representation of both local and directory-based groups and their relationships to member identities.  
+Fields within this entity enable correlation between group membership changes, access evaluations, and privilege assignments across heterogeneous systems.
+
+## Common Use Cases
+
+- Tracking group membership and membership changes for auditing and compliance purposes.  
+- Identifying privileged or sensitive groups associated with elevated access.  
+- Correlating authentication or authorization events with group-based access controls.  
+- Normalizing group identifiers across operating systems, directory services, and cloud identity platforms.
+
+## Implementation Notes
+
+As a top-level entity, `group` represents the group object itself rather than the event that references it.  
+Group identifiers may be numeric, string-based, or security identifiers depending on the source system.  
+Membership-related fields should be populated when group membership is explicitly observed or modified.  
+If group context is implied but not explicitly provided, corresponding group fields should be included to maintain relational integrity and clarify access semantics.
+"""
+
+entity_type = "top"
+
+[[group.fields]]
+field_suffix = "category"
+example_values = "privileged"
+field_type = "keyword"
+description = "Classification applied to the group to provide contextual metadata about its role or sensitivity."
+# NOTE: Categories may be assigned through enrichment to identify groups such as privileged, administrative, or system-defined.
+
+[[group.fields]]
+field_suffix = "domain"
+example_values = "CORP"
+field_type = "keyword"
+description = "Domain, directory, or namespace in which the group is defined."
+
+[[group.fields]]
+field_suffix = "id"
+example_values = "100, S-1-5-32-583"
+field_type = "keyword"
+description = "Unique identifier assigned to the group by the source system."
+# NOTE: This field was previously typed as 'date', which is incorrect for identifiers and should be 'keyword'.
+
+[[group.fields]]
+field_suffix = "member_id"
+example_values = "100, S-1-5-32-583"
+field_type = "keyword"
+description = "Unique identifier of an identity that is a member of the group."
+
+[[group.fields]]
+field_suffix = "member_name"
+example_values = "CN=exampleuser1,OU=Users,OU=Group Policy OU,DC=corp,DC=internal"
+field_type = "keyword"
+description = "Name or distinguished identifier of a group member as provided by the source system."
+
+[[group.fields]]
+field_suffix = "name"
+example_values = "Users, Domain Admins"
+field_type = "keyword"
+description = "Human-readable name assigned to the group."

@@ -1,0 +1,61 @@
+type = "field_schema"
+
+[as]
+title = "Autonomous System (AS) Sub-Fields"
+description = """
+The `as` sub-fields represent Autonomous System (AS) attributes derived from IP addresses associated with entities described elsewhere in the event. These fields are not standalone entities; they are appended to top-level entity names to express network ownership properties, such as `source_as_number` or `destination_as_organization`.
+
+AS fields apply to entities that carry network addressing context, including `source`, `destination`, and `host`. They are typically populated through IP-to-ASN enrichment and describe the organization, network operator, or internet service provider responsible for the address block containing the entity's IP at the time of the event.
+
+Common applications include:
+
+- Identifying the network operator or organization associated with an IP address for threat detection and investigation.
+- Correlating traffic by ASN to detect patterns associated with known malicious or high-risk networks.
+- Enriching events with ISP and domain context to support network-scoped analytics and asset classification.
+
+Each field in this group corresponds to a specific attribute of the autonomous system:
+
+- `as_number` - The globally unique Autonomous System Number (ASN) identifying the network on the internet.
+- `as_organization` - The organization name registered to the autonomous system.
+- `as_isp` - The internet service provider associated with the IP address.
+- `as_domain` - The domain associated with the IP address.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "sub"
+
+# The top-level entities this sub-field group is appended to, e.g. source_as_number,
+# destination_as_organization. Each name must match a field_schema entity with entity_type = "top".
+applies_to = ["source", "destination", "host"]
+
+#[as.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[as.fields]]
+field_suffix = "domain"
+example_values = ""
+field_type = "keyword"
+description = "Domain associated with the IP address resolved to this autonomous system."
+
+[[as.fields]]
+field_suffix = "isp"
+example_values = ""
+field_type = "keyword"
+description = "Internet service provider associated with the IP address resolved to this autonomous system."
+
+[[as.fields]]
+field_suffix = "number"
+example_values = "15169"
+field_type = "keyword"
+description = "Autonomous System Number (ASN) uniquely identifying the network on the internet."
+
+[[as.fields]]
+field_suffix = "organization"
+example_values = "Graylog"
+field_type = "keyword"
+description = "Organization name registered to the autonomous system."

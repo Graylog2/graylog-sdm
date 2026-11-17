@@ -1,0 +1,163 @@
+type = "gim"
+
+[audit]
+name = "audit"
+code = 22
+description = """
+The Audit category includes events that describe the health, configuration, and integrity of a system’s auditing subsystem. 
+These events indicate whether the audit service is running, if its policies have changed, or if audit logs have been cleared or corrupted. 
+Unlike user activity logs, audit category events reflect the state of the mechanisms that record and preserve those logs. 
+Monitoring these events is critical for ensuring compliance, detecting tampering, and verifying that audit controls remain active and trustworthy.
+"""
+required_fields = [ "source" ]
+recommended_fields = []
+optional_fields = [ "user_name" ]
+
+[audit._meta]
+validation_file = "audit.json"
+
+[[audit.indicators]]
+type = "auditIndicator"
+title = "Audit events default indicator template"
+description = "Define summary font colors for audit events"
+danger = [
+    "audit error","audit service stopped","audit log cleared"
+    ]
+success = ["audit service started"]
+warning = ["audit policy changed"]
+indicator = "gim_event_type"
+default_indicator = "warning"
+
+
+#[[audit.summaries]]
+#template_id = "auditDefault"
+#"summary" = "[{gim_event_type}] source:{source} | vendor_event_action:{vendor_event_action} | user_name:{user_name}"
+#"title" = "Audit events template"
+#"description" = "Default audit events template"
+
+[audit.subcategories]
+
+[audit.subcategories.00]
+name = "integrity"
+class = "endpoint"
+description = """
+Events that report on the integrity or preservation of a system’s audit trail. 
+These messages indicate that audit data has been deleted, cleared, or otherwise modified in a way that could impact 
+the completeness or reliability of audit records. 
+Integrity events differ from audit service state changes in that they focus on the audit log content itself, 
+not the operational status of the audit subsystem. 
+Such events are critical for detecting potential tampering or attempts to conceal activity.
+"""
+required_fields = [ "vendor_event_action" ]
+recommended_fields = []
+optional_fields = []
+
+# Message Summary configuration
+summary.title = "auditIntegrity"
+summary.description = "Audit Integrity (schema v3.0)"
+summary.summary_template = "[audit.integrity] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}"
+summary.indicator_template = "indicatorTemplate.auditIndicator"
+#"default_indicator": null
+
+[audit.subcategories.00.event_type_codes]
+00.name = "audit log cleared"
+00.description = "The audit log for a system has been cleared"
+
+
+[audit.subcategories.01]
+name = "state"
+class = "endpoint"
+description = """
+Events that describe the operational state of a system’s audit subsystem, such as when the audit service starts, stops, or encounters an error. 
+These events reflect whether the auditing process responsible for generating or storing audit logs is running and functioning properly. 
+Monitoring these state transitions is essential for ensuring audit continuity — if the audit service is stopped or fails, no further audit data can be collected.
+"""
+required_fields = [ "vendor_event_action" ]
+recommended_fields = []
+optional_fields = []
+
+# Message summary configuration
+summary.title = "auditState"
+summary.description = "Audit service state (schema v3.0)"
+summary.summary_template = "[audit.state] {event_source_product} - vendor_event_action:{vendor_event_action}"
+#summary.indicator_template = "indicatorTemplate.auditIndicator"
+summary.indicator_template = "indicatorTemplate.auditIndicator"
+#"default_indicator": null
+
+[audit.subcategories.01.event_type_codes]
+00.name = "audit service started"
+00.description = """
+The system’s auditing component or service has started successfully. 
+This indicates that audit collection and logging have resumed after being stopped or unavailable.
+"""
+
+01.name = "audit service stopped"
+01.description = """
+The system’s auditing component or service has stopped. 
+While this may occur during normal maintenance, it can also indicate that auditing has been disabled or disrupted.
+"""
+
+02.name = "audit error"
+02.description = """
+An error occurred in the auditing subsystem, preventing it from recording events reliably. 
+This may indicate corruption, misconfiguration, or resource exhaustion within the audit service.
+"""
+
+
+[audit.subcategories.05]
+name = "policy"
+class = "endpoint"
+description = """
+Events that describe changes to the system’s audit configuration or policies. 
+Audit policy events occur when administrators modify which activities are audited, 
+how audit data is retained, or where it is stored. 
+These changes can significantly affect visibility and compliance posture — 
+for example, disabling process tracking or account logon auditing reduces the scope of collected evidence. 
+Policy change events should be closely monitored and correlated with administrative actions to detect unauthorized modifications.
+"""
+required_fields = [ "vendor_event_action" ]
+recommended_fields = []
+optional_fields = []
+
+# Message summary configuration
+summary.title = "auditPolicy"
+summary.description = "Audit policy (schema v3.1)"
+summary.summary_template = "[audit.policy] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}"
+#summary.indicator_template = "indicatorTemplate.auditIndicator"
+summary.indicator_template = "indicatorTemplate.auditIndicator"
+#"default_indicator": null
+
+[audit.subcategories.05.event_type_codes]
+00.name = "audit policy changed"
+00.description = """
+The system’s audit configuration or policy was modified. 
+This may include enabling or disabling audit categories, changing log retention settings, or altering audit destinations. 
+Such changes can affect what events are captured and should be reviewed for authorization and compliance.
+"""
+
+
+[audit.subcategories.99]
+name = "default"
+class = "endpoint"
+description = """
+The default subcategory is used for audit-related events that do not match a more specific subcategory. 
+These messages generally originate from the audit subsystem but may describe vendor-specific or informational activity 
+not directly related to audit state, integrity, or policy. 
+Using this subcategory ensures that all audit component messages can be normalized and retained for visibility, 
+even when their precise type is unknown or product-specific.
+"""
+
+
+summary.title = "auditDefault"
+summary.description = "Default audit events (schema v3.1)"
+summary.summary_template = "[audit.default] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}"
+#summary.indicator_template = "indicatorTemplate.auditIndicator"
+summary.indicator_template = "indicatorTemplate.auditIndicator"
+#"default_indicator": null
+
+[audit.subcategories.99.event_type_codes]
+99.name = "audit event"
+99.description = """
+A generic audit subsystem event that does not fit a defined subcategory or event type. 
+This serves as a fallback classification to ensure consistent handling of all audit-related messages.
+"""

@@ -1,0 +1,78 @@
+{% macro render_section(section) %}
+{% import "macros/descriptions_mdsf.html.j2" as desc_mdsf %}
+{%- if section.section_header %}
+    <h2>{{ section.section_header }}</h2>
+{% endif %}
+
+{%- if section.type == 'paragraphs' %}
+    {%- for para in section.content %}
+        {{ desc_mdsf.render_description(para) | trim }}
+    {% endfor %}
+
+{%- elif section.type == 'list_unordered' %}
+    <ul>
+        {% for item in section.content %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+{%- elif section.type == 'list_ordered' %}
+    <ol>
+        {% for item in section.content %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ol>
+
+{%- elif section.type == 'hint' %}
+    <p>
+        <section class="infoBox">
+            <div class="content"><b>Hint: </b><span style="font-weight: normal;">{{ section.content[0] }}</span>
+            </div>
+    {% if section.content|length > 1 %}
+        {% for line in section.content[1:] if line.strip() %}
+            <div class="content"><span style="font-weight: normal;">{{ line  }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+        </section>
+    </p>
+
+{%- elif section.type == 'warning' %}
+    {% set warn_text_lines = section.content.split('\n') %}
+    <p>
+        <section class="warningBox">
+            <div class="content"><b>Warning: </b><span style="font-weight: normal;">{{ warn_text_lines[0] }}</span>
+            </div>
+    {% if warn_text_lines|length > 1 %}
+    {% for line in warn_text_lines[1:] if line.strip() %}
+            <div class="content"><span style="font-weight: normal;">{{ line  }}</span>
+            </div>
+    {% endfor %}
+    {% endif %}
+        </section>
+    </p>
+
+{%- elif section.type == 'table' %}
+    <table>
+        <thead>
+            <tr>
+                {%- for col in section.content[0] %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {%- for row in section.content[1:] %}
+            <tr>
+                {%- for cell in row %}
+                <td>{{ cell }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{%- else %}
+    <p><em>Unknown section type: {{ section.type }}</em></p>
+{% endif %}
+{% endmacro %}

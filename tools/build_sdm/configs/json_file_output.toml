@@ -1,0 +1,5 @@
+[plugin]
+name = "JsonFileOutput"
+output_filename = "test_gim.json"
+json_indent = 2
+enabled = 1

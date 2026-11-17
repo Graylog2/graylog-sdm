@@ -1,0 +1,139 @@
+type = "gim"
+
+[wmi]
+name = "wmi"
+code = 24
+description = """
+The WMI category represents events related to the creation, modification, and execution of 
+Windows Management Instrumentation (WMI) components, including filters, consumers, and bindings. 
+WMI is a core subsystem in Windows used for management and automation, but it is also frequently abused 
+by attackers for persistence and lateral movement. 
+This category captures WMI-related activity to support detection, investigation, and baselining of 
+normal versus suspicious system behavior.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[wmi._meta]
+validation_file = "wmi.json"
+
+[wmi.subcategories]
+
+[wmi.subcategories.00]
+name = "filter"
+description = """
+Events that describe the creation, modification, or removal of WMI filters. 
+WMI filters define query-based conditions that determine when specific management actions 
+or consumers should be executed. Changes to filters can indicate normal administrative activity 
+or the setup of persistence mechanisms.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "wmiFilter"
+summary.description = "WMI Filter (schema v3.0)"
+summary.summary_template = "[{gim_event_type}] user_name:{user_name} | wmi_filter_name:{wmi_filter_name} | wmi_filter_query:{wmi_filter_query}"
+summary.default_indicator = "default"
+
+[wmi.subcategories.00.event_type_codes]
+00.name = "wmi filter created"
+00.description = """
+A WMI filter was created on the system. 
+WMI filters define query-based conditions that trigger actions through WMI consumers. 
+Creation events may indicate legitimate administrative configuration or the setup of persistence by attackers.
+"""
+
+01.name = "wmi filter removed"
+01.description = """
+A WMI filter was deleted or removed from the system. 
+Filter removal may indicate cleanup after administrative configuration changes 
+or attempts to conceal persistence mechanisms.
+"""
+
+
+[wmi.subcategories.05]
+name = "consumer"
+description = """
+Events that describe the creation, modification, or removal of WMI consumers. 
+WMI consumers define actions executed when a filter condition is met, such as running a command 
+or launching a script. Monitoring consumer activity is critical for detecting persistence or 
+malicious code execution via WMI.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "wmiConsumer"
+summary.description = "WMI Consumer (schema v3.0)"
+summary.summary_template = "[{gim_event_type}] user_name:{user_name} | wmi_consumer_name:{wmi_consumer_name} | wmi_consumer_destination:{wmi_consumer_destination}"
+summary.default_indicator = "default"
+
+[wmi.subcategories.05.event_type_codes]
+00.name = "wmi consumer created"
+00.description = """
+A WMI consumer was created on the system. 
+Consumers define what actions occur when WMI filter conditions are met, 
+such as executing commands, launching scripts, or writing data. 
+These events are high-value indicators for persistence creation.
+"""
+
+01.name = "wmi consumer removed"
+01.description = """
+A WMI consumer was deleted or removed. 
+Removal can indicate decommissioning of management automation or cleanup of a persistence mechanism.
+"""
+
+
+[wmi.subcategories.10]
+name = "binding"
+description = """
+Events that describe the creation or modification of WMI bindings. 
+A binding associates a WMI filter with a consumer, forming a complete trigger-action pair. 
+These events are essential for detecting persistence mechanisms that rely on WMI automation.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "wmiBinding"
+summary.description = "WMI Binding (schema v3.0)"
+summary.summary_template = "[{gim_event_type}] user_name:{user_name} | wmi_consumer:{wmi_consumer} | wmi_filter:{wmi_filter}"
+summary.default_indicator = "default"
+
+[wmi.subcategories.10.event_type_codes]
+00.name = "wmi binding created"
+00.description = """
+A WMI binding was created or modified. 
+A binding associates a filter with a consumer, enabling automated execution when the filter condition is met. 
+Creation or modification of bindings is rare and often associated with persistent automation or malicious configuration.
+"""
+
+
+[wmi.subcategories.99]
+name = "default"
+description = """
+Events related to general WMI activity that do not fit a more specific subcategory. 
+This may include instrumentation queries, provider registrations, or generic system management operations.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "wmiDefault"
+summary.description = "WMI Default (schema v3.0)"
+summary.summary_template = "[{gim_event_type}] user_name:{user_name}"
+summary.default_indicator = "default"
+
+[wmi.subcategories.99.event_type_codes]
+99.name = "wmi event"
+99.description = """
+A general WMI-related event that does not fit into a specific subcategory. 
+This may represent WMI provider activity, query execution, or other instrumentation events 
+used for system management or monitoring.
+"""

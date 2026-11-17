@@ -1,0 +1,49 @@
+{% macro render_table(columns, rows, table_class="TableStyle-Alternate-Row-Color", resources_path="../../Resources", type="normal", label="Fields List") %}
+{% import "macros/descriptions_mdsf.html.j2" as table_mdsf %}
+{% set table_html %}
+<table cellspacing="21" style="width: 100%; mc-table-style: url('{{ resources_path }}/TableStyles/Alternate-Row-Color.css');" class="{{ table_class }}">
+    <colgroup>
+    {% for col in columns %}
+        <col class="{{ table_class }}-Column-Column1" />
+    {% endfor %}
+    </colgroup>
+    <thead>
+        <tr class="{{ table_class }}-Head-Header1">
+            {% for col in columns %}
+            {% set head_type = 'HeadD' if loop.last else 'HeadE' %}
+            <th class="{{ table_class }}-{{ head_type }}-Column1-Header1">{{ col }}</th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        {% set override_body_type = True if loop.last else False %}
+        {% set row_style = loop.cycle('1', '2') %}
+        <tr class="{{ table_class }}-Body-Body{{ row_style }}">
+            {% for col in columns %}
+            {% if override_body_type %}
+            {% set body_type = 'BodyA' if loop.last else 'BodyB' %}
+            {% else %}
+            {% set body_type = 'BodyD' if loop.last else 'BodyE' %}
+            {% endif %}
+            <td class="{{ table_class }}-{{ body_type }}-Column1-Body{{ row_style }}">{{ table_mdsf.render_description(row[col]) }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{%- endset %}
+
+{%- if type == "dropdown" %}
+<MadCap:dropDown>
+    <MadCap:dropDownHead>
+        <MadCap:dropDownHotspot>{{ label }} <span style="font-size: 8pt;">▼</span></MadCap:dropDownHotspot>
+    </MadCap:dropDownHead>
+    <MadCap:dropDownBody>
+{{ table_html | indent(8, true) }}
+    </MadCap:dropDownBody>
+</MadCap:dropDown>
+{%- else %}
+{{ table_html }}
+{%- endif %}
+{%- endmacro %}

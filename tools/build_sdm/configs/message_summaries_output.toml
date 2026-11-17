@@ -1,0 +1,5 @@
+[plugin]
+name = "MessageSummariesOutput"
+output_filename = "message_summaries.json"
+json_indent = 2
+enabled = 1

@@ -1,0 +1,221 @@
+type = "field_schema"
+
+[destination]
+description = """
+## Overview
+
+The `destination` fields describe the target system, device, or endpoint involved in a network transaction, system interaction, or event correlation. These fields represent the entity that receives, hosts, or processes the action initiated by a source within telemetry data.
+
+## Design and Usage
+
+`destination` represents the endpoint context of an event and is used to capture identifying, network, and system-level attributes of the target environment. It provides a normalized view of where data, connections, or operations are directed — whether to a physical host, virtual machine, cloud service, or logical network zone. These fields are typically modeled symmetrically with the `source` entity to describe bidirectional communication or relational event structures.
+
+## Common Use Cases
+
+- Identifying the target host, application, or service involved in a network or system event.
+- Associating traffic or actions with specific regions, zones, or virtual systems.
+- Analyzing directional flow in network telemetry (for example, from `source` to `destination`).
+- Correlating activity across multi-tenant or segmented environments by destination IP, hostname, or virtual context.
+
+## Implementation Notes
+
+As a top-level entity, `destination` defines a coherent object representing the receiving endpoint of a communication or operation.  It should be modeled independently of vendor-specific naming conventions and supports hierarchical mappings, including NAT, virtual system, and region metadata. `destination` fields commonly appear in conjunction with `source` to provide complete directional context for events within normalized telemetry schemas.  If a `source` is implied but not explicitly defined, corresponding `source` fields should be included to clarify event semantics and ensure consistent bidirectional modeling.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[destination.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[destination.fields]]
+field_suffix = "application_name"
+example_values = "facebook, twitter"
+field_type = "keyword"
+description = "Name of the application that is the target of the action defined in an event."
+
+[[destination.fields]]
+field_suffix = "bytes_sent"
+example_values = "204235"
+field_type = "long"
+description = "Network bytes sent by destination to the source. Some sources may present this as source bytes received, bytes received, or similar."
+
+[[destination.fields]]
+field_suffix = "device_model"
+example_values = "iPad"
+field_type = "keyword"
+description = "Name of device model."
+
+[[destination.fields]]
+field_suffix = "device_vendor"
+example_values = "Apple, ASUS"
+field_type = "keyword"
+description = "Device vendor name."
+
+[[destination.fields]]
+field_suffix = "domain"
+example_values = "www.example.com, mail.corp.local"
+field_type = "keyword"
+description = """
+Domain name associated with the destination system, such as a hostname, fully qualified domain name, or other host naming value. May originate from the original event or be added through enrichment.
+
+When Illuminate is installed, this field is processed by the core domain enrichment pipeline: the value is normalized (ASCII-lowercased, with any trailing dot stripped, and punycode labels decoded to Unicode) before destination_registered_domain, destination_subdomain, and destination_top_level_domain are derived from it.
+
+Some event sources instead populate this field with an authentication domain context, such as a Windows or Kerberos domain (for example, "corp.local"). In that case the value is not a DNS domain and the derived subfields do not apply.
+"""
+
+[[destination.fields]]
+field_suffix = "hostname"
+example_values = "corpdc01, vplaptop10"
+field_type = "keyword/lowercase"
+description = "Hostname of the destination device/system."
+
+[[destination.fields]]
+field_suffix = "ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IPv4 or IPv6 address of the destination device."
+
+[[destination.fields]]
+field_suffix = "nat_ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "translated IP address assigned by a network device performing the NAT function."
+
+[[destination.fields]]
+field_suffix = "nat_port"
+example_values = "80, 443, 3389"
+field_type = "integer"
+description = "Translated network port assigned by a network device performing the NAT function."
+
+[[destination.fields]]
+field_suffix = "os_name"
+example_values = "IOS, Android"
+field_type = "keyword"
+description = "Operating system type name of the destination device."
+
+[[destination.fields]]
+field_suffix = "os_version"
+example_values = "10.0, 22.04"
+field_type = "keyword"
+description = "Operating system version number of the destination device."
+
+[[destination.fields]]
+field_suffix = "packets_sent"
+example_values = "230929"
+field_type = "long"
+description = "Number of packets delivered to the destination endpoint from the source endpoint."
+
+[[destination.fields]]
+field_suffix = "port"
+example_values = "45392"
+field_type = "integer"
+description = "Network service port, represented as a value between 0 and 65535."
+
+[[destination.fields]]
+field_suffix = "port_iana_name"
+example_values = "ssh, ftp"
+field_type = "keyword"
+description = "The IANA-registered service name associated with the network application. Illuminate Core will use this value to define destination_port in events that have destination_ip defined, if destination_port is not already defined"
+
+[[destination.fields]]
+field_suffix = "region"
+example_values = "us-east-1"
+field_type = "keyword"
+description = "Name of region source device is located in"
+
+[[destination.fields]]
+field_suffix = "registered_domain"
+example_values = "example.com"
+field_type = "keyword"
+description = "Highest registered domain of destination_domain, stripped of any subdomain, determined using the public suffix list. For example, the registered domain of \"mail.example.com\" is \"example.com\". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently."
+
+[[destination.fields]]
+field_suffix = "subdomain"
+example_values = "mail"
+field_type = "keyword"
+description = "Subdomain portion of destination_domain, containing all labels below destination_registered_domain, with no trailing period. For example, the subdomain of \"mail.corp.example.com\" is \"mail.corp\". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently."
+
+[[destination.fields]]
+field_suffix = "top_level_domain"
+example_values = "com"
+field_type = "keyword"
+description = "Effective top-level domain (eTLD), also known as the domain suffix, of destination_domain, determined using the public suffix list. For example, the top-level domain of \"example.co.uk\" is \"co.uk\". Illuminate Core's domain enrichment pipeline populates this field from destination_domain when installed; other event sources or pipelines may populate it independently."
+
+[[destination.fields]]
+field_suffix = "id"
+example_values = "09VX93DD"
+field_type = "keyword"
+description = "Identifying value for the destination such as a serial number"
+
+[[destination.fields]]
+field_suffix = "type"
+example_values = ""
+field_type = "keyword"
+description = "Destination device information such as model number"
+
+[[destination.fields]]
+field_suffix = "vm_name"
+example_values = "vsys01"
+field_type = "keyword"
+description = "Virtual system name (not to be confused with the hostname)"
+
+[[destination.fields]]
+field_suffix = "vsys_uuid"
+example_values = "1f5398c7-4d84-4499-84ee-d5e9246c52f8"
+field_type = "keyword"
+description = "Destination virtual system UUID"
+
+[[destination.fields]]
+field_suffix = "zone"
+example_values = "internal"
+field_type = "keyword"
+description = "Network zone for the destination"
+
+[[destination.fields]]
+field_suffix = "category"
+example_values = ""
+field_type = "keyword"
+description = "The category assigned to the destination device."
+
+[[destination.fields]]
+field_suffix = "location_name"
+example_values = "Chicago, US, Datacenter 01, Bismark - Finance"
+field_type = "keyword"
+description = "Field is derived either from an internal enterprise network definition or the Geo location fields if available."
+
+[[destination.fields]]
+field_suffix = "mac"
+example_values = "a0:b4:44:01:a9:d1"
+field_type = "keyword"
+description = "MAC address of the destination device."
+
+[[destination.fields]]
+field_suffix = "priority"
+example_values = "critical, high, medium, low, informational"
+field_type = "keyword"
+description = """
+Text value representing the priority of the destination device.
+This will be added to all messages processed by Illuminate Core if destination_priority_level is defined and this value does not exist.
+"""
+
+[[destination.fields]]
+field_suffix = "priority_level"
+example_values = "4"
+field_type = "byte"
+description = """
+Numeric value representing the priority of the destination device, 1 = informational, 2 = low, 3 = medium, 4 = high, 5 = critical.
+This will be added to all messages processed by Illuminate Core if destination_priority is defined and this value does not exist.
+"""
+
+[[destination.fields]]
+field_suffix = "reference"
+example_values = "IPv4, IPv6, corpdc01, corpdc01.east.local"
+field_type = "keyword/lowercase"
+description = """
+This is a derived field, added by Illuminate Core, that is selected from a list of fields, in order: destination_ip, destination_hostname, destination_vm_name, destination_mac. This can be defined in a parsing pack if a different order, or different fields, are preferred. It is defined to provide a field that can be used in aggregations as a single identifier that should be defined when aggregating over different event log types.
+"""

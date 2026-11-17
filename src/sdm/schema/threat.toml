@@ -1,0 +1,44 @@
+type = "field_schema"
+
+[threat]
+description = """
+## Overview
+
+The `threat` fields describe indicators, categories, and contextual attributes associated with potentially malicious or security-relevant activity. These fields represent high-level threat information derived from detection engines, classification systems, behavioral analysis, or security telemetry. The entity provides a normalized structure for modeling threat-related context across diverse platforms and analytic sources.
+
+## Design and Usage
+
+The `threat` entity defines conceptual properties that characterize the nature, severity, or classification of identified threats. It is designed to support consistent representation of threat intelligence, detection outcomes, and analytic findings without relying on vendor-specific terminology. As a top-level entity, `threat` may be referenced by events that include threat classifications, alerts, or determinations made by security systems.
+
+## Common Use Cases
+
+- Associating security events with the threat category or classification relevant to the detected behavior
+- Normalizing heterogeneous threat terminology across analytics engines, endpoint tools, and network detection systems
+- Supporting investigations, triage workflows, and reporting where threat context is essential for understanding event impact
+
+## Implementation Notes
+
+As a top-level entity, `threat` models the abstract concept of security-relevant classifications and detections. Its fields should remain neutral and consistently defined to align threat context across multiple data sources. If a detection or classification is implied but not explicitly represented in the event data, related fields may be included to clarify event semantics and maintain relational integrity.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[threat.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"] 
+
+[[threat.fields]]
+field_suffix = "category"
+example_values = "malware, trojan"
+field_type = "keyword"
+description = "Classification of the threat based on its type, behavior, or functional characteristics."
+
+[[threat.fields]]
+field_suffix = "detected"
+example_values = "true, false"
+field_type = "keyword"
+description = "Indicates whether a threat was identified during analysis or evaluation."

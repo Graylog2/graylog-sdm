@@ -1,0 +1,4 @@
+type = "config"
+
+[sdm_version]
+current_version = "7.1.0"

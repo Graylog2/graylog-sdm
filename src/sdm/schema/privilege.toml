@@ -1,0 +1,82 @@
+type = "field_schema"
+
+[privilege]
+description = """
+## Overview
+
+The `privilege` fields describe operating system- or platform-level privilege constructs that govern what actions an account is authorized to perform. Privileges may represent roles, rights, or attributes depending on the underlying system. These fields support normalized interpretation across privilege models such as attribute-based systems found in Windows or role-based models used in cloud identity platforms.
+
+## Design and Usage
+
+The `privilege` entity provides a vendor-neutral representation of identifiers, names, and contextual metadata associated with privilege assignments or removals. It abstracts the conceptual properties of privileges regardless of whether they originate from security tokens, directory roles, application-defined permissions, or local operating system configuration. Category-style subfields allow enrichment to flag elevated or sensitive privileges based on organizational or compliance requirements.
+
+## Common Use Cases
+
+- Identifying which privileges were assigned or removed from an account during authentication, authorization, or configuration changes.
+- Normalizing privilege identifiers across heterogeneous systems for audit, compliance, and access governance.
+- Highlighting privileged operations or elevated attributes that may indicate risk or require additional review.
+- Supporting correlation between account activity and the privileges that governed that activity.
+
+## Implementation Notes
+
+As a top-level entity, `privilege` represents the privilege object itself rather than the event in which it was used or evaluated. Privilege identifiers may originate from security tokens, identity services, or operating system structures; therefore, normalization should focus on stable identifiers and descriptive names when available. Category subfields may be applied to clarify privilege characteristics or to indicate classifications such as elevated or built-in privilege types. If multiple privilege naming conventions are present, both identifier and descriptive fields should be included to maintain relational integrity and consistent interpretation across sources.
+"""
+
+entity_type = "top"
+
+[[privilege.fields]]
+field_suffix = "assigned_category"
+example_values = "elevated_privilege"
+field_type = "keyword"
+description = "Classification applied to the privilege at assignment time to provide contextual metadata about its characteristics."
+# NOTE: The value 'elevated_privilege' may be used to identify privileges that enable sensitive or high-impact system actions.
+
+[[privilege.fields]]
+field_suffix = "assigned_id"
+example_values = "ffd52fa5-98dc-465c-991d-fc073eb59f8f"
+field_type = "keyword"
+description = "Identifier of the privilege that was assigned to the account or group."
+
+[[privilege.fields]]
+field_suffix = "assigned_name"
+example_values = "SeDebugPrivilege"
+field_type = "keyword"
+description = "Descriptive name of the privilege assigned to the account or group."
+
+[[privilege.fields]]
+field_suffix = "category"
+example_values = "built_in"
+field_type = "keyword"
+description = "Classification applied to the privilege to supply contextual metadata about its origin or characteristics."
+# NOTE: Values may include organizational or vendor-defined labels such as 'elevated_privilege' to identify sensitive privileges.
+
+[[privilege.fields]]
+field_suffix = "id"
+example_values = "c430b396-e693-46cc-96f3-db01bf8bb62a"
+field_type = "keyword"
+description = "Identifier of the privilege referenced by the event."
+
+[[privilege.fields]]
+field_suffix = "name"
+example_values = "Attack Simulation Administrator"
+field_type = "keyword"
+description = "Human-readable name associated with the privilege."
+
+[[privilege.fields]]
+field_suffix = "removed_category"
+example_values = "built_in"
+field_type = "keyword"
+description = "Classification applied to the privilege at the time it was removed to provide contextual metadata about its characteristics."
+# NOTE: Values such as 'elevated_privilege' may identify situations where sensitive privileges were revoked.
+
+[[privilege.fields]]
+field_suffix = "removed_id"
+example_values = "c430b396-e693-46cc-96f3-db01bf8bb62a"
+field_type = "keyword"
+description = "Identifier of the privilege that was removed from the account or group."
+
+[[privilege.fields]]
+field_suffix = "removed_name"
+example_values = "SeLoadDriverPrivilege"
+field_type = "keyword"
+description = "Descriptive name of the privilege that was removed from the account or group."

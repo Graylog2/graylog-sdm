@@ -1,0 +1,112 @@
+
+type = "field_schema"
+
+[host]
+description = """
+## Overview
+
+The `host` entity represents a single physical or virtual device involved in an event. It provides a normalized view of system identity, addressing, and contextual attributes that characterize the device generating, receiving, or otherwise associated with the event.
+
+## Design and Usage
+
+The host entity models device-level properties independently of vendor-specific terminology to maintain consistent interpretation across diverse telemetry sources. It supports scenarios where only one device is relevant to the event, such as endpoint activity, security detections, or system state reporting. When paired with other directional entities in networked events, host fields help clarify event semantics and maintain relational integrity.
+
+## Common Use Cases
+
+- Describing the system where an action occurred when no network source or destination is applicable
+- Normalizing device attributes such as hostname, operating system information, or hardware identifiers
+- Supporting attribution and correlation across event types through stable identifiers
+
+## Implementation Notes
+
+As a top-level entity, host defines a coherent object representing a singular device. Its fields are designed to accommodate physical hosts, virtual machines, and partitioned systems without implying a specific platform or technology. Host attributes should be included whenever a device is implied but no directional role is established, ensuring consistent modeling across event categories.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[host.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[host.fields]]
+field_suffix = "device"
+example_values = "\\Device\\HarddiskVolume2"
+field_type = "keyword"
+description = "Identifier representing a hardware or logical device associated with the host."
+
+[[host.fields]]
+field_suffix = "hostname"
+example_values = "corpdc01, corpdc01.local, lab01.corpdomain.com"
+field_type = "keyword/lowercase"
+description = "Name assigned to the host, including NetBIOS or DNS forms."
+
+[[host.fields]]
+field_suffix = "id"
+example_values = ""
+field_type = "keyword"
+description = "Unique identifier assigned to the host by the operating system or platform."
+
+[[host.fields]]
+field_suffix = "ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IP address assigned to the host, supporting both IPv4 and IPv6."
+
+[[host.fields]]
+field_suffix = "ipv6"
+example_values = "fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IPv6 address associated with the host."
+
+[[host.fields]]
+field_suffix = "mac"
+example_values = "02:a1:f9:c2:d5:04"
+field_type = "keyword"
+description = "Link-layer hardware address of the host."
+
+[[host.fields]]
+field_suffix = "reference"
+example_values = "127.0.0.1, corpdc01, corpdc01.local, lab01.corpdomain.com"
+field_type = "keyword/lowercase"
+description = "Canonical host reference value derived from available identifiers (e.g., host_hostname, host_ip) to support consistent attribution - CIDR search will not work against this field."
+
+[[host.fields]]
+field_suffix = "region"
+example_values = "us-east-1"
+field_type = "keyword"
+description = "Geographic or logical region associated with the host, including service-assigned region values distinct from geolocation fields."
+
+[[host.fields]]
+field_suffix = "type_version"
+example_values = ""
+field_type = "keyword"
+description = "Version information describing the operating system running on the host."
+
+[[host.fields]]
+field_suffix = "virtfw_hostname"
+example_values = ""
+field_type = "keyword/lowercase"
+description = "For firewalls that operate as partitioned services this is the name of the logical device."
+
+[[host.fields]]
+field_suffix = "virtfw_id"
+example_values = ""
+field_type = "keyword"
+description = "For firewalls that operate as partitioned services this is the ID value of the logical device."
+
+[[host.fields]]
+field_suffix = "virtfw_uid"
+example_values = ""
+field_type = "keyword"
+description = "Unique identifier such as a UUID value representing a virtual host."
+
+[[host.fields]]
+field_suffix = "vm_name"
+example_values = ""
+field_type = "keyword"
+description = "Virtual system name (not to be confused with the hostname)."

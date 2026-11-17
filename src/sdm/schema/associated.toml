@@ -1,0 +1,60 @@
+type = "field_schema"
+
+[associated]
+description = """
+The `associated` fields are generated automatically by the Illuminate indexing templates. They will not appear in the message view but can be used in searches, event definitions, and aggregations. These fields will contain one or more value(s) that are copied from associated source fields, e.g. `associated_ip` would contain the values copied from both `source_ip` and `destination_ip` in a network event log message. The intent of these fields is to provide a single field that can be searched/analyzed for a value, instead of requiring users to search for all of the possible candidate fields for a given value.
+
+The sources fields are any schema-defined fields that contain data that matches the criteria for the defined association.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[associated.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'associated_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[associated.fields]]
+field_suffix = "hash"
+example_values = "6f9efb466e043b9f3635827ce446e13c"
+field_type = "keyword"
+description = "All associated MD5, SHA1, SHA256, SHA512, IMP hashes from a log message"
+
+[[associated.fields]]
+field_suffix = "host"
+example_values = "10.1.2.3,corpdc01,corpdc01.corpdomain.local"
+field_type = "keyword"
+description = "FUTURE: copy of any identifying host information - IP, Hostname, etc. from a log message, not implmented yet."
+
+[[associated.fields]]
+field_suffix = "ip"
+example_values = "10.1.2.3,fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "Associated IP addresses for a log message"
+
+[[associated.fields]]
+field_suffix = "mac"
+example_values = "a0:b4:44:01:a9:d1"
+field_type = "keyword"
+description = "Associated MAC address for a log message"
+
+[[associated.fields]]
+field_suffix = "session_id"
+example_values = "0xa72c"
+field_type = "keyword"
+description = "Associated session IDs for a log message"
+
+[[associated.fields]]
+field_suffix = "user_id"
+example_values = "999,S-1-5-18"
+field_type = "keyword"
+description = "This will be a field that maps to all user ID values (uids, SIDs, etc.) that are associated with a user context."
+
+[[associated.fields]]
+field_suffix = "user_name"
+example_values = "administrator,root,administrator@corp.local"
+field_type = "keyword/lowercase"
+description = "Any associated/alternate User ID from a log message"

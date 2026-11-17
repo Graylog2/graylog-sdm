@@ -1,0 +1,203 @@
+type = "gim"
+
+[file]
+name = "file"
+code = 20
+description = """
+The File category covers events related to file activity on a system, including creation, 
+deletion, modification, access, and integrity monitoring. These events are typically generated 
+by operating system auditing features, file integrity monitoring tools, or endpoint detection 
+and response (EDR) products. They provide visibility into how files are created, altered, 
+or removed, which is critical for detecting suspicious activity such as unauthorized changes, 
+tampering, or malware execution.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[file._meta]
+validation_file = "file.json"
+
+[[file.summaries]]
+#
+# See https://github.com/Graylog2/graylog-illuminate-devguide/blob/master/security_features/summary_message_templates.md 
+# for information about message summary templates
+#
+template_id = "fileCategory00"
+title = "file category template"
+description = "Basic file category message template"
+summary = "[{gim_event_type}] file_name:{file_name} | process_name:{process_name}"
+
+[[file.summaries]]
+template_id = "fileCategory01"
+title = "file category template 01"
+description = "Basic file category message template 01"
+summary = "[{gim_event_type}] file_name:{file_name} | user_name:{user_name} | process_name:{process_name}"
+
+[[file.indicators]]
+type = "fileDangerIndicator"
+title = "File Danger indicator"
+description = "Set summary font color for some file events"
+danger = ["file signature invalid","file deleted"]
+success = []
+info = []
+primary = []
+warning = []
+default = []
+indicator = "gim_event_type"
+default_indicator = "info"
+
+[file.subcategories]
+
+
+[file.subcategories.00]
+name = "create"
+description = """
+Create events represent the creation of a new file on a system. 
+These events typically include the file name, the process that created the file, 
+and the user context under which the action occurred. File creation monitoring is 
+critical for detecting suspicious activity, such as malware dropped to disk, 
+unauthorized configuration changes, or staging of tools by an attacker.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "fileCreateSummary"
+summary.description = "Summary for a file was created"
+summary.summary_template = "summaryTemplate.fileCategory01"
+summary.default_indicator = "default"
+
+[file.subcategories.00.event_type_codes]
+00.name = "file created"
+00.description = "A new file was created on the system."
+
+[file.subcategories.01]
+name = "delete"
+description = """
+Delete events represent the removal of a file from a system. 
+These events typically include the file name, the process responsible for the deletion, 
+and the user context under which it occurred. File deletion monitoring is important 
+for detecting attacker cleanup activity, data destruction, or ransomware behavior, 
+as well as tracking normal administrative actions.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "fileDeleteSummary"
+summary.description = "File deletion summary"
+summary.summary_template = "summaryTemplate.fileCategory01"
+summary.indicator_template = "indicatorTemplate.fileDangerIndicator"
+
+[file.subcategories.01.event_type_codes]
+00.name = "file deleted"
+00.description = "A file was deleted from the system."
+
+
+[file.subcategories.10]
+name = "modify"
+description = """
+Modify events represent changes made to an existing file. 
+This can include editing file contents, altering metadata such as timestamps, 
+or attaching additional data streams. Monitoring file modifications is 
+important for detecting tampering, persistence mechanisms, or suspicious 
+changes to system and application files.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "fileModifySummary"
+summary.description = "File modification summary"
+summary.summary_template = "summaryTemplate.fileCategory01"
+summary.default_indicator = "default"
+
+
+[file.subcategories.10.event_type_codes]
+00.name = "file modified"
+00.description = "The contents of a file were modified."
+
+01.name = "file timestamp modified"
+01.description = "A file's timestamp attributes (such as creation or last modified time) were changed."
+
+02.name = "file stream created"
+02.description = "An alternate data stream (ADS) or equivalent was attached to a file."
+
+
+[file.subcategories.15]
+name = "access"
+description = """
+Access events represent attempts to open or read a file. 
+This includes normal user or process access as well as raw device-level access 
+that bypasses the file system. Monitoring file access is valuable for detecting 
+unauthorized reads, discovery activity, or attempts to evade standard auditing.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+#summary.title = "fileModifySummary"
+#summary.description = "File modification summary"
+#summary.summary_template = "summaryTemplate.fileCategory01"
+#summary.default_indicator = "default"#
+
+[file.subcategories.15.event_type_codes]
+00.name = "file accessed"
+00.description = "A process or user attempted to access a file."
+
+01.name = "raw file access"
+01.description = "A process attempted raw file access directly from a storage device, bypassing normal filesystem controls."
+
+
+[file.subcategories.20]
+name = "integrity"
+description = """
+Integrity events represent the monitoring or validation of a file's authenticity or consistency. 
+This may include changes to a file's cryptographic hash, digital signature, or results reported 
+by file integrity monitoring (FIM) tools. These events are important for detecting tampering, 
+unauthorized modifications, or attempts to bypass system integrity protections.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "fileIntegritySummary"
+summary.description = "File integrity summary"
+summary.summary_template = "summaryTemplate.fileCategory00"
+summary.default_indicator = "default"
+
+[file.subcategories.20.event_type_codes]
+00.name = "file signature invalid"
+00.description = "A file's digital signature or hash validation failed, indicating possible tampering."
+
+01.name = "file integrity notice"
+01.description = "A file integrity monitoring (FIM) system reported a general integrity event for a file."
+
+
+[file.subcategories.99]
+name = "default"
+description = """
+The default subcategory is used for file-related events that do not fit into a more specific subcategory 
+(such as create, delete, modify, access, or integrity). This may include vendor-specific log messages or 
+file events with incomplete context. The default ensures that all file activity can still be captured 
+and represented within the model.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "fileDefaultSummary"
+summary.description = "File default summary"
+summary.summary_template = "summaryTemplate.fileCategory00"
+summary.default_indicator = "default"
+
+[file.subcategories.99.event_type_codes]
+99.name = "file event"
+99.description = "A generic file activity event that does not match a more specific subcategory."

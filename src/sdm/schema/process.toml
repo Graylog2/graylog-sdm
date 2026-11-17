@@ -1,0 +1,139 @@
+type = "field_schema"
+
+[process]
+description = """
+## Overview
+
+The `process` fields describe properties of running or executed processes as observed in operating system or application telemetry. They represent identifiers, executable names, command-line details, file paths, integrity attributes, and related parent or target process information. These fields provide a normalized view of process creation, interaction, and lifecycle activity across different platforms.
+
+## Design and Usage
+
+The `process` entity models the conceptual characteristics of a process independently of the operating system’s internal implementation details. It captures observable attributes such as IDs, command-line arguments, execution paths, and hierarchical relationships between processes. This structure supports consistent interpretation of process activity, allowing correlation with user actions, security events, or system operations. Subfields referencing parent or target processes enable representation of process lineage and interactions.
+
+## Common Use Cases
+
+- Tracing process lineage to support investigations involving suspicious activity or unauthorized execution.
+- Identifying executed commands and process invocation parameters.
+- Correlating process events with authentication, privilege escalation, or policy evaluation.
+- Analyzing targeted process interactions such as injection, signaling, or termination attempts.
+
+## Implementation Notes
+
+As a top-level entity, `process` represents a single executed or running process and may be linked to related entities through parent or target identifiers. Process identifiers and unique IDs may vary across platforms; therefore, modeling should emphasize stable identifiers when available. Fields capturing command line, path, and working directory help maintain relational integrity and clarify execution context. If vendor-specific identifiers or naming conventions are present, both standardized and source-specific forms may be included to preserve semantic accuracy.
+"""
+
+entity_type = "top"
+
+#[process.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[process.fields]]
+field_suffix = "description"
+example_values = "WMI Commandline Utility"
+field_type = "keyword"
+description = "Human-readable description of the executed process."
+
+[[process.fields]]
+field_suffix = "command_line"
+example_values = "c:\\tmp\\runme.exe, /tmp/runme"
+field_type = "keyword/lowercase"
+description = "Full command line used to invoke the process."
+
+[[process.fields]]
+field_suffix = "command_line_length"
+example_values = "29347"
+field_type = "long"
+description = "Character length of the process command line."
+
+[[process.fields]]
+field_suffix = "id"
+example_values = "2045,0x3e7"
+field_type = "keyword/lowercase"
+description = "Numeric process identifier assigned to the executed process."
+
+[[process.fields]]
+field_suffix = "integrity_level"
+example_values = "medium, high, trusted"
+field_type = "keyword"
+description = "Security integrity level associated with the executed process."
+
+[[process.fields]]
+field_suffix = "parent_command_line"
+example_values = "c:\\tmp\\runme.exe, /tmp/runme"
+field_type = "keyword/lowercase"
+description = "Full command line used to invoke the parent process."
+
+[[process.fields]]
+field_suffix = "parent_id"
+example_values = "2045,0x3e7"
+field_type = "keyword/lowercase"
+description = "Numeric process identifier assigned to the parent process."
+
+[[process.fields]]
+field_suffix = "parent_name"
+example_values = "whoami, whoami.exe"
+field_type = "keyword/lowercase"
+description = "File name of the parent process, excluding the directory path."
+
+[[process.fields]]
+field_suffix = "parent_path"
+example_values = "C:\\Windows\\system32\\whoami.exe, /usr/bin/whoami"
+field_type = "keyword/lowercase"
+description = "Full file system path of the parent process executable."
+
+[[process.fields]]
+field_suffix = "parent_uid"
+example_values = "{73123815-5caa-4e39-90dc-d25d4013bf15}"
+field_type = "keyword"
+description = "Unique identifier for the parent process that is distinct from its numeric process identifier."
+
+[[process.fields]]
+field_suffix = "name"
+example_values = "whoami, whoami.exe"
+field_type = "keyword/lowercase"
+description = "File name of the executed process, excluding the directory path."
+
+[[process.fields]]
+field_suffix = "path"
+example_values = "C:\\Windows\\system32\\whoami.exe, /usr/bin/whoami"
+field_type = "keyword/lowercase"
+description = "Full file system path of the executed process executable."
+
+[[process.fields]]
+field_suffix = "target_id"
+example_values = "2045,0x3e7"
+field_type = "keyword"
+description = "Numeric process identifier of the process targeted by an observed action."
+
+[[process.fields]]
+field_suffix = "target_name"
+example_values = "whoami, whoami.exe"
+field_type = "keyword"
+description = "File name of the process targeted by an observed action."
+
+[[process.fields]]
+field_suffix = "target_path"
+example_values = "C:\\Windows\\system32\\whoami.exe, /usr/bin/whoami"
+field_type = "keyword"
+description = "Full file system path of the process targeted by an observed action."
+
+[[process.fields]]
+field_suffix = "target_uid"
+example_values = "{73123815-5caa-4e39-90dc-d25d4013bf15}"
+field_type = "keyword"
+description = "Unique identifier for the process targeted by an observed action."
+
+[[process.fields]]
+field_suffix = "uid"
+example_values = "{73123815-5caa-4e39-90dc-d25d4013bf15}"
+field_type = "keyword"
+description = "Unique identifier for the executed process that is distinct from its numeric process identifier."
+
+[[process.fields]]
+field_suffix = "working_directory"
+example_values = "C:\\Windows\\Temp"
+field_type = "keyword"
+description = "Current working directory of the executed process."

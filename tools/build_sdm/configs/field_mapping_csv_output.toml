@@ -1,0 +1,5 @@
+[plugin]
+name = "FieldMappingCSVOutput"
+output_filename = "gim_field_mapping.csv"
+enabled = 1
+unchecked_fields = ["source"]

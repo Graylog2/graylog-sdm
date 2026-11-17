@@ -1,0 +1,80 @@
+type = "field_schema"
+
+[user]
+description = """
+## Overview
+
+The `user` fields describe the account, identity, or principal associated with activity recorded in an event. They represent identifiers, naming attributes, and contextual information used to determine which user initiated, executed, or was otherwise involved in an action. The entity provides a normalized structure for referencing user information across heterogeneous platforms and identity systems.
+
+## Design and Usage
+
+The `user` entity models conceptual properties of an account or identity without relying on platform-specific naming conventions or authentication mechanisms. Its fields capture identifiers, domains, and contextual details that support correlation across operating systems, directory services, applications, and cloud environments. As a top-level entity, `user` may be referenced by events that describe authentication, authorization, process execution, resource access, or other interactions involving an identity.
+
+## Common Use Cases
+
+- Associating system or application activity with the identity responsible for initiating it
+- Normalizing user information from diverse identity providers and account models
+- Supporting investigations, access reviews, and behavioral analytics that rely on user context
+
+## Implementation Notes
+
+As a top-level entity, `user` represents the complete object describing a principal or account involved in an event. Its fields should remain platform-neutral to ensure consistent interpretation across sources that emit identity-related telemetry. If a related identity or account context is implied but not explicitly provided, corresponding fields may be included to clarify event semantics and preserve relational integrity.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[user.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"] 
+
+[[user.fields]]
+field_suffix = "command"
+example_values = ""
+field_type = "keyword"
+description = "Command invoked by the user as part of the recorded activity."
+
+[[user.fields]]
+field_suffix = "command_path"
+example_values = ""
+field_type = "keyword"
+description = "File system path or location of the command executed by the user."
+
+[[user.fields]]
+field_suffix = "domain"
+example_values = "mycorp.internal"
+field_type = "keyword"
+description = "Domain or namespace associated with the user account."
+
+[[user.fields]]
+field_suffix = "email"
+example_values = "user@mycorp.internal"
+field_type = "keyword"
+description = "Email address associated with the user account."
+
+[[user.fields]]
+field_suffix = "id"
+example_values = ""
+field_type = "keyword"
+description = "Unique identifier associated with the user, such as a system-assigned UID or security identifier."
+
+[[user.fields]]
+field_suffix = "name"
+example_values = ""
+field_type = "keyword/lowercase"
+description = "Name of the user account, represented in lowercase."
+
+[[user.fields]]
+field_suffix = "session_id"
+example_values = "0x534, 1055"
+field_type = "keyword"
+description = "Identifier representing the user session in which the activity occurred."
+
+[[user.fields]]
+field_suffix = "type"
+example_values = "user, service, computer, guest"
+field_type = "keyword"
+description = "Classification of the account associated with the user, such as a standard user, service account, computer/machine account, or guest account."

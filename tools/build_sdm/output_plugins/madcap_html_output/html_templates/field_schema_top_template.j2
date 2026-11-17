@@ -1,0 +1,28 @@
+{% import 'macros/top_level_page_sections.j2' as sections %}
+{% set resources_path = '../../Resources' %}
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd">
+    <head>
+        <link href="{{ resource_path }}/TableStyles/Alternate-Row-Color.css" rel="stylesheet" MadCap:stylesheetType="table" /><title>{{ config.title or 'Field Schema Reference' }}</title>
+    </head>
+    <body>
+        <h1>{{ config.title or 'Field Schema Reference' }}</h1>
+    {% for section in config.field_schema_config.documentation.sections %}
+    {% filter indent(width=0, first=True) %}
+    {{ sections.render_section(section) }}
+    {% endfilter %}
+    {% endfor %}
+        <p>{{ config.intro or "The following schema field definitions are part of Graylog's normalized event model:" }}</p>
+        <ul>
+        {% for entity_name, entity_data in categories.items() %}
+            <li>
+                <p>
+                    <a href="{{ entity_name | regex_replace('[^A-Za-z0-9_]', '_') }}.html">
+                        {{ entity_data.title if entity_data.title else (entity_name | title) }}
+                    </a>
+                </p>
+            </li>
+        {% endfor %}
+        </ul>
+    </body>
+</html>

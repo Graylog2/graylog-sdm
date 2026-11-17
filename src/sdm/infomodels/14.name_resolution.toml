@@ -1,0 +1,153 @@
+type = "gim"
+
+[name_resolution]
+name = "name resolution"
+code = 14
+description = """
+The Name Resolution category covers events where a system attempts to translate a hostname or service name
+into a network address. While this category is primarily focused on DNS today, it is designed to support
+other resolution protocols such as NBNS, LLMNR, or mDNS in the future.
+
+Name resolution events are important for identifying which domains or services a system is attempting to reach.
+They are often analyzed to detect malicious domains, troubleshoot connectivity problems, and correlate higher-level
+network activity back to its origin.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[name_resolution._meta]
+validation_file = "name_resolution.json"
+
+[name_resolution.subcategories]
+
+[name_resolution.subcategories.00]
+name = "dns request"
+description = """
+DNS request events represent a system attempting to resolve a hostname or service name.
+These events capture the fact that a query was made to a DNS server, regardless of the eventual response.
+
+They provide visibility into what domains or services a system is trying to reach,
+which can be critical for investigations, threat hunting, or identifying unusual communication patterns.
+"""
+required_fields = [ "query_request" ]
+recommended_fields = []
+optional_fields = []
+class = "protocol"
+
+summary.title = "name resolution dns request"
+summary.description = "DNS request summary view"
+summary.summary_template = "[name resolution.dns request] event source:{source} | source_reference:{source_reference} | query_request:{query_request}"
+summary.default_indicator = "default"
+
+[name_resolution.subcategories.00.event_type_codes]
+00.name = "dns query"
+00.description = "An attempt to resolve a hostname to a network address via DNS was made"
+
+
+[name_resolution.subcategories.02]
+name = "dns answer"
+description = """
+DNS answer events represent a server’s response to a DNS query.
+Responses may indicate successful resolution (e.g., returning an IP address)
+or negative results such as NXDOMAIN or SERVFAIL, which are still considered valid answers.
+
+Capturing both successful and unsuccessful responses allows analysts to track resolution outcomes,
+detect attempts to reach malicious or non-existent domains, and troubleshoot connectivity problems.
+"""
+required_fields = [ "query_response" ]
+recommended_fields = []
+optional_fields = []
+class = "protocol"
+
+summary.title = "name resolution dns answer"
+summary.description = "DNS response summary view"
+summary.summary_template = "[{gim_event_type}] source:{source} | query_response:{query_response}"
+summary.default_indicator = "default"
+
+[name_resolution.subcategories.02.event_type_codes]
+00.name = "dns response"
+00.description = "An answer to a DNS request was provided"
+
+
+[name_resolution.subcategories.03]
+name = "error"
+description = """
+DNS error events represent situations where a DNS query could not be completed because the server
+was unable to return any valid response. These errors are distinct from negative responses
+such as NXDOMAIN or SERVFAIL, which are valid answers.
+
+Instead, they capture conditions such as transport failures, protocol violations,
+or server-side issues that prevent the query from being answered at all.
+Monitoring these events is useful for detecting infrastructure problems,
+misconfigurations, or disruptions in the resolution service.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+class = "protocol"
+
+summary.title = "nameResDNSError"
+summary.description = "DNS response summary view"
+summary.summary_template = "[{gim_event_type}] source:{source} | event_error_code:{event_error_code}"
+summary.default_indicator = "default"
+
+[name_resolution.subcategories.03.event_type_codes]
+00.name = "dns error"
+00.description = "A DNS request has resulted in an error"
+
+
+[name_resolution.subcategories.05]
+name = "ddns update"
+description = """
+DDNS update events represent attempts to modify DNS records dynamically, without requiring manual
+changes on the authoritative DNS server. This mechanism is often used in enterprise networks
+to allow clients or services to automatically register or update their own hostnames.
+
+While common in environments with frequently changing devices (such as laptops or virtual machines),
+DDNS updates can also be abused by attackers to maintain control of malicious infrastructure
+or evade detection by rapidly changing domain-to-IP mappings.
+
+Tracking DDNS updates is useful for identifying normal infrastructure activity
+and spotting unusual or unauthorized record changes.
+"""
+
+required_fields = []
+recommended_fields = []
+optional_fields = []
+class = "protocol"
+
+summary.title = "name resolution ddns update"
+summary.description = "Dynamic DNS update summary view"
+summary.summary_template = "[{gim_event_type}] {message}"
+summary.default_indicator = "default"
+
+[name_resolution.subcategories.05.event_type_codes]
+00.name = "ddns update"
+00.description = "A request to update a dynamic DNS record entry was made"
+
+
+[name_resolution.subcategories.99]
+name = "default"
+description = """
+The default subcategory is used for DNS or name resolution events that do not fit into a more 
+specific subcategory such as request, answer, error, or DDNS update. These may include 
+vendor-specific log formats, generalized informational messages, or cases where the 
+event cannot be reliably classified. 
+
+By providing a catch-all, the default subcategory ensures that all name resolution 
+activity is captured and normalized, even when detailed parsing is not possible.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+class = "protocol"
+
+summary.title = "name resolution default"
+summary.description = "Default name resolution event summary view"
+summary.summary_template = "[{gim_event_type}] query_request:{query_request}"
+summary.default_indicator = "default"
+
+[name_resolution.subcategories.99.event_type_codes]
+99.name = "dns message"
+99.description = "DNS-related messages"

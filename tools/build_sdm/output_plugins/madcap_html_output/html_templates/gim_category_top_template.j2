@@ -1,0 +1,28 @@
+{% import 'macros/top_level_page_sections.j2' as section_builder %}
+{% set resources_path = '../../Resources' %}
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd">
+    <head>
+        <title>{{ section_cfg.title if section_cfg is defined and section_cfg.title is defined else 'GIM Categories' }}</title>
+    </head>
+    <body>
+        <h1>{{ section_cfg.title if section_cfg is defined and section_cfg.title is defined else 'GIM Categories' }}</h1>
+    {% for section in config.gim_config.documentation.sections %}
+    {% filter indent(width=0, first=True) %}
+    {{ section_builder.render_section(section) }}
+    {% endfilter %}
+    {% endfor %}
+        <p>{{ section_cfg.intro or 'The following metadata field categories represent the Graylog Information Model:' }}</p>
+        <ul>
+        {% for category_name in categories.keys() %}
+            <li>
+                <p>
+                    <a href="{{ category_name }}.html">
+                        {{ category_name | title }}
+                    </a>
+                </p>
+            </li>
+        {% endfor %}
+        </ul>
+    </body>
+</html>
