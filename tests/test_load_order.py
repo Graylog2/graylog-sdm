@@ -67,3 +67,13 @@ def test_gim_dir_setting_is_repo_relative(tmp_path: Path) -> None:
     result = _load_and_transform_gim_config(tmp_path, {"global": {"sdm_source_dir": "src/sdm"}})
 
     assert result["config"]["gim_dir"] == "src/sdm"
+
+
+def test_absolute_sdm_source_dir_is_rejected(tmp_path: Path) -> None:
+    """An absolute sdm_source_dir would put a machine-specific path in the output, so it is refused."""
+    source_dir = tmp_path / "src" / "sdm"
+    source_dir.mkdir(parents=True)
+    _write_config_files(source_dir)
+
+    with pytest.raises(ValueError, match="sdm_source_dir must be relative"):
+        _load_and_transform_gim_config(tmp_path, {"global": {"sdm_source_dir": str(source_dir)}})
