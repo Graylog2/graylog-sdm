@@ -19,7 +19,8 @@ def run_build(
         repo_dir: Path,
         config_dir: Path,
         dry_run: bool = False,
-        output_dir_overrides: Optional[Dict[str, Path]] = None
+        output_dir_overrides: Optional[Dict[str, Path]] = None,
+        output_root: Optional[Path] = None
     ) -> None:
     '''
     Main entry point for building GIM documentation and artifacts.
@@ -30,9 +31,13 @@ def run_build(
         dry_run: Log what would be generated without writing files.
         output_dir_overrides: Output directory per plugin class name (e.g. from a CLI
             flag). Takes precedence over the plugin's configured and default directory.
+        output_root: Replaces the configured global output_dir (e.g. a temporary
+            directory, so a check build doesn't touch build/).
     '''
     _scan_and_import_plugins()
     script_config = _load_script_config(config_dir)
+    if output_root is not None:
+        script_config['global']['output_dir'] = str(output_root)
 
     output_dir = _ensure_output_dir(repo_dir, script_config)
     gim_config = _load_and_transform_gim_config(repo_dir, script_config, config_dir)

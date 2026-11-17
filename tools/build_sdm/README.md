@@ -40,6 +40,13 @@ Example:
 uv run build-sdm build -ll debug --dry-run
 ```
 
+Other commands:
+
+| Command | Purpose |
+|---|---|
+| `uv run build-sdm check-generated` | Builds into a temporary directory and compares the MadCap HTML byte for byte with the committed `generated/MadcapHtmlOutput/` (the MadCap plugin's `output_dir`). It exits 1 and lists every changed, stale (no longer built) or missing file. To fix: `rm -rf generated/MadcapHtmlOutput && uv run build-sdm build`, then commit the result. |
+| `uv run build-sdm validate` | Placeholder until PR 3; it exits 2. |
+
 ## Configuration
 
 - **`configs/build_sdm.toml`** — global settings: `sdm_source_dir` (where `src/sdm/` lives) and `output_dir` (where generated artifacts are written), both resolved relative to the repository root.
