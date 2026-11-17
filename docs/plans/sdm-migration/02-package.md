@@ -36,21 +36,22 @@ It is tied to the Illuminate layout in these places:
 - One CLI with subcommands.
 
 ## Commit order (review commit by commit)
-This PR combines a pure refactor with behavior changes. To keep the parity check meaningful, structure the commits like this:
+This PR combines a pure refactor with behavior changes. To keep the parity check meaningful, structure the commits like this. Merge with **rebase-merge** (not squash), so each commit, including the parity-checked commit 1, stays on `main`.
 
 1. **Refactor, no behavior change:** steps 2–7, 11a and 12a (packaging, imports, rename, repo-root discovery, config loading, a CLI with only the `build` subcommand, moving tests). Step 11a has to be in this commit because the `build-sdm` console script from step 2 points at `build_sdm.cli:main`. Without it, `uv run build-sdm build` can't run the parity check.
    - The parity check runs **at this commit**. Every plugin's output must be byte-identical to Illuminate's at the PR 1 SHA (see Verification).
-   - Record the result in the PR description, because a squash merge loses this intermediate state on `main`.
+   - Record the result in the PR description too, so reviewers see it without checking out the commit.
 1b. **Imported test and latent-defect fixes:** step 12b. Kept out of commit 1 so the move stays a pure move. Tool output is unchanged (the hint fix affects no current data).
+1c. **Output snapshot tests:** step 12c. Snapshots are taken from the parity-verified output, so every later commit (here and in PR 3) must show any output change in its own diff.
 2. **Fatal plugin failures:** step 9. If parity at commit 1 revealed a plugin that was failing silently, this commit surfaces it.
 3. **Optional MadCap output path:** step 8, including the `--madcap-output-dir` flag on `build`. It's additive, and the default output is unchanged.
 4. **CLI additions:** step 11b.
-5. **`allowed_field_types` fix:** step 10. This is the only commit expected to change output. List any output differences in the PR description.
+5. **`allowed_field_types` fix:** step 10. This is the only commit expected to change output. Update the snapshots in this same commit, and list any output differences in the PR description.
 6. **Generated output and determinism:** steps 13–14. Commit `generated/MadcapHtmlOutput/` from the final state.
 7. **Standards and plan status:** steps 15–16.
 
 ## Steps
-1. Branch `migration/02-package`.
+1. Branch `migration-package-02`.
 2. Root `pyproject.toml`:
    - `name = "build-sdm"`, `requires-python = ">=3.13,<3.14"`
    - dependencies copied from `tools/build_sdm/pyproject.toml`: `pydantic>=1.10,<2.0`, `jinja2>=3.1`, `markdown>=3.4`, `tomlkit>=0.12`
@@ -105,6 +106,8 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
     - **11a (commit 1).** Replace `main.py` with `cli.py` (argparse subcommands). Add only `build [--dry-run] [-ll LEVEL] [-c CONFIG_DIR]`, with exactly the old `main.py` flags and behavior.
     - **11b (commit 4).** Add:
       - `check-generated`: build MadCap into a temporary dir, then run a recursive byte-for-byte diff against `generated/MadcapHtmlOutput/`. Print the differing files and exit 1 on any difference.
+        - The diff must go both ways. The tool never deletes files, so a removed or renamed category leaves stale HTML in `generated/`. Report files that exist only in `generated/` as stale, and tell the contributor to delete them; report files that exist only in the fresh build as missing.
+        - Tests: exit 0 on a clean tree; exit 1 for a hand-edited file, an extra stale file, and a missing file.
       - a placeholder for `validate` (implemented in PR 3)
     - Commit 3 adds `--madcap-output-dir PATH` to `build`, as part of step 8.
 12. Tests, in two parts:
@@ -114,6 +117,11 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
       - `output_madcap/test_madcap_output_html_subdir.py`: has no test functions or assertions; it validates a local copy of the model in import-time loops. Replace it with parametrized tests against the real `TopLevelGimSectionMetadata` and `TopLevelFieldSchemaSectionMetadata` (`madcap_html_output/models.py`, `SafeSubdir`), asserting acceptance or `ValidationError` per the real contract. Check that contract in the code; don't copy the local model's regex.
       - `utils/transform.py:39`: the duplicate (type, category) `ValueError` has no test. Add one that feeds two entries with the same type and category and asserts the error.
       - `html_templates/macros/top_level_page_sections.j2:33`: the `hint` branch indexes `section.content` as a list, but the model requires a string (`field_schema_model.py:137-139`), so a hint renders one character per line. Split on `\n` as the `warning` branch does, and add a render test. No current data uses a hint, so output is unchanged.
+      - Tests that write to fixed paths under `/tmp` (`/tmp/gim`, `/tmp/DummyPlugin`): `output_madcap/test_madcap_output_gen_category_pages.py` (3 tests) and `test_runner_run_plugins.py::test_run_plugins_normal`. Use pytest's `tmp_path` instead. They write into a shared system directory and fail in a sandbox that blocks `/tmp`.
+    - **12c (commit 1c).** Snapshot tests for the plugin output built from the live data (the cheap part of follow-up F1):
+      - `tests/golden/<Plugin>/` holds the output of `CategoryDataCSVOutput`, `FieldMappingCSVOutput`, `JsonFileOutput` and `MessageSummariesOutput`, copied from the parity-verified build at commit 1. MadCap is covered by `generated/` and `check-generated`.
+      - A test builds from `src/sdm/` into `tmp_path` and compares each plugin's output byte for byte with its snapshot, in both directions (stale and missing files fail too).
+      - `pytest --update-golden` (an option in `tests/conftest.py`) rewrites the snapshots. Any change to the data or the tool that changes output must update them in the same commit, so the change shows up in review.
 13. Add a determinism check: run `build` twice and diff the results. If anything nondeterministic shows up (timestamps, dict or set ordering), fix it.
 14. Run `uv run build-sdm build` and commit `generated/MadcapHtmlOutput/`. Add `build/` to `.gitignore` if it isn't there.
 15. Update the standards files:
@@ -136,5 +144,7 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
 - `uv run build-sdm build --madcap-output-dir "$TMPDIR/x"` writes only to `$TMPDIR/x`, and `generated/` is unchanged.
 - With the config `output_dir` set to another path and no flag, output goes to that path. With both set, the flag wins.
 - A test plugin that raises makes the CLI exit 1. So do a plugin write failure and an enabled plugin with invalid config.
-- `uv run build-sdm check-generated` exits 0 on a clean tree, and exits 1 after one generated file has been hand-edited.
+- `uv run build-sdm check-generated` exits 0 on a clean tree, and exits 1 after one generated file has been hand-edited, after a stale file is added to `generated/`, and after a generated file is deleted.
+- The snapshot tests pass at every commit from 1c on. Only commit 5 updates snapshots, and its diff shows exactly the output changes listed in the PR description.
+- `uv run pytest` passes inside the Claude Code sandbox (no test writes outside `tmp_path`).
 - `grep -rn "build_gim\|gim_artifacts\|_meta/gim" tools/ tests/ src/ pyproject.toml` returns no hits. This is the same scope as step 5; docs are excluded.

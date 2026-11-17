@@ -14,7 +14,7 @@ Not covered here:
 
 | # | Follow-up | Priority | Target | Decision needed |
 |---|---|---|---|---|
-| F1 | Golden-file tests for all output plugins | High | PR 2 or PR 3 | No |
+| F1 | Golden-file tests for all output plugins | High | Live-data snapshots in PR 2; fixture-based tests later | No |
 | F2 | Compatibility checker + enforced `sdm_version` bump | High | After PR 3 (extends `validate --base-ref`) | Yes: versioning policy |
 | F3 | Minimal CI from PR 2; branch protection now | High | Now / PR 2 | Yes: CI sequencing |
 | F4 | Safe writes for the MadCap output path | High | PR 2 | No |
@@ -41,6 +41,8 @@ Not covered here:
 - Optionally, also snapshot outputs built from the live `src/sdm/` data. Updating a snapshot then becomes an explicit, reviewed act (`pytest --update-golden` or similar).
 
 **Done when:** a change to any plugin's output fails `pytest` until the golden files are updated in the same PR.
+
+**Status:** snapshots of the live-data output are planned for PR 2 (`02-package.md` step 12c). Still open: the snapshots built from a small fixed fixture dataset, which test plugin behavior independently of data changes.
 
 ## F2. Compatibility checker with an enforced `sdm_version` bump
 
@@ -82,7 +84,7 @@ Not covered here:
 **Problem:** `--madcap-output-dir` replaces the default location. If the plugin clears or overwrites its output directory, pointing it at a Flare project could destroy hand-written content.
 
 **Activity:**
-1. Check whether `MadcapHtmlOutput` (or `utils.file.write_file`) deletes or cleans its target directory.
+1. Check whether `MadcapHtmlOutput` (or `utils.file.write_file`) deletes or cleans its target directory. Checked 2026-11-17: nothing in the tool deletes files (no `rmtree`, `unlink`, `remove` or `shutil`); it creates directories and overwrites same-named files. The risk is overwriting hand-edited files, not wiping a directory.
 2. Write only into an empty directory, or one containing a `.build-sdm-output` marker file that the tool itself created. Otherwise refuse, unless `--force` is given.
 3. Never delete files the tool didn't write. If stale-file cleanup is needed, limit it to files listed in a manifest from the previous run.
 4. Add tests for the refuse, force and marker cases.
