@@ -1,0 +1,66 @@
+type = "field_schema"
+
+[alert]
+description = """
+## Overview
+
+The `alert` fields represent metadata describing alerts or detections reported by security technologies such as intrusion detection systems, antivirus software, or other analytic components. These fields capture the details of *why* an event was identified as noteworthy, suspicious, or malicious, and define the contextual information that distinguishes alerts from normal telemetry.
+
+Each `alert` field provides a consistent structure for representing vendor-specific threat intelligence, classification, and versioning data. This supports reliable normalization of alerts across different security products and enables unified analysis, reporting, and threat correlation.
+
+## Design and Usage
+
+The `alert` fields are **top-level** and are not appended to other field entities. They describe intrinsic alert metadata, including the alert’s classification, the indicators that triggered it, and the signature or definition set version that produced the detection.
+
+Key design principles include:
+
+- **Interoperability:** Normalizes alert data across diverse products and log formats. 
+- **Contextual clarity:** Encapsulates key identifying information about what caused the alert. 
+- **Traceability:** Enables analysts to trace alerts back to their underlying detection logic. 
+- **Version awareness:** Supports version tracking for detection content such as 
+  antivirus definitions or intrusion detection signatures.
+
+## Common Use Cases
+
+- **Threat correlation** — Use `alert_category` and `alert_indicator` to align detections 
+  from multiple sources.
+- **Detection analytics** — Filter or group alerts by `alert_definitions_version` to evaluate 
+  detection coverage or outdated signature sets.
+- **Incident investigation** — Combine `alert_*` fields with `event_*` and `source_*` fields 
+  to reconstruct what triggered an alert and where it originated.
+- **Reporting and trend analysis** — Aggregate alerts by category, indicator type, or version 
+  to identify recurring threats or detection gaps.
+
+## Integration Context
+
+The `alert` fields often appear alongside `event`, `network`, or `file` entities in normalized data. This combination provides both the *context* (event) and the *cause* (alert) of security-relevant detections, allowing for precise correlation, tuning, and enrichment.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+[alert.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'alert_entity_template.j2'
+field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[alert.fields]]
+field_suffix = "definitions_version"
+example_values = "2020.1, 4092348"
+field_type = "keyword"
+description = "Version or identification value that indicates the version a collection of signatures (A/V, etc.) is in use."
+
+[[alert.fields]]
+field_suffix = "category"
+example_values = "malware, trojan, ransomware"
+field_type = "keyword"
+description = "Vendor-provided category assignment."
+
+[[alert.fields]]
+field_suffix = "indicator"
+example_values = "malware.exe, http://badsite"
+field_type = "keyword"
+description = "A filename, URL, packet snippet or other artifact that is related to the event that caused the alert to be generated."

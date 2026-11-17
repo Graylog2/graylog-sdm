@@ -1,0 +1,43 @@
+type = "field_schema"
+
+[policy]
+description = """
+## Overview
+
+The `policy` fields describe configuration objects that define rules, constraints, or behavioral directives applied by a system. These fields represent the identifying attributes of a policy, such as its unique identifiers and human-readable name, as observed in telemetry or configuration-based events.
+
+## Design and Usage
+
+The `policy` entity provides a normalized structure for representing policies across heterogeneous platforms and security technologies. It models the conceptual characteristics of a policy object without assuming any vendor-specific semantics, enabling consistent reference and correlation within broader event and configuration models. As a top-level entity, `policy` is treated independently of rule sets, actions, or outcomes that may reference or depend on it.
+
+## Common Use Cases
+
+- Associating events or alerts with the specific policy that triggered, allowed, or evaluated them.
+- Tracking changes to policy definitions over time for auditing and compliance monitoring.
+- Normalizing telemetry from different systems that generate or apply policy-based controls.
+
+## Implementation Notes
+
+As a top-level entity, `policy` represents a distinct configuration construct rather than an operational event outcome. It may be linked to entities such as `rule`, `user`, or `resource` in systems that evaluate or enforce policies, but its identifying fields should remain stable and vendor-neutral. If a related entity is implied but not explicitly modeled, corresponding fields should be included to maintain relational integrity and clarify event semantics.
+"""
+
+entity_type = "top"
+
+[[policy.fields]]
+field_suffix = "id"
+example_values = "policy-12345"
+field_type = "keyword"
+description = "Secondary identifier or system-specific unique value associated with the policy."
+# NOTE: Example value reflects a non-GUID but commonly used opaque identifier used in systems where policies have both internal IDs and user-facing identifiers.
+
+[[policy.fields]]
+field_suffix = "name"
+example_values = "admin-user-template"
+field_type = "keyword"
+description = "Human-readable name assigned to the policy."
+
+[[policy.fields]]
+field_suffix = "uid"
+example_values = "6da61e4c-84a8-4136-900d-f86c09bb3774"
+field_type = "keyword"
+description = "Stable unique identifier assigned to the policy."

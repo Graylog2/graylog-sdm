@@ -1,0 +1,50 @@
+type = "field_schema"
+
+[container]
+description = """
+## Overview
+
+The `container` fields describe isolated execution environments that run applications or processes within a virtualized or constrained context. Containers abstract the underlying system resources, enabling consistent behavior across different hosts and deployment environments.
+
+## Design and Usage
+
+Container-related fields capture identifying and contextual information about the container instance, such as unique identifiers, names, and namespaces. These fields support correlation across containerized workloads, orchestration systems, and host telemetry. The schema design assumes containers operate as discrete yet transient entities within broader system or cluster environments.
+
+## Common Use Cases
+
+- Tracking container activity within security or performance monitoring data.
+- Correlating events across multiple containers or orchestration namespaces.
+- Identifying workloads involved in alerts, deployments, or process lineage analysis.
+
+## Implementation Notes
+
+The **container** entity represents a top-level schema component and should not be modeled as a sub-entity. Field naming conventions follow the standard prefix pattern (`container_<suffix>`). Implementations rely on stable identifiers to enable event correlation even when containers are ephemeral.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[container.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'container_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[container.fields]]
+field_suffix = "id"
+example_values = ""
+field_type = "keyword"
+description = "Unique container ID"
+
+[[container.fields]]
+field_suffix = "name"
+example_values = ""
+field_type = "keyword"
+description = "Container name"
+
+[[container.fields]]
+field_suffix = "namespace"
+example_values = ""
+field_type = "keyword"
+description = "Namespace the container is running in"

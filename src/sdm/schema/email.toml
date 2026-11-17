@@ -1,0 +1,129 @@
+type = "field_schema"
+
+[email]
+description = """
+## Overview
+
+The `email` fields describe properties of electronic mail (email) messages as observed in telemetry or event data. They represent logical components of an email object, including sender and recipient information, message routing, and content-related metadata. These fields support consistent modeling of email-related events across different log sources and security platforms.
+
+## Design and Usage
+
+The `email` entity provides a standardized structure for representing email message attributes that may originate from mail servers, gateways, or endpoint telemetry. It enables normalization of diverse vendor data into a coherent schema, capturing both message-level details (such as headers, identifiers, and message size) and contextual attributes (such as directionality and originating IP). As a top-level entity, `email` should be modeled independently of transport or network-layer entities, while maintaining references to related actors or systems through linking identifiers when available.
+
+## Common Use Cases
+
+- Correlating sender, recipient, and message identifiers across security telemetry to detect phishing or data exfiltration activity.
+- Analyzing attachment metadata for malware detection or suspicious file transfer analysis.
+- Mapping inbound and outbound message flows to determine lateral or cross-domain communication within an organization.
+- Enriching message-level data for content inspection, policy enforcement, or compliance logging.
+
+## Implementation Notes
+
+As a top-level entity, `email` defines a self-contained conceptual object representing an email message. It should be modeled independently of vendor-specific schema variations, supporting hierarchical or relational mappings to entities such as `user`, `network`, or `file` when applicable. `email` fields may appear in conjunction with related entities to clarify event semantics and maintain relational integrity within normalized telemetry. If an associated `network` or `file` entity is implied but not explicitly defined, corresponding fields should be included to ensure directional and contextual consistency.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[email.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[email.fields]]
+field_suffix = "attachment_file_name"
+example_values = "attachment.exe"
+field_type = "keyword"
+description = "The file name(s) of an attachment."
+
+[[email.fields]]
+field_suffix = "attachment_file_size"
+example_values = "1024"
+field_type = "long"
+description = "The size in bytes of the attachments."
+
+[[email.fields]]
+field_suffix = "bcc"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "The email address of BCC recipient/email."
+
+[[email.fields]]
+field_suffix = "cc"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "The email address of CC recipient/email."
+
+[[email.fields]]
+field_suffix = "delivered_to"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "The Delivered-To email header field."
+
+[[email.fields]]
+field_suffix = "direction"
+example_values = "inbound, outbound, lateral"
+field_type = "keyword"
+description = "Indicates the direction of the observed email flow. Must be either inbound, outbound or lateral, this should be mapped to these values if vendors provide network direction differently."
+
+[[email.fields]]
+field_suffix = "from"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "Per RFC 5322, specifies the address responsible for the actual transmission/sender of the message."
+
+[[email.fields]]
+field_suffix = "message_id"
+example_values = "<CAD78=PvAb+iLQ6x+221MGa-22@mail.gmail.com>"
+field_type = "keyword"
+description = "The globally-unique message identifier."
+
+[[email.fields]]
+field_suffix = "raw_header"
+example_values = ""
+field_type = "keyword"
+description = "The email authentication header."
+
+[[email.fields]]
+field_suffix = "reply_to"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "The address that replies should be delivered to based on the value in the RFC 5322 Reply-To: header."
+
+[[email.fields]]
+field_suffix = "size"
+example_values = "234"
+field_type = "long"
+description = "The size of an email in bytes."
+
+[[email.fields]]
+field_suffix = "subject"
+example_values = "RE: FWD: Testing"
+field_type = "keyword"
+description = "The email subject."
+
+[[email.fields]]
+field_suffix = "to"
+example_values = "corp_user@corp.local"
+field_type = "keyword"
+description = "The email address of recipient/email."
+
+[[email.fields]]
+field_suffix = "uid"
+example_values = "123456789A"
+field_type = "keyword"
+description = "The email unique identifier internally used by an email software to track a message."
+
+[[email.fields]]
+field_suffix = "x_originating_ip"
+example_values = "192.168.2.3"
+field_type = "keyword"
+description = "The X-Originating-IP header identifying the email's originating IP address(es)."
+
+[[email.fields]]
+field_suffix = "xmailer"
+example_values = "spambot"
+field_type = "keyword"
+description = "Tool that created and sent the email."

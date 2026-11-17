@@ -1,0 +1,33 @@
+type = "field_schema"
+
+[pipe]
+description = """
+## Overview
+
+The `pipe` fields describe named pipes, filesystem-visible interprocess communication (IPC) objects used to exchange data or signal events between processes. They provide a normalized structure for referencing named pipe activity such as creation, removal, and connection state changes.
+
+## Design and Usage
+
+The `pipe` entity models the named pipe itself, independent of the process that created, removed, or connected to it. As a top-level entity, `pipe` should be modeled alongside `process` and `user` fields where available to fully describe who created or used the pipe.
+
+## Common Use Cases
+
+- Detecting abnormal interprocess communication, such as unauthorized or ad-hoc IPC channels.
+- Identifying named pipes commonly associated with persistence or lateral movement techniques used by malicious software.
+- Correlating pipe creation, connection, and removal events to reconstruct IPC activity over time.
+
+## Implementation Notes
+
+As a top-level entity, `pipe` represents the named pipe object referenced by an event. If the process or user responsible for the activity is known, corresponding `process`/`user` fields should be included to fully describe the event.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+[[pipe.fields]]
+field_suffix = "name"
+example_values = "\\Device\\NamedPipe\\lsass, \\.\\pipe\\atsvc"
+field_type = "keyword"
+description = "Name or path of the named pipe involved in the event."

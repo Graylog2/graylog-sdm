@@ -1,0 +1,182 @@
+type = "field_schema"
+
+[source]
+description = """
+## Overview
+
+The `source` fields describe the originating system, device, or network endpoint associated with an event. They represent identifying and network-related attributes that characterize where an action, connection, or message was initiated. The entity provides a consistent structure for referencing source-side information across heterogeneous platforms and event types.
+
+The `source` fields have the prefix `source_` and describe the originating system or endpoint involved in the event. They are conceptually distinct from the top-level event field named `source` that may represent the system responsible for sending or forwarding the log message. See the Reserved Fields documentation for details on that top-level `source` field.
+
+## Design and Usage
+
+The `source` entity models conceptual properties of the system or endpoint responsible for originating activity described in an event. Its fields capture device identifiers, network addresses, operating system metadata, and other attributes commonly associated with source context. As a top-level entity, `source` supports reliable correlation and normalization across diverse logging formats and network environments.
+
+## Common Use Cases
+
+- Associating activity with the device or endpoint that initiated a network connection or system action
+- Normalizing heterogeneous source identifiers for use in detections, analytics, and investigative workflows
+- Tracking attributes of originating systems to support behavioral baselining, asset classification, and forensic analysis
+
+## Implementation Notes
+
+As a top-level entity, `source` represents the complete object describing the originating system or endpoint. Its fields should remain platform-neutral and consistently applied to preserve clarity across event types. If related entities such as `destination` or `network` are implied but not explicitly defined, corresponding fields may be included to clarify event semantics and maintain relational integrity.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[source.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"] 
+
+[[source.fields]]
+field_suffix = "bytes_sent"
+example_values = "29834710"
+field_type = "long"
+description = "Amount of network data transmitted from the source, measured in bytes."
+
+[[source.fields]]
+field_suffix = "device_model"
+example_values = "iPad"
+field_type = "keyword"
+description = "Model designation of the source device."
+
+[[source.fields]]
+field_suffix = "device_vendor"
+example_values = "Apple, ASUS"
+field_type = "keyword"
+description = "Manufacturer associated with the source device."
+
+[[source.fields]]
+field_suffix = "domain"
+example_values = "www.example.com, mail.corp.local"
+field_type = "keyword"
+description = """
+Domain name associated with the source system, such as a hostname, fully qualified domain name, or other host naming value. May originate from the original event or be added through enrichment.
+
+When Illuminate is installed, this field is processed by the core domain enrichment pipeline: the value is normalized (ASCII-lowercased, with any trailing dot stripped, and punycode labels decoded to Unicode) before source_registered_domain, source_subdomain, and source_top_level_domain are derived from it.
+"""
+
+[[source.fields]]
+field_suffix = "hostname"
+example_values = "corpdc01, corpdc01.local, lab01.corpdomain.com"
+field_type = "keyword/lowercase"
+description = "Hostname of the source system, represented in lowercase."
+
+[[source.fields]]
+field_suffix = "id"
+example_values = "09VX93DD"
+field_type = "keyword"
+description = "Identifier associated with the source device, such as a serial or hardware ID."
+
+[[source.fields]]
+field_suffix = "ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IPv4 or IPv6 address assigned to the source."
+
+[[source.fields]]
+field_suffix = "ipv6"
+example_values = "fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IPv6 address assigned to the source."
+
+[[source.fields]]
+field_suffix = "nat_ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "Translated IP address assigned to the source by a network address translation mechanism."
+
+[[source.fields]]
+field_suffix = "nat_port"
+example_values = "2384"
+field_type = "integer"
+description = "Translated network port assigned to the source by a network address translation mechanism."
+
+[[source.fields]]
+field_suffix = "os_name"
+example_values = "IOS, Android"
+field_type = "keyword"
+description = "Name of the operating system running on the source device."
+
+[[source.fields]]
+field_suffix = "os_version"
+example_values = "IOS 10.0"
+field_type = "keyword"
+description = "Version value associated with the operating system of the source."
+
+[[source.fields]]
+field_suffix = "packets_sent"
+example_values = "23094823"
+field_type = "long"
+description = "Number of network packets transmitted from the source."
+
+[[source.fields]]
+field_suffix = "port"
+example_values = "45392"
+field_type = "integer"
+description = "Network port used by the source, represented as a value between 0 and 65535."
+
+[[source.fields]]
+field_suffix = "port_iana_name"
+example_values = "ssh, ftp"
+field_type = "keyword"
+description = "IANA-registered service name associated with the source port."
+
+[[source.fields]]
+field_suffix = "reference"
+example_values = "corpdc01, 192.168.5.25"
+field_type = "keyword"
+description = "This is a derived field, added by Illuminate Core, that is selected from a list of fields, in order: source_ip, source_hostname, source_vm_name, source_mac. This can be defined in a parsing pack if a different order, or different fields, are preferred. It is defined to provide a field that can be used in aggregations as a single identifier that should be defined when aggregating over different event log types."
+
+[[source.fields]]
+field_suffix = "region"
+example_values = "us-east-1"
+field_type = "keyword"
+description = "Geographic or cloud region associated with the source device."
+
+[[source.fields]]
+field_suffix = "registered_domain"
+example_values = "example.com"
+field_type = "keyword"
+description = "Highest registered domain of source_domain, stripped of any subdomain, determined using the public suffix list. For example, the registered domain of \"mail.example.com\" is \"example.com\". Illuminate Core's domain enrichment pipeline populates this field from source_domain when installed; other event sources or pipelines may populate it independently."
+
+[[source.fields]]
+field_suffix = "subdomain"
+example_values = "mail"
+field_type = "keyword"
+description = "Subdomain portion of source_domain, containing all labels below source_registered_domain, with no trailing period. For example, the subdomain of \"mail.corp.example.com\" is \"mail.corp\". Illuminate Core's domain enrichment pipeline populates this field from source_domain when installed; other event sources or pipelines may populate it independently."
+
+[[source.fields]]
+field_suffix = "top_level_domain"
+example_values = "com"
+field_type = "keyword"
+description = "Effective top-level domain (eTLD), also known as the domain suffix, of source_domain, determined using the public suffix list. For example, the top-level domain of \"example.co.uk\" is \"co.uk\". Illuminate Core's domain enrichment pipeline populates this field from source_domain when installed; other event sources or pipelines may populate it independently."
+
+[[source.fields]]
+field_suffix = "user_name"
+example_values = ""
+field_type = "keyword/lowercase"
+description = "Name of the user or service account that initiated the activity, represented in lowercase. Distinct from `user_name`, which identifies the account being acted upon."
+
+[[source.fields]]
+field_suffix = "type"
+example_values = ""
+field_type = "keyword"
+description = "Type or classification of the source device."
+
+[[source.fields]]
+field_suffix = "vm_name"
+example_values = ""
+field_type = "keyword"
+description = "Name of the virtual system associated with the source device."
+
+[[source.fields]]
+field_suffix = "vsys_uuid"
+example_values = ""
+field_type = "keyword"
+description = "Unique identifier associated with the source virtual system."

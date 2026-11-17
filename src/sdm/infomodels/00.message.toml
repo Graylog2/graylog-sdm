@@ -1,0 +1,84 @@
+type = "gim"
+
+[message]
+name = "message"
+code = "00"
+description = "Basic Messages"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[message._meta]
+validation_file = "message.json"
+
+#[[message.summaries]]
+#
+# See https://github.com/Graylog2/graylog-illuminate-devguide/blob/master/security_features/summary_message_templates.md 
+# for information about message summary templates
+#
+#template_id = "templateName"
+#title = ".."
+#description = ".."
+#summary = "[{gim_event_type}]"
+[[message.summaries]]
+template_id = "default"
+title = "Default"
+description = "Default Message Summary View"
+summary = "[{gim_event_type}] {source} - {message}"
+
+#[[message.indicators]]
+#type = "indicatorName"
+#title = ".."
+#description = ".."
+#danger = ["value1"]
+#success = ["value2"]
+#info = ["value3"]
+#primary = ["value4"]
+#warning = ["value5"]
+#default = ["value6"]
+#indicator = "field_name"
+#default_indicator = "info"
+
+[[message.indicators]]
+type = "eventOutcome"
+title = "Event Outcome Indicator Template"
+description = "Basic event outcome message summary indicator"
+success = [
+    "success"
+]
+danger = [
+    "failure"
+]
+indicator = "event_outcome"
+default_indicator = "warning"
+
+#[[message.indicators]]
+#type = "indicatorDefaultInfo"
+#title = "Default info indicator"
+#description = "Default info indicator - sets only the default_indicator as info"
+#success = [ "success" ]
+#danger = [ "_undefined_" ]
+# default = [ "_undefined_" ]
+# primary = [] (works, dark gray)
+# warning = [] (works, gold)
+# danger = [] (works, red)
+# success = [] (works, green)
+# info = [] - doesn't work? Same color as standard message view?
+# gray = [] - doesn't work
+# default = [] - doesn't work? variant - dark default is gray
+#indicator = "event_action"
+#default_indicator = "success"
+
+[message.subcategories]
+
+[message.subcategories.00]
+name = "log_message"
+description = "Log message"
+# class = ""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[message.subcategories.00.event_type_codes]
+00.name = "message"
+00.description = "Log message"

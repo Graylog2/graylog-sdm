@@ -1,0 +1,10 @@
+# === Sample Plugin Configuration File (configs/plaintext_output.toml) ===
+
+# This file defines the *global* (plugin-wide) configuration. It is loaded
+# once when the plugin is initialized. The schema class `PlainTextOutputConfig`
+# will be used to validate its contents.
+
+[plugin]
+name = "PlainTextOutput"
+output_filename = "gim_data.txt"
+enabled = false

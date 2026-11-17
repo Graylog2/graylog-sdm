@@ -1,0 +1,6 @@
+[global]
+# Directories in this configuration are relative to what is assumed to be the respository directory
+# which is determined relative to the script directory; the repository directory is two directory
+# levels up from the location of the script. The script is assumed to be in scripts/build_gim.
+gim_source_dir = "_meta/gim"
+output_dir = "build/gim_artifacts"

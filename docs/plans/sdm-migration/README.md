@@ -83,7 +83,7 @@ build/sdm_artifacts/<Plugin>/    # gitignored
 
 | PR | Step file | Status |
 |---|---|---|
-| 1 | `01-import.md`: scaffold, AI standards, ADRs, plan conventions, verbatim import | active |
+| 1 | `01-import.md`: scaffold, AI standards, ADRs, plan conventions, verbatim import | done |
 | 2 | `02-package.md`: package, rename, paths, optional MadCap path | active |
 | 3 | `03-lint.md`: `build-sdm validate` + TOML formatting | active |
 | 4 | `04-ci.md`: CI workflow | active |

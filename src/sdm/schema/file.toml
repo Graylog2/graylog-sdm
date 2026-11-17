@@ -1,0 +1,109 @@
+type = "field_schema"
+
+[file]
+description = """
+The `file` entity defines fields used to describe attributes of files observed in event logs. These fields capture details such as the file name, path, size, metadata, and properties that help analysts understand the role of a file in an event. For example, file_name records the file’s name, file_path indicates where it was located in the filesystem, and file_size captures its size in bytes.
+
+Additional fields can describe file-specific characteristics such as whether it was executable, which company created it, or when it was compiled. Together, these fields provide a consistent way to represent file-related activity across different platforms and log sources.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[file.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[file.fields]]
+field_suffix = "company"
+example_values = "Microsoft"
+field_type = "keyword"
+description = "Company name associated with a file taken from the file metadata."
+
+[[file.fields]]
+field_suffix = "compile_time"
+example_values = ""
+field_type = "date"
+description = "Compiled date/time that a binary file was compiled."
+
+[[file.fields]]
+field_suffix = "contents"
+example_values = ""
+field_type = "keyword"
+description = "Contents of a file."
+
+[[file.fields]]
+field_suffix = "description"
+example_values = "WMI"
+field_type = "keyword"
+description = "Description of file."
+
+[[file.fields]]
+field_suffix = "is_executable"
+example_values = "true, false"
+field_type = "boolean"
+description = "Flag indicating if file is executable."
+
+[[file.fields]]
+field_suffix = "is_signed"
+example_values = "1"
+field_type = "boolean"
+description = "Flag indicating if file has been digitally signed."
+
+[[file.fields]]
+field_suffix = "name"
+example_values = "file.zip, file.exe, file"
+field_type = "keyword"
+description = "File name, not including path."
+
+[[file.fields]]
+field_suffix = "path"
+example_values = "C:\\temp\\file.exe"
+field_type = "keyword"
+description = "Full path and file name."
+
+[[file.fields]]
+field_suffix = "product"
+example_values = ""
+field_type = "keyword"
+description = "Product name the file was shipped with."
+
+[[file.fields]]
+field_suffix = "product_version"
+example_values = ""
+field_type = "keyword"
+description = "Product version the file was shipped with."
+
+[[file.fields]]
+field_suffix = "signature_status"
+example_values = "valid"
+field_type = "keyword"
+description = "Status of file signature."
+
+[[file.fields]]
+field_suffix = "signed_by"
+example_values = "Microsoft Windows"
+field_type = "keyword"
+description = "Title of file signer."
+
+[[file.fields]]
+field_suffix = "size"
+example_values = "23894713"
+field_type = "long"
+description = "File size in bytes."
+
+[[file.fields]]
+field_suffix = "type"
+example_values = "gzip compressed data, application/pdf"
+field_type = "keyword"
+description = "Description of file contents."
+
+[[file.fields]]
+field_suffix = "version"
+example_values = "10.0.14393.4169 (rs1_release.210107-1130)"
+field_type = "keyword"
+description = "Version of file."

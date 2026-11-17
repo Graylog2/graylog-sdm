@@ -1,0 +1,44 @@
+
+type = "field_schema"
+
+[reserved]
+title = "Reserved Fields"
+description = """
+Reserved fields are top-level field names that are not prefixed by an entity name — they are used exactly as named on every normalized event. They are populated by Graylog itself (`timestamp`, `message`, `source`) or set directly by Illuminate content pack pipelines (`sdm_version`), and should not be reused or repurposed by pack authors for other purposes.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+# reserved: these fields are not prefixed by the entity name - field_suffix IS the literal field name.
+entity_type = "reserved"
+
+#[reserved.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[reserved.fields]]
+field_suffix = "timestamp"
+example_values = "2026-07-28T14:32:10.123Z"
+field_type = "date"
+description = "The primary timestamp of the event, populated from the original event time when available or the time of ingestion otherwise. This is the canonical time field used for time-range searches and event ordering in Graylog."
+
+[[reserved.fields]]
+field_suffix = "message"
+example_values = "[Authentication] admin - Successful login from 10.1.2.3"
+field_type = "text"
+description = "Human-readable summary of the event - either the raw log line or a normalized summary populated by Illuminate content pack pipeline rules. This is a full-text analyzed field used for keyword search."
+
+[[reserved.fields]]
+field_suffix = "source"
+example_values = "corpdc01.local, 10.1.2.3"
+field_type = "keyword/lowercase"
+description = "Identifies the system or device that transmitted the message to Graylog (e.g. the sending host or collector), as distinct from the source_* entity fields, which describe the originating system or endpoint of the activity described in the event."
+
+[[reserved.fields]]
+field_suffix = "sdm_version"
+example_values = "7.1.0"
+field_type = "keyword"
+description = "Version of the Security Data Model (SDM) schema that this pack's normalized fields conform to, allowing consumers to determine which field definitions apply to a given message."

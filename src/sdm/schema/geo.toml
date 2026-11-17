@@ -1,0 +1,82 @@
+type = "field_schema"
+
+[geo]
+title = "Geolocation (Geo) Sub-Fields"
+description = """
+The `geo` sub-fields represent geolocation attributes derived from IP addresses or other location-bearing data associated with entities described elsewhere in the event. These fields are not standalone entities; they are appended to top-level entity names to express location-specific properties, such as `source_geo_city` or `destination_geo_country`.
+
+Geo fields apply to entities that carry network or host addressing context, including `source`, `destination`, and `host`. They are typically populated through IP geolocation enrichment and describe the physical or administrative location associated with the entity at the time of the event.
+
+Common applications include:
+
+- Identifying the geographic origin or destination of network connections for threat detection and investigation.
+- Enriching events with country, region, and city context to support geographically scoped analytics and dashboards.
+- Deriving location-based signals for behavioral baselining and anomaly detection.
+
+Each field in this group corresponds to a specific level of geographic resolution or representation:
+
+- `geo_city` - The city associated with the resolved location.
+- `geo_continent` - The continent associated with the resolved location.
+- `geo_country` - The full country name associated with the resolved location.
+- `geo_country_iso` - The ISO 3166-1 alpha-2 country code.
+- `geo_coordinates` - Latitude and longitude as a comma-separated string.
+- `geo_name` - A human-readable location label, optionally derived by combining other geo values.
+- `geo_state` - The state, province, or equivalent administrative subdivision.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "sub"
+
+# The top-level entities this sub-field group is appended to, e.g. source_geo_city,
+# destination_geo_country. Each name must match a field_schema entity with entity_type = "top".
+applies_to = ["source", "destination", "host"]
+
+#[geo.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[geo.fields]]
+field_suffix = "city"
+example_values = "Hamburg, Houston"
+field_type = "keyword"
+description = "City name associated with the resolved geolocation."
+
+[[geo.fields]]
+field_suffix = "continent"
+example_values = "America"
+field_type = "keyword"
+description = "Continent name associated with the resolved geolocation."
+
+[[geo.fields]]
+field_suffix = "coordinates"
+example_values = "34.1186,-118.3004"
+field_type = "keyword"
+description = "Latitude and longitude of the resolved geolocation, expressed as a comma-separated decimal coordinate pair."
+
+[[geo.fields]]
+field_suffix = "country"
+example_values = "USA, Canada"
+field_type = "keyword"
+description = "Full country name associated with the resolved geolocation."
+
+[[geo.fields]]
+field_suffix = "country_iso"
+example_values = "US, DE, CA"
+field_type = "keyword"
+description = "ISO 3166-1 alpha-2 country code associated with the resolved geolocation."
+
+[[geo.fields]]
+field_suffix = "name"
+example_values = "Hamburg, DE"
+field_type = "keyword"
+description = "Human-readable location label associated with the resolved geolocation. May be derived by combining other geo field values."
+
+[[geo.fields]]
+field_suffix = "state"
+example_values = "Hamburg"
+field_type = "keyword"
+description = "State, province, or equivalent administrative subdivision associated with the resolved geolocation."

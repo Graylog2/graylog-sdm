@@ -1,0 +1,234 @@
+type = "gim"
+
+[authentication]
+name = "authentication"
+code = 10
+description = """
+The authentication category covers events where accounts or services attempt to access, validate, or terminate sessions on a system.
+This includes, but is not limited to, logon activity, credential validation, and related events such as logoff, Kerberos requests, or policy checks.
+Authentication events in this category are account-centric: each event must identify a user or service account (`user_name`) and the application or system (`application_name`) where the activity occurred.
+"""
+required_fields = [ "application_name", "user_name" ]
+recommended_fields = []
+optional_fields = []
+
+[authentication._meta]
+validation_file = "authentication.json"
+
+#[[authentication.summaries]]
+#template_id = "authBasic"
+#title = "Basic Authentication Message Summary Template"
+#description = "Summarize basic authentication messages"
+#summary = "[category:{gim_event_category}] user_name:{user_name} | event_outcome:{event_outcome}"
+
+#[[authentication.summaries]]
+#template_id = "authExtended"
+#title = "Extended Authentication Message Summary Template"
+#description = "Extended message summary template for authentication messages"
+#summary = "[category:{gim_event_category}] application_name:{application_name} | source_reference:{source_reference} | user_domain:{user_domain} | user_name:{user_name} | event_outcome:{event_outcome}"
+
+#[[authentication.summaries]]
+#template_id = "authPrimary"
+#title = "Primary Authentication Message Summary Template"
+#description = "Primary message summary template for authentication messages"
+#summary = "[category:{gim_event_category}] application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}"
+
+[authentication.subcategories]
+
+[authentication.subcategories.00]
+name = "logon"
+description = """
+Logon events represent attempts to establish or resume an authenticated session on a system or service. The result should be captured in `event_outcome` (for example, success or failure). This is distinct from credential validation, which is the act of an authenticator checking submitted credentials.
+
+Mapping guidance:
+
+- If the platform emits separate records for logon and credential validation, assign a single, matching GIM code to each record respectively. Do not assign both codes to the same record.
+- If the platform emits only a logon record that implies credential validation (for example, "user 'administrator' logged on successfully"), assign both the 'logon' and 'credential validation' event type codes to that single record.
+- If the event reflects resuming an existing session without re-validating credentials (for example, a session reconnect), assign only the 'logon' code.
+"""
+required_fields = [
+    'event_outcome', 'source_reference', 'destination_reference'
+]
+recommended_fields = []
+optional_fields = [ "user_domain" ]
+
+summary.title = "authentication logon"
+summary.description = "Logon message summary view"
+summary.summary_template = "[authentication.logon] application_name:{application_name} | source_reference:{source_reference} | user_domain:{user_domain} | user_name:{user_name} | event_outcome:{event_outcome}"
+summary.indicator_template = "indicatorTemplate.eventOutcome"
+
+[authentication.subcategories.00.event_type_codes]
+00.name = "logon"
+00.description = "A user or service performed a logon activity"
+
+03.name = "logon with alternate credentials"
+03.description = "A user or service has provided alternate credentials when authenticating"
+
+04.name = "session reconnect"
+04.description = "A user or service has resumed an existing session that was disconnected from but was not terminated"
+
+
+[authentication.subcategories.05]
+name = "credential validation"
+description = """
+Credential validation events represent the act of an authentication system checking credentials provided by a user or service account. The outcome of this check (for example, success or failure) must be recorded in `event_outcome`.
+
+Credential validation is distinct from logon. A system may emit both a credential validation event and a separate logon event (for example, Windows with Kerberos or NTLM), or it may emit only a logon event that implies credential validation. In the latter case, the logon description provides mapping guidance for assigning both codes to the single logon event.
+"""
+required_fields = [ 'event_outcome', 'source_reference' ]
+recommended_fields = []
+optional_fields = []
+summary.title = "authentication credential validation"
+summary.description = "Authentication:Credential Validation summary view configuration"
+summary.indicator_template = "indicatorTemplate.eventOutcome"
+summary.summary_template = "[authentication.credential validation] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_domain:{user_domain} | user_name:{user_name} | event_outcome:{event_outcome}"
+
+[authentication.subcategories.05.event_type_codes]
+00.name = "credential validation"
+00.description = "The validation of credentials provided by a user or service"
+
+01.name = "error"
+01.description = "An error was encountered when attempting to validate credentials provided by a user or service"
+
+02.name = "mfa"
+02.description = "The authenticating system asked for an additional authentication factor"
+
+03.name = "sms_send_message"
+03.description = "The authenticating system sent an authentication token via SMS"
+
+04.name = "voice_call"
+04.description = "The authenticating system sent an authentication token via a voice call"
+
+
+[authentication.subcategories.10]
+name = "access notice"
+description = "Access notices are events that are generated during authentication that provide additional information related to authentication"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "authentication access notice"
+summary.description = """
+Access notice events provide supplemental information generated during authentication that does not directly represent a logon or credential validation. These events add context about the authentication process, such as when a logon occurs with elevated privileges ("special logon") or when the system generates an advisory error.
+
+Access notices should be treated as contextual events: they provide important security-relevant details but do not by themselves indicate a successful or failed authentication attempt.
+"""
+summary.summary_template = "[authentication.access notice] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}"
+summary.default_indicator = "default"
+
+[authentication.subcategories.10.event_type_codes]
+00.name = "special logon"
+00.description = "The user logging on has elevated privileges"
+
+01.name = "error"
+01.description = "There was a system error encountered during the authentication process"
+
+
+[authentication.subcategories.15]
+name = "access policy"
+description = """
+Access policy events record enforcement actions taken during authentication when an account, device, or session violates a defined policy.
+These events do not represent the credential validation process itself, but rather show when access is denied or restricted due to policy rules.
+
+Examples include:
+- Access policy violations (such as time-of-day restrictions or geo-blocking)
+- Device policy violations (such as requiring managed devices)
+- Account policy violations (such as expired or disabled accounts)
+
+Access policy events are security-relevant because they indicate that authentication was attempted but blocked or constrained by policy enforcement.
+"""
+required_fields = ['source_reference']
+recommended_fields = []
+optional_fields = []
+
+summary.title = "authentication access policy"
+summary.description = "Access policy messages"
+summary.summary_template = "[authentication.access policy] application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}"
+summary.default_indicator = "default"
+
+[authentication.subcategories.15.event_type_codes]
+00.name = "access policy violation"
+00.description = "The account attempting to access a system or service has committed a violation of a defined access policy"
+
+01.name = "device policy violation"
+01.description = "The account attempting to access a system or service has committed a violation of a defined device policy"
+
+02.name = "account policy violation"
+02.description = "The account attempting to access a system or service has committed a violation of a defined account policy"
+
+
+[authentication.subcategories.20]
+name = "kerberos request"
+description = """
+Kerberos request events represent authentication activity specific to the Kerberos protocol. These events capture the lifecycle of Kerberos ticket operations, including service ticket requests and renewals, ticket-granting ticket (TGT) requests, and errors encountered by the Kerberos subsystem.
+
+Kerberos request events are distinct from generic credential validation or logon events. They should be assigned when the authenticator records Kerberos-specific ticket activity, even if additional logon or credential validation events are also present.
+"""
+required_fields = [ 'event_outcome', 'source_reference' ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "authentication kerberos request"
+summary.description = "Kerberos request message summary template"
+summary.summary_template = "[authentication.kerberos request] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}"
+summary.indicator_template = "indicatorTemplate.eventOutcome"
+#summary.default_indicator = "info"
+
+[authentication.subcategories.20.event_type_codes]
+00.name = "service ticket renewed"
+00.description = "A Kerberos service ticket has been renewed"
+
+01.name = "service ticket requested"
+01.description = "A Kerberos service ticket has been requested"
+
+02.name = "tgt request"
+02.description = "A Kerberos ticket-granting ticket (TGT) has been requested"
+
+03.name = "error"
+03.description = "The Kerberos system has encountered an error"
+
+
+[authentication.subcategories.25]
+name = "logoff"
+description = """
+Logoff events represent the termination of an authenticated session on a system or service. These events indicate when a user or service account intentionally ends a session, or when the system records a disconnect without fully terminating the session.
+
+Logoff events provide closure to the authentication lifecycle, complementing logon events. They are valuable for tracking session activity and distinguishing between normal logoff behavior and disconnected sessions that remain idle or open.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "authentication logoff"
+summary.description = "A user has logged off from a system or session"
+summary.summary_template = "[authentication.logoff] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}"
+summary.default_indicator = "default"
+
+[authentication.subcategories.25.event_type_codes]
+00.name = "logoff"
+00.description = "User has logged off from a system"
+
+01.name = "session disconnect"
+01.description = "A user has disconnected from a system, leaving the user session idle and waiting for a reconnection"
+
+
+[authentication.subcategories.99]
+name = "default"
+description = """
+The default subcategory is a fallback for authentication-related events that do not clearly fit into another defined subcategory. It should be used sparingly, and only when no more specific mapping is available.
+
+Default mappings are useful for capturing unclassified or vendor-specific authentication events, but relying heavily on this subcategory reduces the consistency and analytic value of the information model. Whenever possible, events should be assigned to a more specific authentication subcategory.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "authentication default"
+summary.description = "Messages related to authentication"
+summary.summary_template = "[authentication.default] {event_source_product} - user_name:{user_name} | event_outcome:{event_outcome}"
+summary.indicator_template = "indicatorTemplate.eventOutcome"
+#summary.default_indicator = "info"
+
+[authentication.subcategories.99.event_type_codes]
+99.name = "authentication message"
+99.description = "Messages related to authentication"

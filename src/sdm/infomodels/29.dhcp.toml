@@ -1,0 +1,139 @@
+type = "gim"
+
+[dhcp]
+name = "dhcp"
+code = 29
+description = """
+The DHCP category models events related to the Dynamic Host Configuration Protocol (DHCP), 
+which manages automatic assignment of IP addresses and network configuration parameters. 
+These events describe the interactions between DHCP clients and servers throughout the 
+lease lifecycle — from discovery and offer to renewal and release. Monitoring DHCP activity 
+supports identification of rogue servers, unauthorized hosts, and changes in network topology.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[dhcp._meta]
+validation_file = "dhcp.json"
+
+[[dhcp.summaries]]
+template_id = "dhcpDefault"
+summary = "[{gim_event_type}] source_mac:{source_mac} | source_ip:{source_ip} | source_hostname:{source_hostname}"
+title = "DHCP Basic Template"
+description = "Basic DHCP message summary template"
+
+[dhcp.subcategories]
+
+[dhcp.subcategories.00]
+name = "request"
+description = """
+Events generated when a DHCP client requests an IP address lease, renewal, or parameter update 
+from a DHCP server. Requests are typically part of the DHCP handshake sequence but can also 
+represent lease renewals or rebindings as part of normal network operation.
+"""
+class = "protocol"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "dhcpRequest"
+summary.description = "DHCP Request (schema v3.1)"
+summary.summary_template = "summaryTemplate.dhcpDefault"
+summary.default_indicator = "default"
+
+[dhcp.subcategories.00.event_type_codes]
+00.name = "dhcp request"
+00.description = "A DHCP client issued a request for an IP address lease or renewal."
+
+
+[dhcp.subcategories.01]
+name = "offer"
+description = """
+Events generated when a DHCP server offers an IP address lease to a requesting client. 
+The offer includes network configuration details such as IP address, subnet mask, gateway, 
+and lease duration.
+"""
+class = "protocol"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "dhcpOffer"
+summary.description = "DHCP Offer (schema v3.1)"
+summary.summary_template = "summaryTemplate.dhcpDefault"
+summary.default_indicator = "default"
+
+[dhcp.subcategories.01.event_type_codes]
+00.name = "dhcp offer"
+00.description = "A DHCP server issued an offer containing IP configuration parameters for a client."
+
+
+[dhcp.subcategories.02]
+name = "discovery"
+description = """
+Events generated when a DHCP client broadcasts a discovery message to locate available 
+DHCP servers. Discovery events indicate initial attempts to obtain an IP configuration 
+after system startup or network reconnection.
+"""
+class = "protocol"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "dhcpDiscovery"
+summary.description = "DHCP Discovery (schema v3.1)"
+summary.summary_template = "summaryTemplate.dhcpDefault"
+summary.default_indicator = "default"
+
+[dhcp.subcategories.02.event_type_codes]
+00.name = "dhcp discovery"
+00.description = "A DHCP client broadcast a discovery message to locate available DHCP servers."
+
+
+[dhcp.subcategories.03]
+name = "acknowledgement"
+description = """
+Events generated when a DHCP server acknowledges a client’s request, finalizing the 
+assignment of an IP address lease. This message completes the DHCP handshake and allows 
+the client to use the assigned configuration.
+"""
+class = "protocol"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "dhcpAck"
+summary.description = "DHCP Acknowledgement (schema v3.1)"
+summary.summary_template = "summaryTemplate.dhcpDefault"
+summary.default_indicator = "default"
+
+[dhcp.subcategories.03.event_type_codes]
+00.name = "dhcp acknowledgement"
+00.description = "A DHCP server acknowledged a client’s request, confirming the lease assignment."
+
+
+[dhcp.subcategories.99]
+name = "default"
+description = """
+General DHCP-related messages that do not correspond to a specific transaction stage, 
+such as NAK (negative acknowledgment), decline, release, or vendor-specific extensions. 
+These events may indicate configuration changes, protocol errors, or unauthorized DHCP traffic.
+"""
+class = "protocol"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "dhcpDefault"
+summary.description = "DHCP Default (schema v3.1)"
+summary.summary_template = "summaryTemplate.dhcpDefault"
+summary.default_indicator = "default"
+
+[dhcp.subcategories.99.event_type_codes]
+99.name = "dhcp default event"
+99.description = """
+General DHCP-related messages that do not correspond to a specific transaction stage, 
+such as NAK (negative acknowledgment), decline, release, or vendor-specific extensions. 
+These events may indicate configuration changes, protocol errors, or unauthorized DHCP traffic.
+"""

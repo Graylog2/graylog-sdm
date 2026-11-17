@@ -1,0 +1,138 @@
+type = "gim"
+
+[pipe]
+name = "pipe"
+code = 23
+description = """
+The Pipe category represents events related to the creation, deletion, and use of named pipes, 
+which are interprocess communication (IPC) mechanisms that appear as filesystem objects. 
+Named pipes provide a one-way or duplex communication channel between processes, 
+and are commonly used by operating systems and applications for exchanging data or signaling events. 
+Monitoring named pipe activity is valuable for detecting abnormal IPC behavior, 
+such as unauthorized process communications or persistence mechanisms used by malicious software.
+"""
+
+required_fields = [ "pipe_name" ]
+recommended_fields = [ "process_name", "user_name" ]
+optional_fields = []
+
+[pipe._meta]
+validation_file = "pipe.json"
+
+[[pipe.summaries]]
+template_id = "pipeCategory"
+summary = "[{gim_event_type}] pipe_name:{pipe_name} | user_name:{user_name}"
+title = "pipe category template"
+description = "Basic pipe category message template for schema v3.1"
+
+[pipe.subcategories]
+
+[pipe.subcategories.00]
+name = "add"
+99.name = "pipe event"
+description = """
+Events that represent the creation of named pipes on a system. 
+A named pipe is an interprocess communication (IPC) channel that appears as a filesystem object 
+and allows data exchange between processes. 
+Creation events indicate the establishment of such communication channels, 
+whether for legitimate system operations or for ad-hoc or malicious data transfer. 
+Monitoring these events helps identify new IPC endpoints that could be used for persistence or covert communication.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "pipeAddSummary"
+summary.description = "Named pipe add (schema v3.1)"
+summary.summary_template = "summaryTemplate.pipeCategory"
+summary.default_indicator = "default"
+
+[pipe.subcategories.00.event_type_codes]
+00.name = "pipe created"
+00.description = """
+A named pipe was created on the system. 
+This typically occurs when an application or process sets up an interprocess communication (IPC) channel 
+through the filesystem. Creation events can indicate legitimate application behavior or the setup 
+of a custom communication channel by malware or scripts.
+"""
+
+
+
+[pipe.subcategories.01]
+name = "remove"
+description = """
+Events that represent the removal or deletion of named pipes from the filesystem. 
+When a named pipe is removed, the IPC channel it provided is no longer available for communication. 
+These events typically occur during normal cleanup or service shutdown but can also signal 
+an attempt to conceal unauthorized IPC activity by deleting the evidence of a communication channel.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "pipeRemoveSummary"
+summary.description = "Named pipe remove (schema v3.1)"
+summary.summary_template = "summaryTemplate.pipeCategory"
+summary.default_indicator = "default"
+
+[pipe.subcategories.01.event_type_codes]
+00.name = "pipe deleted"
+00.description = """
+A named pipe was deleted or unlinked from the filesystem. 
+This event indicates that an IPC channel was removed, ending the communication path between processes.
+"""
+
+
+[pipe.subcategories.05]
+name = "state"
+description = """
+Events that describe the operational state or state transitions of named pipes. 
+These include successful or attempted connections between processes using pipes for communication. 
+State events are important for understanding active IPC behavior — for example, 
+when a process begins or ends communication through an existing pipe. 
+Tracking state changes can help detect unexpected or unauthorized interprocess connections.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "pipeStateSummary"
+summary.description = "Named pipe state (schema v3.1)"
+summary.summary_template = "summaryTemplate.pipeCategory"
+summary.default_indicator = "default"
+
+[pipe.subcategories.05.event_type_codes]
+00.name = "pipe connected"
+00.description = """
+A connection was established or attempted between processes via a named pipe. 
+This event marks active or pending communication through an IPC channel.
+"""
+
+
+[pipe.subcategories.99]
+name = "default"
+description = """
+Events that relate to named pipe activity but do not fit into a more specific subcategory. 
+These may include vendor-specific or informational messages related to named pipe usage. 
+This subcategory ensures that all pipe-related events can be normalized and retained 
+even if their exact purpose or type is unknown.
+"""
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "pipeDefaultSummary"
+summary.description = "Named pipe default (schema v3.1)"
+summary.summary_template = "summaryTemplate.pipeCategory"
+summary.default_indicator = "default"
+
+[pipe.subcategories.99.event_type_codes]
+99.name = "pipe event"
+99.description = """
+A generic named pipe event that does not fit a more specific subcategory or event type. 
+This serves as a fallback classification for vendor-specific or informational pipe activity.
+"""

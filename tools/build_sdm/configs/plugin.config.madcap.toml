@@ -1,0 +1,20 @@
+type = "config_output_plugin"
+
+[base]
+plugin_name = "output_plugins.madcap_html_output.plugin.MadcapHtmlOutput"
+
+[gim]
+title = "Graylog Information Model (GIM) Categories Reference"
+intro = """
+This section provides documentation for each GIM category and its usage context.
+"""
+template = "gim_category_top_template.j2"
+output_filename = "Graylog_Entity_Categories.html"
+html_output_subdir = "Graylog Information Models"  # Optional
+
+[field_schema]
+title = "Field Schema Reference"
+intro = "This section provides descriptions and formats for schema fields used in normalized events."
+template = "field_schema_top_template.j2"
+output_filename = "Graylog_Schema_entities.html"
+html_output_subdir = "Field Schema Entities"  # Optional

@@ -1,0 +1,77 @@
+type = "gim"
+
+[category_name]
+code = XX
+description = "Description"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+[category_name._meta]
+validation_file = "category_name.json"
+
+# Per-category custom settings can be defined here if the plugins support
+# customization. 
+#[network.meta.plugin_config.'output_plugins.madcap_html_output.MadcapHtmlOutput']
+# Provide the name of the template used to generate the documentation HTML file
+#category_template_filename = "gim_category_template_network.j2"
+
+#[[category_name.summaries]]
+#
+# See https://github.com/Graylog2/graylog-illuminate-devguide/blob/master/security_features/summary_message_templates.md 
+# for information about message summary templates
+#
+#template_id = "templateName"
+#title = ".."
+#description = ".."
+#summary = "[{gim_event_type}]"
+
+#[[category_name.indicators]]
+#type = "indicatorName"
+#title = ".."
+#description = ".."
+#danger = ["value1"]
+#success = ["value2"]
+#info = ["value3"]
+#primary = ["value4"]
+#warning = ["value5"]
+#default = ["value6"]
+#indicator = "field_name"
+#default_indicator = "info"
+      
+[category_name.subcategories]
+
+[category_name.subcategories.00]
+name = ".."
+description = ".."
+# class = ""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = ".."
+summary.description = ".."
+summary.summary_template = "[{gim_event_type}] "
+summary.default_indicator = "default"
+
+[category_name.subcategories.00.event_type_codes]
+00.name = ".."
+00.description = ".."
+
+[category_name.subcategories.99]
+name = "default"
+description = "category_name messages"
+# class = ""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "category_name default"
+summary.description = "Messages related to category_name"
+summary.summary_template = "summaryTemplate.templateName"
+summary.indicator_template = "indicatorTemplate.indicatorName"
+summary.default_indicator = "info"
+
+[category_name.subcategories.99.event_type_codes]
+99.name = "category_name message"
+99.description = "Messages related to category_name"

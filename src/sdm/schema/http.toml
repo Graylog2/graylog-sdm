@@ -1,0 +1,160 @@
+type = "field_schema"
+
+[http]
+description = """
+## Overview
+
+The `http` fields describe properties of Hypertext Transfer Protocol (HTTP) requests and responses as observed in network and application telemetry. They represent logical components of HTTP transactions, including methods, paths, headers, versions, and payload characteristics. This entity provides a normalized view of client and server interactions that occur over HTTP or HTTPS.
+
+## Design and Usage
+
+The `http` entity defines a structured representation of request and response data across diverse logging sources. It captures transactional attributes such as message size, content type, user agent details, and server response information in order to support consistent analysis across vendors and protocols. As a top-level entity, `http` is modeled independently of network session data but may be related to network or user entities through higher-level correlation when available.
+
+## Common Use Cases
+
+- Analyzing web traffic patterns to support threat detection, anomaly identification, and categorization of browsing activity.
+- Investigating client behavior through normalized user agent, URI, and request method information.
+- Reviewing response codes and content metadata to identify service failures, redirects, or suspicious responses.
+- Correlating HTTP activity with broader network telemetry to clarify event semantics and support incident investigations.
+
+## Implementation Notes
+
+As a top-level entity, `http` represents a complete logical object describing an HTTP transaction. It should be modeled independently of vendor-specific field naming conventions while supporting hierarchical mappings to related entities such as `network`, `file`, or `user` when applicable. The entity may appear in conjunction with connection-level data to maintain relational integrity across normalized telemetry. 
+If a related entity is implied but not explicitly present, corresponding fields should be included to ensure consistent interpretation of HTTP request and response semantics.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[http.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[http.fields]]
+field_suffix = "application"
+example_values = "facebook"
+field_type = "keyword"
+description = "Identifies the application-layer service or platform associated with the HTTP transaction."
+
+[[http.fields]]
+field_suffix = "bytes"
+example_values = "29347485"
+field_type = "long"
+description = "Total size of the request and response combined, measured in bytes."
+
+[[http.fields]]
+field_suffix = "content_type"
+example_values = "application/octet-stream"
+field_type = "keyword"
+description = "Mime type of http content."
+
+[[http.fields]]
+field_suffix = "headers"
+example_values = ""
+field_type = "keyword"
+description = "Full list of http headers."
+
+[[http.fields]]
+field_suffix = "host"
+example_values = "Host: wwww.mycorp.local"
+field_type = "keyword"
+description = "Value of the Host header provided in the HTTP request."
+
+[[http.fields]]
+field_suffix = "referrer"
+example_values = "http://mycorp.local/"
+field_type = "keyword"
+description = "Value of the 'Referer' header supplied by the client."
+
+[[http.fields]]
+field_suffix = "request_bytes"
+example_values = "239478"
+field_type = "long"
+description = "Size of the HTTP request payload, measured in bytes."
+
+[[http.fields]]
+field_suffix = "request_method"
+example_values = "GET, POST"
+field_type = "keyword"
+description = "Method used in the HTTP request, such as GET or POST."
+
+[[http.fields]]
+field_suffix = "request_path"
+example_values = "/path/to/resource?option=test"
+field_type = "keyword"
+description = "Path component of the HTTP request, which may include a query string depending on the source format."
+
+[[http.fields]]
+field_suffix = "response_bytes"
+example_values = "498274"
+field_type = "long"
+description = "Size of HTTP response, measured in bytes."
+
+[[http.fields]]
+field_suffix = "response"
+example_values = "OK, Moved Permanently"
+field_type = "keyword"
+description = "Textual description associated with the HTTP response status."
+
+[[http.fields]]
+field_suffix = "response_code"
+example_values = "200, 404, 500"
+field_type = "integer"
+description = "Numeric status code returned by the server in response to the HTTP request."
+
+[[http.fields]]
+field_suffix = "uri"
+example_values = "https://www.graylog.org, https://www.graylog.org/blog, https://www.mycorp.local/workspaces/team#posts"
+field_type = "keyword"
+description = "Full URI referenced in the HTTP request."
+
+[[http.fields]]
+field_suffix = "uri_category"
+example_values = "Suspicious, Games"
+field_type = "keyword"
+description = "Classification assigned to the destination URI based on content or reputation."
+
+[[http.fields]]
+field_suffix = "uri_stem"
+example_values = "Default.htm"
+field_type = "keyword"
+description = "The target of the request. For Example: http://www.test.com/test.jsp?hello=y the URI stem is /test.jsp."
+
+[[http.fields]]
+field_suffix = "uri_query"
+example_values = "hello=y"
+field_type = "keyword"
+description = "The query the client was trying to perform. Example http://www.test.com/test.jsp?hello=y the query is hello=y."
+
+[[http.fields]]
+field_suffix = "user_agent"
+example_values = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:74.0) Gecko/20100101 Firefox/74.0)"
+field_type = "keyword"
+description = "User Agent string."
+
+[[http.fields]]
+field_suffix = "user_agent_name"
+example_values = "Firefox"
+field_type = "keyword"
+description = "Attempted identification of the browser client usually based on user agent analysis."
+
+[[http.fields]]
+field_suffix = "user_agent_os"
+example_values = "Windows 10"
+field_type = "keyword"
+description = "Operating System of User Agent."
+
+[[http.fields]]
+field_suffix = "version"
+example_values = "1.0, 1.1, 2.0"
+field_type = "keyword"
+description = "HTTP protocol version used in the request."
+
+[[http.fields]]
+field_suffix = "xff"
+example_values = "X-Forwarded-For: 10.1.2.3"
+field_type = "keyword"
+description = "Value of the X-Forwarded-For header indicating one or more client IP addresses."

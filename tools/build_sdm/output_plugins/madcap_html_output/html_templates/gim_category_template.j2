@@ -1,0 +1,37 @@
+{% import "macros/tables.html.j2" as tables %}
+{% import "macros/descriptions_mdsf.html.j2" as descriptions_mdsf %}
+{% set resources_path = '../Resources' %}
+<?xml version="1.0" encoding="utf-8"?>
+<html xmlns:MadCap="http://www.madcapsoftware.com/Schemas/MadCap.xsd">
+    <head>
+        <link href="{{ resources_path }}/TableStyles/Alternate-Row-Color.css" rel="stylesheet" MadCap:stylesheetType="table" /><title>{{ 'GIM Category: ' ~ category_data.name }}</title>
+        <link href="{{ resources_path }}/Stylesheets/Styles.css" rel="stylesheet" />
+    </head>
+    <body>
+        <h1>{{ 'GIM Category: ' ~ category_data.name }}</h1>
+        {{ descriptions_mdsf.render_description(category_data.description) }}
+        {% for subcat_code, subcat in category_data.subcategories.items() %}
+        <h2>{{ subcat.name }}</h2>
+        {% filter indent(width=8, first=False) %}
+        {{ descriptions_mdsf.render_description(subcat.description) }}
+        {% endfilter %}
+        {% for level in ['required', 'recommended', 'optional'] %}
+        {% if subcat.merged_fields[level] %}
+        <h4>{{ level|capitalize }} Fields</h4>
+        <ul>
+        {% for field in subcat.merged_fields[level] %}
+            <li><code class="linecode">{{ field }}</code></li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+      {% endfor %}
+        {% if subcat.table_rows %}
+        {% filter indent(width=4, first=False) %}
+        {{ tables.render_table(subcat.table_rows[0].keys(), subcat.table_rows) }}
+        {% endfilter %}
+        {% else %}
+        <p><em>No event type data available for this subcategory.</em></p>
+        {% endif %}
+      {% endfor %}
+    </body>
+</html>

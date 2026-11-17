@@ -1,0 +1,44 @@
+type = "field_schema"
+
+[trace]
+description = """
+## Overview
+
+The `trace` fields describe contextual information that links multiple related events or captures call-level diagnostic details. They represent identifiers and call data that help reconstruct execution flow, correlate distributed activity, or associate events originating from the same logical operation. The entity provides a normalized structure for referencing trace information across systems that emit telemetry containing call paths, spans, or grouped event sequences.
+
+## Design and Usage
+
+The `trace` entity models conceptual properties used to connect events that belong to the same execution chain or diagnostic workflow. Its fields capture identifiers and call details without relying on platform-specific tracing frameworks, enabling consistent interpretation across heterogeneous environments. As a top-level entity, `trace` supports analysis techniques such as correlation, sequence reconstruction, and activity mapping.
+
+## Common Use Cases
+
+- Correlating multiple events that are part of the same logical operation or workflow
+- Reconstructing execution sequences using trace or call information
+- Supporting diagnostic, performance, or troubleshooting workflows that rely on trace identifiers or call hierarchies
+
+## Implementation Notes
+
+As a top-level entity, `trace` defines a complete object representing correlated or call-level diagnostic information. Its fields should remain neutral and independent of platform-specific tracing terminology to ensure consistent usage across event types. If a related process or activity entity is implied but not explicitly included, corresponding fields may be added to clarify event semantics and preserve relational integrity.
+"""
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[trace.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"] 
+
+[[trace.fields]]
+field_suffix = "id"
+example_values = ""
+field_type = "keyword"
+description = "Identifier that associates multiple related events with the same execution or workflow."
+
+[[trace.fields]]
+field_suffix = "call"
+example_values = ""
+field_type = "keyword"
+description = "Call information or stack context associated with the traced execution."

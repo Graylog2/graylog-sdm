@@ -1,0 +1,33 @@
+type = "field_schema"
+
+[registry]
+description = """
+## Overview
+
+The `registry` fields describe activity within the Windows Registry, the hierarchical database that stores configuration data for the operating system and installed applications. They provide a normalized structure for referencing registry key and value changes such as creation, modification, deletion, and renaming.
+
+## Design and Usage
+
+The `registry` entity models the registry key or value referenced by an event, independent of the process or user that performed the action. As a top-level entity, `registry` should be modeled alongside `process` and `user` fields where available to fully describe who made the change.
+
+## Common Use Cases
+
+- Detecting configuration and policy changes made by the operating system, administrators, or software.
+- Identifying registry locations commonly associated with persistence or privilege escalation techniques used by attackers.
+- Auditing registry key and value changes for change management and forensic investigation.
+
+## Implementation Notes
+
+As a top-level entity, `registry` represents the registry object referenced by an event. If the process or user responsible for the activity is known, corresponding `process`/`user` fields should be included to fully describe the event.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+[[registry.fields]]
+field_suffix = "path"
+example_values = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\updater"
+field_type = "keyword"
+description = "Full path of the registry key or value involved in the event."

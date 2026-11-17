@@ -1,0 +1,4 @@
+[plugin]
+name = "CategoryDataCSVOutput"
+output_filename = "category_data.csv"
+enabled = 1

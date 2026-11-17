@@ -1,0 +1,232 @@
+type = "gim"
+
+[iam]
+name = "iam"
+code = 11
+description = """
+The Identity and Access Management (IAM) category covers events where accounts, groups, and related objects are created, modified, enabled, disabled, or deleted. It includes administrative actions such as privilege assignment, password resets, and changes to group membership or properties.
+
+IAM events are account-centric: each event must identify the account being acted upon (`user_name`), and in most cases, the initiating account (`source_user_name`). These events are highly security-relevant because they directly reflect changes to identities and their access capabilities.
+"""
+required_fields = [ "user_name" ]
+recommended_fields = []
+optional_fields = [ "user_type", "user_domain" ]
+
+[iam._meta]
+validation_file = "iam.json"
+
+[[iam.summaries]]
+template_id = "iamEvents"
+summary = "[{gim_event_type}] event_source_product:{event_source_product} | source_user_name:{source_user_name} | user_name:{user_name}"
+title = "IAM Events"
+description = "IAM Events Summary View Template"
+
+[iam.subcategories]
+
+[iam.subcategories.00]
+name = "object create"
+description = """
+Object create events record the creation of IAM objects such as user accounts or groups. These events identify both the target account or group (`user_name`) and the actor that initiated the operation (`source_user_name`).
+
+Mapping guidance:
+- Use this subcategory when the directory, identity provider, or management API reports that an object was created. Do not use this for property changes on existing objects (see object modify).
+- If a platform emits separate events for request/approval and final creation, map the final creation to 'account created' or 'group created' and map earlier workflow steps to your vendor-specific fields; do not use object create for pending states.
+- Service-initiated provisioning (for example, automated sync from HRIS) should still be mapped to object create; the initiating service account should populate `source_user_name`.
+"""
+required_fields = [ "user_name", "source_user_name" ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamObjectCreate"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "summaryTemplate.iamEvents"
+summary.default_indicator = "default"
+
+
+[iam.subcategories.00.event_type_codes]
+00.name = "account created"
+00.description = "An account was created"
+
+01.name = "error"
+01.description = "An error was encountered when creating an account"
+
+02.name = "group created"
+02.description = "A group was created"
+
+
+[iam.subcategories.05]
+name = "object delete"
+description = """
+Object delete events record the removal of IAM objects such as user accounts or groups. These events identify both the account or group being removed (`user_name`) and the actor that initiated the deletion (`source_user_name`).
+
+Mapping guidance:
+- Use this subcategory only when the directory, identity provider, or management API confirms that an object has been deleted.
+- Do not use this for accounts that are disabled or locked; see the object disable subcategory instead.
+- For platforms that support staged deletion (soft delete), map the final deletion event here. Retention, recycle-bin, or disable operations should not be mapped to object delete.
+"""
+required_fields = [ "user_name", "source_user_name" ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamObjectDelete"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "summaryTemplate.iamEvents"
+summary.default_indicator = "default"
+
+
+[iam.subcategories.05.event_type_codes]
+00.name = "account deleted"
+00.description = "An account was deleted"
+
+01.name = "group deleted"
+01.description = "A group account was deleted"
+
+[iam.subcategories.10]
+name = "object modify"
+description = """
+Object modify events capture changes to IAM objects such as user accounts or groups. These include updates to account properties, group properties, privilege assignments or removals, password changes or resets, and group membership changes. 
+
+Mapping guidance:
+- Use this subcategory for modifications that alter an account’s attributes or group relationships without creating, deleting, enabling, or disabling the object.
+- Privilege assignments and removals, group membership changes, and password resets should all be mapped here.
+- Use object enable/disable for changes to account status, and object delete for removal of objects.
+"""
+required_fields = [ "source_user_name", "user_name" ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamobjectModify"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "[{gim_event_type}] event_source_product:{event_source_product} | source_user_name:{source_user_name} | user_name:{user_name} | vendor_event_description:{vendor_event_description}"
+summary.default_indicator = "default"
+
+[iam.subcategories.10.event_type_codes]
+00.name = "account modified"
+00.description = "An account was modified"
+
+01.name = "privileges assigned"
+01.description = "Privileges were assigned to an account"
+
+02.name = "privileges removed"
+02.description = "Privileges were removed from an account"
+
+03.name = "account renamed"
+03.description = "An account was renamed"
+
+04.name = "password change"
+04.description = "An account password was changed"
+
+05.name = "administrative password reset"
+05.description = "An administrative account has reset a password for another account"
+
+06.name = "error"
+06.description = "An error was encountered when an attempt was made to modify an account"
+
+07.name = "group member added"
+07.description = "A group member was added to a group"
+
+08.name = "group member removed"
+08.description = "A group member was removed from a group"
+
+09.name = "group properties modified"
+09.description = "The properties of a group were modified"
+
+
+[iam.subcategories.15]
+name = "object disable"
+description = """
+Object disable events record when IAM objects such as user accounts are made inactive. This includes temporary account locks (for example, due to repeated failed logon attempts) and administrative disablement actions performed by an operator.
+
+Mapping guidance:
+- Use this subcategory for directory or identity provider events that mark an account as unusable without deleting it.
+- Do not use this for session termination (logoff) or for permanent account deletion; see the corresponding subcategories instead.
+"""
+required_fields = [ "source_user_name", "user_name" ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamObjectDisable"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "summaryTemplate.iamEvents"
+summary.default_indicator = "default"
+
+
+[iam.subcategories.15.event_type_codes]
+00.name = "account locked"
+00.description = "An account was locked"
+
+01.name = "account disabled"
+01.description = "An account was administratively disabled"
+
+
+[iam.subcategories.20]
+name = "object enable"
+description = """
+Object enable events record when IAM objects such as user accounts are reactivated or unlocked after being previously disabled. This includes administrative actions that enable accounts as well as system-driven unlocks.
+
+Mapping guidance:
+- Use this subcategory when an existing account is made active again, either through an administrative action or an automatic unlock.
+- Do not use this for new account creation; see the object create subcategory instead.
+"""
+required_fields = [ "source_user_name", "user_name" ]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamObjectEnable"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "summaryTemplate.iamEvents"
+summary.default_indicator = "default"
+
+
+[iam.subcategories.20.event_type_codes]
+00.name = "account unlocked"
+00.description = "An account was unlocked"
+
+01.name = "account enabled"
+01.description = "An account was administratively enabled"
+
+02.name = "error"
+02.description = "An error was encountered when an attempt to enable an account was made."
+
+
+[iam.subcategories.95]
+name = "information"
+description = """
+Information events provide context about IAM objects or directory state that do not represent a create, modify, delete, enable, or disable action. These events often reflect queries or enumerations, such as listing group memberships.
+
+Although categorized as informational, these events can still be security-relevant. For example, group membership enumeration may indicate reconnaissance or privilege review activity.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamInformation"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "[{gim_event_type}] event_source_product:{event_source_product} | user_name:{user_name}"
+summary.default_indicator = "default"
+
+
+[iam.subcategories.95.event_type_codes]
+00.name = "group membership enumerated"
+00.description = "A group’s members were enumerated"
+
+
+[iam.subcategories.99]
+name = "default"
+description = """
+The default subcategory is a fallback for IAM-related events that do not clearly fit into another defined subcategory. It should be used sparingly, and only when no more specific mapping is available.
+
+Use the information subcategory (95) for events that provide context such as enumeration or queries. Use the default subcategory only for events that cannot be classified elsewhere in the IAM model.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "iamDefault"
+summary.description = "IAM Events (schema v3.1)"
+summary.summary_template = "[{gim_event_type}] event_source_product:{event_source_product} | user_name:{user_name}"
+summary.default_indicator = "default"
+
+[iam.subcategories.99.event_type_codes]
+99.name = "iam message"
+99.description = "IAM default message"

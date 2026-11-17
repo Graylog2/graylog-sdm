@@ -1,0 +1,4 @@
+[plugin]
+name = "JsonConsoleOutput"
+json_indent = 2
+enabled = 0

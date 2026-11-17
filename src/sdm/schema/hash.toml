@@ -1,0 +1,68 @@
+type = "field_schema"
+
+[hash]
+description = """
+The `hash` sub-fields represent cryptographic hash values associated with digital objects described elsewhere in the log (for example, files, processes, scripts, or executables). These fields are not standalone entities; they are appended to top-level object names to express object-specific properties, such as `file_hash_md5` or `process_hash_sha256`.
+
+Cryptographic hashes are fixed-length values derived from data using one-way mathematical functions such as MD5, SHA1, or SHA256. They serve as unique digital fingerprints that allow systems and analysts to verify the integrity or identity of an object without exposing its contents. In cybersecurity monitoring and digital forensics, hash values are commonly used to:
+
+- Detect known malware or benign files through reputation and threat intelligence lookup.
+- Verify the integrity of executables, configurations, or downloaded artifacts.
+- Support correlation across diverse data sources by normalizing object identity.
+
+Each field in this group corresponds to a specific algorithm:
+
+- `hash_md5` - 128-bit MD5 hash (legacy, collision-prone, often used for backward compatibility).
+- `hash_sha1` - 160-bit SHA1 hash (deprecated for integrity assurance but still encountered in older tools).
+- `hash_sha256` - 256-bit SHA2 hash (current best practice for integrity validation and threat correlation).
+- `hash_sha512` - 512-bit SHA2 hash (used when enhanced resistance to collisions is required).
+- `hash_imphash` - Import hash derived from PE (Portable Executable) import tables,
+  commonly used to identify similar Windows executables or malware families.
+
+When defining object properties in logs, these fields provide consistent semantic meaning across different data sources, allowing for accurate normalization, correlation, and enrichment of security telemetry.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "sub"
+
+# The top-level entities this sub-field group is appended to, e.g. file_hash_md5,
+# process_hash_sha256. Each name must match a field_schema entity with entity_type = "top".
+applies_to = ["file", "process"]
+
+#[hash.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_filename = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"]
+
+[[hash.fields]]
+field_suffix = "md5"
+example_values = "4c583e00d47108f809282d5d595f5fb0"
+field_type = "keyword"
+description = "MD5 hash value."
+
+[[hash.fields]]
+field_suffix = "sha1"
+example_values = "5d4d04eff6aba8467ebd26c43008ab028203be35"
+field_type = "keyword"
+description = "SHA1 hash value."
+
+[[hash.fields]]
+field_suffix = "sha256"
+example_values = ""
+field_type = "keyword"
+description = "SHA256 hash value."
+
+[[hash.fields]]
+field_suffix = "sha512"
+example_values = ""
+field_type = "keyword"
+description = "SHA512 hash value."
+
+[[hash.fields]]
+field_suffix = "imphash"
+example_values = "0c2803c4e9a2102c4dc65963dad36cdf"
+field_type = "keyword"
+description = "IMP hash value."

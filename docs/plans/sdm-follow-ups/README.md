@@ -26,6 +26,9 @@ Not covered here:
 | F10 | Reconsider the `src/sdm` directory name | Low | Before PR 1 | Yes |
 | F11 | Collapse generated output in PR diffs | Low | PR 2 | No |
 | F12 | Check that taplo preserves multiline strings | Low | PR 3 | No |
+| F13 | Fix the field-schema index stylesheet path | Low | After migration | No |
+| F14 | Replace non-ASCII characters in SDM meta text | Low | After PR 3 | No |
+| F15 | Review `system_time` required `user_name` | Medium | After migration | Yes: field classification |
 
 ---
 
@@ -172,3 +175,34 @@ Not covered here:
 - In PR 3, before the formatting commit, pin the taplo options that touch strings and arrays.
 - After formatting, confirm that every source file still parses to the same values (a parse → compare script, not just a check that the output is unchanged) and that `generated/` is byte-identical.
 - Add the parse-equivalence check as a test, so future formatter upgrades are covered too.
+
+## F13. Fix the field-schema index stylesheet path
+
+**Problem:** `field_schema_top_template.j2:6` uses `{{ resource_path }}`, but the template defines `resources_path`. The link renders as `/TableStyles/Alternate-Row-Color.css`, so the field-schema index page loads no table styles. Found in the PR 1 Copilot review (PR #3). The migration keeps output unchanged, so it isn't fixed there.
+
+**Activity:**
+- Use `resources_path` in the link.
+- Regenerate `generated/MadcapHtmlOutput/` and check that only the field-schema index page changes.
+
+**Done when:** the generated field-schema index links `../../Resources/TableStyles/Alternate-Row-Color.css`.
+
+## F14. Replace non-ASCII characters in SDM meta text
+
+**Problem:** 16 source files contain non-ASCII characters (em dashes, curly apostrophes) in meta text, against the US-ASCII rule. The PR 1 Copilot review (PR #3) flagged `gim.config.toml`, `alert.toml`, `file.toml` and `reserved.toml`. PR 3's `ascii-meta` rule will report all of them as existing violations, which only warn.
+
+**Activity:**
+- After PR 3 lands, run `build-sdm validate` and fix every `ascii-meta` violation in one data PR, with ASCII equivalents (`-` or `--`, `'`, `"`).
+- Regenerate `generated/`; only the affected text changes.
+- Classify as additive (no meaning change).
+
+**Done when:** `build-sdm validate` with no base ref reports no `ascii-meta` violations.
+
+## F15. Review `system_time` required `user_name`
+
+**Problem:** `26.system_time.toml` requires `source` and `user_name` for the whole category. Its description includes automatic changes (NTP, domain time sync), which may carry no user. Because the default subcategory's required fields are the baseline for the category, events from automatic sync can never satisfy it. Raised in the PR 1 Copilot review (PR #3).
+
+**Activity:**
+- Check what the supported sources actually emit for automatic time changes, and which Illuminate content (event definitions, dashboards) relies on `user_name` for this category.
+- If `user_name` is not reliably present, move it to recommended.
+
+**Decision needed:** keep `user_name` required, or move it to recommended. The SDM owners decide; record the change classification (relaxing a requirement) and whether it needs an `sdm_version` bump.

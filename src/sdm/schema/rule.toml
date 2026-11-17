@@ -1,0 +1,45 @@
+type = "field_schema"
+
+[rule]
+description = """
+## Overview
+
+The `rule` fields describe a discrete evaluative condition or directive that operates within the scope of a broader policy. Rules represent granular configuration elements used to determine whether actions are allowed, denied, audited, or otherwise influenced by the controlling policy. They function as the specific criteria or statements that govern how a policy is applied when a system processes events or enforces security controls.
+
+## Design and Usage
+
+The `rule` entity provides a normalized structure for representing rule-level configuration across heterogeneous systems. It captures the identifying attributes of a rule without assuming vendor-specific implementation details, allowing consistent interpretation across firewalls, operating systems, identity platforms, and other policy-driven technologies. `rule` is conceptually linked to `policy`, and its fields clarify the evaluative elements that contribute to policy behavior. Unlike a sub-field group (for example `hash` or `geo`), `rule` fields keep their own `rule_` prefix rather than being composed onto `policy`'s name.
+
+## Common Use Cases
+
+- Correlating enforcement decisions with the specific rule that permitted, denied, or evaluated an action
+- Tracking changes to rule definitions for auditing, compliance, or configuration monitoring
+- Normalizing rule-level data across diverse platforms to support unified detection logic and analytics
+
+## Implementation Notes
+
+`rule` describes the granular components of policy behavior and is not intended to represent standalone configuration objects. It should be modeled independently of vendor naming conventions while maintaining consistency with the hierarchical relationship to `policy`. If a related `policy` entity is implied but not explicitly included in a message, corresponding fields should be incorporated to clarify event semantics and preserve relational integrity.
+"""
+
+# Entity types are:
+# top: these are top-level fields and should not be assigned as sub-fields
+# sub: these are sub-fields, and should be appended to other top-level fields.
+entity_type = "top"
+
+#[rule.meta.plugin_config.MadcapHtmlOutput]
+# Define a custom template to use for this schema page.
+# This will override the default page setting.
+#entity_template_hostname = 'destination_entity_template.j2'
+#field_column_order = ["field_suffix", "description", "example_values", "field_type"] 
+
+[[rule.fields]]
+field_suffix = "id"
+example_values = "6da61e4c-84a8-4136-900d-f86c09bb3774"
+field_type = "keyword"
+description = "Unique identifier associated with the rule."
+
+[[rule.fields]]
+field_suffix = "name"
+example_values = "Outbound Web Traffic"
+field_type = "keyword"
+description = "Human-readable name assigned to the rule."

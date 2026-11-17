@@ -1,0 +1,248 @@
+type = "gim"
+
+[network]
+name = "network"
+code = 12
+description = """
+The Network category is for events that describe communication between two systems.
+This includes individual connections (such as a logon over TCP), connectionless activity
+(such as ICMP requests and replies), and summarized flow records (such as NetFlow or IPFIX).
+"""
+required_fields = ["source_reference", "destination_reference"]
+recommended_fields = []
+optional_fields = []
+
+#[network.meta.plugin_config.'output_plugins.madcap_html_output.plugin.MadcapHtmlOutput']
+# Provide the name of the template used to generate the documentation HTML file
+#category_template_filename = "gim_category_template_network.j2"
+
+[[network.summaries]]
+#template_id = "networkConnection"
+template_id = "networkDefault"
+summary = "[{gim_event_type}] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]"
+title = "Network Connection"
+description = "Network connection details summary view template"
+
+[network.subcategories]
+
+[network.subcategories.00]
+name = "network connection"
+description = """
+Network connection events represent communication between two systems using protocols that include 
+both addressing and port information, such as TCP and UDP. These events typically capture source and 
+destination addresses, source and destination ports, and the network transport protocol. 
+They provide the foundation for analyzing session-oriented traffic, distinct from connectionless 
+protocols such as ICMP or summarized records such as NetFlow and IPFIX.
+"""
+required_fields = [
+    "destination_reference", "destination_port", "event_action", "event_source",
+    "network_transport", "source_reference", "source_port"
+]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network network connection"
+summary.description = "Network connection summary view"
+summary.summary_template = "[network.network connection] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]"
+summary.default_indicator = "default"
+
+[network.subcategories.00.event_type_codes]
+00.name = "network connection"
+00.description = """
+A generic network connection event between a source and destination system using a port-based protocol 
+(such as TCP or UDP). This code is used when the log does not explicitly indicate initiation or termination, 
+but provides enough information to represent an active connection.
+"""
+
+
+[network.subcategories.01]
+name = "routing"
+description = """
+The routing subcategory is deprecated. Routing logs describe control-plane events such as 
+route advertisements, peer status, or path changes. These logs are highly vendor-specific 
+and are not typically used in SIEM content focused on security or investigation. 
+They may be revisited in the future as part of a separate infrastructure monitoring model, 
+but they are not part of the Network category scope.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network network routing"
+summary.description = "Network routing summary view"
+summary.summary_template = "summaryTemplate.networkDefault"
+summary.default_indicator = "default"
+
+[network.subcategories.01.event_type_codes]
+00.name = "network routing"
+00.description = "A basic network routing message"
+
+
+[network.subcategories.02]
+name = "open"
+description = """
+Open events represent the initiation of a network connection between a source and a destination system.
+These events typically capture the initial attempt to establish communication, including source and
+destination addresses, ports, and the transport protocol (such as TCP or UDP).
+They are useful for identifying when communication was attempted, regardless of whether the session was later completed or closed.
+"""
+required_fields = [
+    "source_reference", "destination_reference", "source_port", "destination_port",
+    "network_transport"
+]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network connection open"
+summary.description = "Network connection open summary view"
+summary.summary_template = "[network.open] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]"
+summary.default_indicator = "default"
+
+[network.subcategories.02.event_type_codes]
+00.name = "network connection initiated"
+00.description = """
+The source system initiated a network connection to a destination system. 
+This event represents the start of communication, such as the initial TCP SYN or first UDP packet.
+It indicates that a connection attempt was made, regardless of whether the session was later established or terminated.
+"""
+
+[network.subcategories.03]
+name = "close"
+description = """
+Close events represent the termination of a network connection between a source and a destination system. 
+These events apply to protocols that use ports, such as TCP and UDP, and typically indicate that a session has been 
+gracefully closed (e.g., TCP FIN sequence) or otherwise ended. 
+They are useful for correlating with connection initiation events to understand the full lifecycle of a session.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network connection close"
+summary.description = "A network connection has closed"
+summary.summary_template = "[network.close] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]"
+summary.default_indicator = "default"
+
+[network.subcategories.03.event_type_codes]
+00.name = "network connection ended"
+00.description = """
+The source and destination systems terminated a network connection.
+This event indicates the end of communication for protocols such as TCP or UDP,
+whether the session was closed gracefully, reset, or timed out.
+It provides a marker for the conclusion of a session and can be correlated with initiation events.
+"""
+
+
+[network.subcategories.05]
+name = "flow"
+description = """
+Flow events represent summarized records of network traffic between a source and a destination. 
+They are typically exported by devices such as routers, firewalls, or cloud platforms using formats 
+like NetFlow, IPFIX, or sFlow. Unlike individual connection events, flow records aggregate data over 
+a time window, reporting metrics such as byte and packet counts, start and end times, and transport protocol. 
+Flow data is valuable for understanding traffic volume, detecting anomalies, and correlating activity across large-scale environments.
+"""
+required_fields = [
+    "source_reference", "destination_reference", "source_port", "destination_port",
+    "network_transport", "network_bytes", "network_packets"
+]
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network flow"
+summary.description = "Network Flow Record"
+summary.summary_template = "summaryTemplate.networkConnection"
+summary.default_indicator = "default"
+
+[network.subcategories.05.event_type_codes]
+00.name = "flow record"
+00.description = """
+A summarized record of network traffic exported by a device or service, typically using 
+formats such as NetFlow, IPFIX, sFlow, or equivalent cloud-native logging. 
+The record aggregates traffic between a source and destination over a time interval, 
+including metrics such as byte and packet counts.
+"""
+
+
+[network.subcategories.06]
+name = "icmp_request"
+description = """
+ICMP request events represent traffic where a source system sends an Internet Control Message Protocol (ICMP) 
+request to a destination. The most common example is an ICMP echo request (commonly referred to as "ping"), 
+but other request types may include timestamp requests, router solicitations, or address mask requests. 
+These events are important for identifying connectivity checks, troubleshooting activity, or potential reconnaissance attempts. 
+Unlike TCP or UDP, ICMP is a connectionless protocol and does not involve ports.
+"""
+required_fields = [
+    "network_transport", "network_icmp_request_type_number", "network_icmp_request_code_number",
+    "source_reference", "destination_reference"
+]
+recommended_fields = [
+    "network_icmp_request_message"
+]
+optional_fields = []
+
+summary.title = "network ICMP request summary"
+summary.description = "Network ICMP request summary"
+summary.summary_template = "[ICMP Request] source_reference:{source_reference} - destination_reference:{destination_reference} - network_icmp_request_type_number:{network_icmp_request_type_number} network_icmp_request_code_number:{network_icmp_request_code_number}"
+summary.default_indicator = "default"
+
+[network.subcategories.06.event_type_codes]
+00.name = "icmp_request"
+00.description = """
+An Internet Control Message Protocol (ICMP) request sent from a source system to a destination. 
+This may represent an echo request (ping) or another ICMP request type, such as timestamp or router solicitation.
+"""
+
+
+[network.subcategories.07]
+name = "icmp_reply"
+description = """
+ICMP reply events represent responses sent by a destination system in answer to an ICMP request. 
+The most common example is an ICMP echo reply (the response to a ping), but replies may also include 
+other ICMP message types depending on the request. These events are important for confirming connectivity, 
+measuring responsiveness, and identifying whether a target host or device is actively responding to probes.
+"""
+required_fields = [
+    "network_transport", "network_icmp_reply_type_number", "network_icmp_reply_code_number",
+    "source_reference", "destination_reference"
+]
+recommended_fields = [ "network_icmp_reply_message" ]
+optional_fields = []
+
+summary.title = "network ICMP reply summary"
+summary.description = "Network ICMP reply summary"
+summary.summary_template = "[ICMP Reply] source_reference:{source_reference} - destination_reference:{destination_reference} - network_icmp_reply_type_number:{network_icmp_reply_type_number} network_icmp_reply_code_number:{network_icmp_reply_code_number}"
+summary.default_indicator = "default"
+
+[network.subcategories.07.event_type_codes]
+00.name = "icmp_reply"
+00.description = """
+An Internet Control Message Protocol (ICMP) reply sent by a destination system in response to a request.
+The most common case is an echo reply, but this may also represent other ICMP reply types depending on the request received.
+"""
+
+
+[network.subcategories.99]
+name = "default"
+description = """
+The default subcategory is used for network-related events that do not match a more specific subcategory
+(such as connection, flow, or ICMP). These events may represent vendor-specific messages or generic
+network activity that cannot be consistently normalized. The default category ensures that all
+network events can still be captured, even when they lack the detail needed for finer classification.
+"""
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "network default"
+summary.description = "network default event summary view"
+summary.summary_template = "[{gim_event_type}] {source_reference} - {destination_reference}"
+summary.default_indicator = "default"
+
+[network.subcategories.99.event_type_codes]
+99.name = "network message"
+99.description = """
+A generic network event message that does not map to a more specific subcategory or event type.
+This serves as a fallback to ensure that all network activity can be represented within the model.
+"""

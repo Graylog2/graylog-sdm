@@ -1,0 +1,205 @@
+type = "field_schema"
+
+[network]
+description = """
+## Overview
+
+The `network` fields describe properties of network connections, flows, and packet exchanges as represented in normalized telemetry. They capture attributes such as traffic direction, protocol details, transferred byte counts, and identifiers used to correlate activity across sources. This entity provides a unified conceptual model for interpreting diverse network data from sensors, appliances, and endpoint instrumentation.
+
+## Design and Usage
+
+The `network` entity represents a logical network flow or connection and supports consistent normalization across heterogeneous vendor formats. It abstracts connection-level properties, including transport protocol, packet counts, header and payload characteristics, and connection identifiers. As a top-level entity, `network` should be modeled independently of host or process entities while still allowing correlation when those entities appear within the same telemetry.
+
+## Common Use Cases
+
+- Analyzing network flow patterns for anomaly detection, threat analysis, and capacity monitoring.
+- Associating traffic with higher-level application behaviors, tunnel types, or protocol semantics.
+- Correlating connection identifiers and directionality with security alerts and endpoint activity.
+- Reviewing packet and byte distributions to understand flow behavior or investigate suspected exfiltration.
+
+## Implementation Notes
+
+As a top-level entity, `network` defines a standalone representation of a network flow or packet exchange. It should support mappings to related entities such as `endpoint`, `process`, or `tunnel` where applicable and maintain relational integrity across normalized telemetry. If a related entity is implied but not explicitly provided, corresponding fields should be included to clarify event semantics and maintain consistent connection modeling.
+"""
+
+entity_type = "top"
+
+[[network.fields]]
+field_suffix = "application"
+example_values = "facebook, instagram"
+field_type = "keyword/lowercase"
+description = "Identifies the application-layer service or platform associated with the network activity."
+
+[[network.fields]]
+field_suffix = "bytes"
+example_values = "71238"
+field_type = "long"
+description = "Total number of bytes transferred during the network connection."
+# NOTE: Original description referenced vendor calculations and packet_length differences.
+
+[[network.fields]]
+field_suffix = "community_id"
+example_values = "1:Q9We8WO3piVF8yEQBNJF4uiSVrI="
+# NOTE: Example value is a version 1 Community ID string using the '1:' prefix and a base64-encoded SHA-1 hash as defined in the Community ID Flow Hashing specification.
+field_type = "keyword"
+description = "Hash value representing a normalized identifier for the network flow."
+# NOTE: Original description referenced external documentation links.
+
+[[network.fields]]
+field_suffix = "connection_duration"
+example_values = "0:23:45"
+field_type = "keyword"
+description = "Length of time the network connection was established."
+
+[[network.fields]]
+field_suffix = "connection_uid"
+example_values = "CMdzit1AMNsmfAIiQc"
+field_type = "keyword"
+description = "Unique identifier assigned to the observed network connection."
+
+[[network.fields]]
+field_suffix = "data_bytes"
+example_values = "71238"
+field_type = "long"
+description = "Total number of bytes contained in the data payload of the connection."
+
+[[network.fields]]
+field_suffix = "direction"
+example_values = "inbound, outbound, lateral"
+field_type = "keyword"
+description = "Indicates the direction of the observed network flow."
+# NOTE: Original description required mapping vendors to inbound/outbound/lateral.
+
+[[network.fields]]
+field_suffix = "forwarded_ip"
+example_values = "10.1.2.3, fe80:5cc3:11:4::2c"
+field_type = "ip"
+description = "IP address recorded as part of forwarding or proxy traversal."
+
+[[network.fields]]
+field_suffix = "header_bytes"
+example_values = "71238"
+field_type = "long"
+description = "Total number of bytes associated with packet header information."
+
+[[network.fields]]
+field_suffix = "iana_number"
+example_values = "6, 17, 41"
+field_type = "integer"
+description = "Numeric protocol identifier assigned by IANA at [IANA protocol numbers regsitry](https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)."
+
+[[network.fields]]
+field_suffix = "icmp_request_type_number"
+example_values = "8, 13, 17"
+field_type = "integer"
+description = "Numeric ICMP type code identifying the kind of ICMP request message, as defined by the [IANA ICMP parameters registry](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml). Common values include 8 (Echo Request), 13 (Timestamp Request), and 17 (Address Mask Request)."
+
+[[network.fields]]
+field_suffix = "icmp_request_code_number"
+example_values = "0"
+field_type = "integer"
+description = "Numeric ICMP code further refining the request's type, as defined by the [IANA ICMP parameters registry](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml). Most request types (e.g. Echo Request, Timestamp Request) define only code 0."
+
+[[network.fields]]
+field_suffix = "icmp_request_message"
+example_values = "Echo Request, Timestamp Request"
+field_type = "keyword"
+description = "Human-readable label describing the ICMP request type, such as vendor-supplied text naming the request (e.g. Echo Request, Timestamp Request)."
+
+[[network.fields]]
+field_suffix = "icmp_reply_type_number"
+example_values = "0, 14, 18"
+field_type = "integer"
+description = "Numeric ICMP type code identifying the kind of ICMP reply message, as defined by the [IANA ICMP parameters registry](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml). Common values include 0 (Echo Reply), 14 (Timestamp Reply), and 18 (Address Mask Reply)."
+
+[[network.fields]]
+field_suffix = "icmp_reply_code_number"
+example_values = "0"
+field_type = "integer"
+description = "Numeric ICMP code further refining the reply's type, as defined by the [IANA ICMP parameters registry](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml). Most reply types (e.g. Echo Reply, Timestamp Reply) define only code 0."
+
+[[network.fields]]
+field_suffix = "icmp_reply_message"
+example_values = "Echo Reply, Timestamp Reply"
+field_type = "keyword"
+description = "Human-readable label describing the ICMP reply type, such as vendor-supplied text naming the reply (e.g. Echo Reply, Timestamp Reply)."
+
+[[network.fields]]
+field_suffix = "icmp_type"
+example_values = "echo, time exceeded"
+# NOTE: Example ICMP message types include Echo (type 8) and Time Exceeded (type 11) as defined in the IANA ICMP parameters registry.
+field_type = "keyword"
+description = "ICMP message type associated with the observed traffic defined by [IANA ICMP parameters registry](https://www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml)."
+# NOTE: Original description referenced a URL.
+
+[[network.fields]]
+field_suffix = "inner"
+example_values = ""
+field_type = "keyword"
+description = "Indicates protocol or encapsulation information for inner traffic within a tunneled connection."
+# NOTE: Original description was 'TBD'.
+
+[[network.fields]]
+field_suffix = "interface_in"
+example_values = "gi0/1"
+field_type = "keyword/lowercase"
+description = "Name of the interface that received the network traffic."
+
+[[network.fields]]
+field_suffix = "interface_out"
+example_values = "gi0/1"
+field_type = "keyword/lowercase"
+description = "Name of the interface that transmitted the network traffic."
+
+[[network.fields]]
+field_suffix = "ip_version"
+example_values = "4, 6"
+# NOTE: IP version 4 is defined in RFC 791 and IP version 6 is defined in RFC 8200.
+field_type = "keyword"
+description = "Indicates whether the connection used IPv4 or IPv6."
+
+[[network.fields]]
+field_suffix = "name"
+example_values = ""
+field_type = "keyword"
+description = "Label or identifier assigned to the network flow, if provided by the source."
+# NOTE: Original description was 'TBD'.
+
+[[network.fields]]
+field_suffix = "packets"
+example_values = "71238"
+field_type = "long"
+description = "Total number of packets transferred during the network connection."
+# NOTE: Original description referenced vendor calculation details.
+
+[[network.fields]]
+field_suffix = "protocol"
+example_values = "ipv4, ipv6, icmp"
+field_type = "keyword/lowercase"
+description = "Network-layer protocol associated with the observed traffic."
+# NOTE: Original description referenced IANA Keyword column.
+
+[[network.fields]]
+field_suffix = "transport"
+example_values = "udp, tcp"
+field_type = "keyword/lowercase"
+description = "Transport-layer protocol used by the network connection."
+
+[[network.fields]]
+field_suffix = "tunnel_type"
+example_values = "gre, ipsec"
+field_type = "keyword/lowercase"
+description = "Type of tunneling protocol associated with the network traffic."
+
+[[network.fields]]
+field_suffix = "tunnel_duration"
+example_values = "2093847"
+field_type = "long"
+description = "Duration of an established tunnel, measured in seconds."
+
+[[network.fields]]
+field_suffix = "type"
+example_values = ""
+field_type = "keyword"
+description = "This field is deprecated and will be removed from a future version fo the schema."
+# NOTE: Original description suggested potential removal and relationship to network_protocol.
