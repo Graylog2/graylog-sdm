@@ -122,6 +122,7 @@ def test_generate_category_pages_success(
 # ----------------------------------------------------------------------
 
 def test_generate_category_pages_invalid_config_skips(
+    tmp_path: Path,
     mock_plugin: MadcapHtmlOutput,
     gim_config: callable
 ) -> None:
@@ -134,13 +135,14 @@ def test_generate_category_pages_invalid_config_skips(
     ] = 123  # invalid type
 
     mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, Path('/tmp'))
+    mock_plugin._generate_category_pages(cfg, tmp_path)
 
     mock_plugin._env.get_template.assert_not_called()
     mock_plugin._write_output_file.assert_not_called()
 
 
 def test_generate_category_pages_template_load_fails(
+    tmp_path: Path,
     mock_plugin: MadcapHtmlOutput,
     gim_config: callable
 ) -> None:
@@ -151,12 +153,13 @@ def test_generate_category_pages_template_load_fails(
     mock_plugin._env.get_template.side_effect = TemplateNotFound('missing_template.j2')
 
     mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, Path('/tmp'))
+    mock_plugin._generate_category_pages(cfg, tmp_path)
 
     mock_plugin._write_output_file.assert_not_called()
 
 
 def test_generate_category_pages_render_fails(
+    tmp_path: Path,
     mock_plugin: MadcapHtmlOutput,
     gim_config: callable
 ) -> None:
@@ -170,7 +173,7 @@ def test_generate_category_pages_render_fails(
     cfg = gim_config()
 
     mock_plugin._write_output_file = MagicMock()
-    mock_plugin._generate_category_pages(cfg, Path('/tmp'))
+    mock_plugin._generate_category_pages(cfg, tmp_path)
 
     mock_plugin._write_output_file.assert_not_called()
 

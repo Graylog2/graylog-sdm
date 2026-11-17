@@ -1,55 +1,53 @@
-from pydantic import BaseModel, Field, validator, ValidationError
-from typing import Optional
-import re
+"""Tests for html_output_subdir validation on the MadCap top-level section models."""
 
+import pytest
+from pydantic import BaseModel, ValidationError
 
-class OutputSubdirModel(BaseModel):
-    html_output_subdir: Optional[str] = Field(default=None)
+from build_sdm.output_plugins.madcap_html_output.models import (
+    TopLevelFieldSchemaSectionMetadata,
+    TopLevelGimSectionMetadata,
+)
 
-    @validator('html_output_subdir')
-    @classmethod
-    def validate_subdir(cls, value):
-        if value is None:
-            return value
-        if not re.fullmatch(r'[A-Za-z0-9_]+', value):
-            raise ValueError('Subdirectory names must contain only letters, digits, or underscores')
-        return value
+SECTION_MODELS = [TopLevelGimSectionMetadata, TopLevelFieldSchemaSectionMetadata]
 
-
-# Test cases
-valid_values = [
-    'field_schema',
-    'FIELD_SCHEMA_2024',
-    'My_Dir123',
-    'gim_config',
-    'Valid123'
+VALID_SUBDIRS = [
+    "field_schema",
+    "FIELD_SCHEMA_2024",
+    "My_Dir123",
+    "Graylog Information Models",
+    "Field Schema Entities",
 ]
 
-invalid_values = [
-    '../etc',
-    'field/schema',
-    'field schema',
-    'field-schema',
-    'field.schema',
-    'field@schema!',
-    ''
+INVALID_SUBDIRS = [
+    "../etc",
+    "field/schema",
+    "field-schema",
+    "field.schema",
+    "field@schema!",
+    "",
 ]
 
-valid_results = []
-invalid_results = []
 
-for value in valid_values:
-    try:
-        OutputSubdirModel(html_output_subdir=value)
-        valid_results.append((value, True))
-    except ValidationError:
-        valid_results.append((value, False))
+@pytest.mark.parametrize("model", SECTION_MODELS)
+@pytest.mark.parametrize("subdir", VALID_SUBDIRS)
+def test_valid_subdir_is_accepted(model: type[BaseModel], subdir: str) -> None:
+    """Letters, digits, underscores and spaces are accepted unchanged."""
+    section = model(title="Title", intro="Intro", html_output_subdir=subdir)
 
-for value in invalid_values:
-    try:
-        OutputSubdirModel(html_output_subdir=value)
-        invalid_results.append((value, True))
-    except ValidationError:
-        invalid_results.append((value, False))
+    assert getattr(section, "html_output_subdir") == subdir
 
-(valid_results, invalid_results)
+
+@pytest.mark.parametrize("model", SECTION_MODELS)
+@pytest.mark.parametrize("subdir", INVALID_SUBDIRS)
+def test_invalid_subdir_is_rejected(model: type[BaseModel], subdir: str) -> None:
+    """Path separators, traversal, punctuation and empty names are rejected."""
+    with pytest.raises(ValidationError):
+        model(title="Title", intro="Intro", html_output_subdir=subdir)
+
+
+@pytest.mark.parametrize("model", SECTION_MODELS)
+def test_subdir_is_optional(model: type[BaseModel]) -> None:
+    """Omitting html_output_subdir leaves it unset."""
+    section = model(title="Title", intro="Intro")
+
+    assert getattr(section, "html_output_subdir") is None

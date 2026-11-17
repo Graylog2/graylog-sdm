@@ -26,7 +26,7 @@ class DummyPlugin:
 
         return CaptureHandler(self)
 
-def test_run_plugins_normal(monkeypatch):
+def test_run_plugins_normal(monkeypatch, tmp_path):
     '''
     Should invoke the generate method of a plugin when dry_run is False.
     '''
@@ -38,13 +38,13 @@ def test_run_plugins_normal(monkeypatch):
     _run_plugins(
         script_config={'plugins': {}},
         gim_config={'gim': {}},
-        output_dir=Path('/tmp'),
+        output_dir=tmp_path,
         dry_run=False
     )
 
     assert plugin.generated is True
 
-def test_run_plugins_dry_run(monkeypatch):
+def test_run_plugins_dry_run(monkeypatch, tmp_path):
     '''
     Should NOT call generate, and instead log a dry-run message.
     '''
@@ -56,7 +56,7 @@ def test_run_plugins_dry_run(monkeypatch):
     _run_plugins(
         script_config={'plugins': {}},
         gim_config={'gim': {}},
-        output_dir=Path('/tmp'),
+        output_dir=tmp_path,
         dry_run=True
     )
 
