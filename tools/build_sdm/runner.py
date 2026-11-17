@@ -90,8 +90,8 @@ def _load_and_transform_gim_config(
             entity's applies_to references an entity that isn't a known "top"
             entity.
     '''
-    gim_dir = Path(script_config['global'].get('sdm_source_dir') or 'src/sdm')
-    gim_dir = repo_dir / gim_dir
+    source_dir_setting = Path(script_config['global'].get('sdm_source_dir') or 'src/sdm')
+    gim_dir = repo_dir / source_dir_setting
 
     if not gim_dir.is_dir():
         logger.fatal('Path %s is not a directory', gim_dir)
@@ -108,7 +108,9 @@ def _load_and_transform_gim_config(
             load_gim_config_files(config_dir, merge=False, only_types={'config_output_plugin'})
         )
 
-    gim_config['settings'] = {'type': 'config', 'gim_dir': str(gim_dir)}
+    # Record the configured (repo-relative) path, not the absolute one, so the output
+    # is the same on every checkout.
+    gim_config['settings'] = {'type': 'config', 'gim_dir': source_dir_setting.as_posix()}
 
     serialized = to_serializable(gim_config)
     restructured = restructure_gim_config(serialized)
