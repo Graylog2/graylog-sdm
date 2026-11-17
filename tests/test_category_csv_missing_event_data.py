@@ -88,7 +88,7 @@ def test_empty_or_none_event_type_name_raises_runtime_error(tmp_path, bad_name):
         plugin.generate(config, tmp_path, plugin_config)
 
 
-def test_missing_event_type_codes_raises_runtime_error(tmp_path):
+def test_missing_event_type_codes_without_class_raises_runtime_error(tmp_path):
     plugin = CategoryDataCSVOutput()
 
     config = {

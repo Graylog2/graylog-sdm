@@ -24,12 +24,13 @@
     </ol>
 
 {%- elif section.type == 'hint' %}
+    {% set hint_text_lines = section.content.split('\n') %}
     <p>
         <section class="infoBox">
-            <div class="content"><b>Hint: </b><span style="font-weight: normal;">{{ section.content[0] }}</span>
+            <div class="content"><b>Hint: </b><span style="font-weight: normal;">{{ hint_text_lines[0] }}</span>
             </div>
-    {% if section.content|length > 1 %}
-        {% for line in section.content[1:] if line.strip() %}
+    {% if hint_text_lines|length > 1 %}
+        {% for line in hint_text_lines[1:] if line.strip() %}
             <div class="content"><span style="font-weight: normal;">{{ line  }}</span>
             </div>
         {% endfor %}
