@@ -30,11 +30,12 @@ def test_valid_field_schema_parsing():
     assert doc.entities['alert'].fields[0].field_type == 'keyword'
 
 
-def test_invalid_field_type_raises():
+def test_field_type_is_checked_after_loading_not_by_the_model():
     """
-    Verifies that a field with an invalid field_type causes validation to fail.
+    field_type is validated against config.field_schema_config.allowed_field_types
+    after all files load (see test_field_types.py); the model itself accepts any string.
     """
-    bad_toml_data = {
+    data = {
         'type': 'field_schema',
         'alert': {
             'description': 'Test description',
@@ -50,13 +51,9 @@ def test_invalid_field_type_raises():
         }
     }
 
-    with pytest.raises(ValidationError) as excinfo:
-        FieldSchemaDocument.parse_obj(bad_toml_data)
+    doc = FieldSchemaDocument.parse_obj(data)
 
-    errors = excinfo.value.errors()
-    assert len(errors) == 1
-    assert errors[0]['loc'] == ('entities', 'alert', 'fields', 0, 'field_type')
-    assert 'Invalid field_type:' in errors[0]['msg']
+    assert doc.entities['alert'].fields[0].field_type == 'INVALID_TYPE'
 
 
 def test_missing_required_field_raises():
@@ -142,28 +139,6 @@ def test_field_schema_valid_single_entity(tmp_path):
     assert field.field_suffix == 'name'
     assert field.field_type == 'keyword'
     assert field.description == 'Name field'
-
-
-def test_field_schema_invalid_field_type():
-    invalid_data = {
-        'type': 'field_schema',
-        'alert': {
-            'description': 'Invalid',
-            'entity_type': 'top',
-            'fields': [
-                {
-                    'field_suffix': 'bad',
-                    'field_type': 'not_a_valid_type',
-                    'description': 'Should fail'
-                }
-            ]
-        }
-    }
-
-    with pytest.raises(ValidationError) as excinfo:
-        FieldSchemaDocument.parse_obj(invalid_data)
-
-    assert "field_type" in str(excinfo.value)
 
 
 def test_field_schema_missing_required_field():
