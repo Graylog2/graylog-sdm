@@ -1,0 +1,1036 @@
+{
+  "summaries": {
+    "summaryTemplate": [
+      {
+        "template_id": "default",
+        "summary": "[{gim_event_type}] {source} - {message}",
+        "title": "Default",
+        "description": "Default Message Summary View"
+      },
+      {
+        "template_id": "iamEvents",
+        "summary": "[{gim_event_type}] event_source_product:{event_source_product} | source_user_name:{source_user_name} | user_name:{user_name}",
+        "title": "IAM Events",
+        "description": "IAM Events Summary View Template"
+      },
+      {
+        "template_id": "networkDefault",
+        "summary": "[{gim_event_type}] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]",
+        "title": "Network Connection",
+        "description": "Network connection details summary view template"
+      },
+      {
+        "template_id": "database",
+        "summary": "[{gim_event_type}] {source}",
+        "title": "Default database template",
+        "description": "Default database template"
+      },
+      {
+        "template_id": "fileCategory00",
+        "summary": "[{gim_event_type}] file_name:{file_name} | process_name:{process_name}",
+        "title": "file category template",
+        "description": "Basic file category message template"
+      },
+      {
+        "template_id": "fileCategory01",
+        "summary": "[{gim_event_type}] file_name:{file_name} | user_name:{user_name} | process_name:{process_name}",
+        "title": "file category template 01",
+        "description": "Basic file category message template 01"
+      },
+      {
+        "template_id": "serviceCategory",
+        "summary": "[{gim_event_type}] service_name:{service_name} | user_name:{user_name}",
+        "title": "service category template",
+        "description": "Basic service category message template for schema v3.1"
+      },
+      {
+        "template_id": "pipeCategory",
+        "summary": "[{gim_event_type}] pipe_name:{pipe_name} | user_name:{user_name}",
+        "title": "pipe category template",
+        "description": "Basic pipe category message template for schema v3.1"
+      },
+      {
+        "template_id": "registryCategory",
+        "summary": "[{gim_event_type}] registry_path:{registry_path} | process_path:{process_path} | user_name:{user_name}",
+        "title": "registry category template",
+        "description": "Basic registry category message template for schema v3.1"
+      },
+      {
+        "template_id": "driverCategoryTemplate",
+        "summary": "[{gim_event_type}] event_action:{event_action} | user_name:{user_name}",
+        "title": "driver category template",
+        "description": "Basic driver category message template for schema v3.1"
+      },
+      {
+        "template_id": "dhcpDefault",
+        "summary": "[{gim_event_type}] source_mac:{source_mac} | source_ip:{source_ip} | source_hostname:{source_hostname}",
+        "title": "DHCP Basic Template",
+        "description": "Basic DHCP message summary template"
+      }
+    ],
+    "indicatorTemplate": [
+      {
+        "default_indicator": "warning",
+        "indicator": "event_outcome",
+        "type": "eventOutcome",
+        "title": "Event Outcome Indicator Template",
+        "description": "Basic event outcome message summary indicator",
+        "success": [
+          "success"
+        ],
+        "danger": [
+          "failure"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "alert_severity",
+        "type": "alertPrimary",
+        "title": "Primary Alert",
+        "description": "Primary alert indicator template",
+        "success": [
+          "low"
+        ],
+        "danger": [
+          "critical"
+        ],
+        "info": [
+          "informational"
+        ],
+        "primary": [
+          "medium"
+        ],
+        "warning": [
+          "high"
+        ],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "gim_event_type",
+        "type": "processActionIndicator",
+        "title": "Process Action Indicator",
+        "description": "Set summary font color for different service state events",
+        "success": [],
+        "danger": [
+          "process altered"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "gim_event_type",
+        "type": "fileDangerIndicator",
+        "title": "File Danger indicator",
+        "description": "Set summary font color for some file events",
+        "success": [],
+        "danger": [
+          "file signature invalid",
+          "file deleted"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "gim_event_type",
+        "type": "serviceStateIndicator",
+        "title": "Service State Indicator",
+        "description": "Set summary font color for different service state events",
+        "success": [
+          "service installed",
+          "service enabled"
+        ],
+        "danger": [
+          "service error",
+          "service disabled",
+          "service removed"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "warning",
+        "indicator": "gim_event_type",
+        "type": "auditIndicator",
+        "title": "Audit events default indicator template",
+        "description": "Define summary font colors for audit events",
+        "success": [
+          "audit service started"
+        ],
+        "danger": [
+          "audit error",
+          "audit service stopped",
+          "audit log cleared"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [
+          "audit policy changed"
+        ],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "gim_event_type",
+        "type": "registryWarningIndicator",
+        "title": "Registry Warning Indicator",
+        "description": "Set font color for registry events of note",
+        "success": [],
+        "danger": [
+          "registry value deleted",
+          "registry value modified",
+          "registry value set"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "gim_event_type",
+        "type": "driverWarningIndicator",
+        "title": "Driver Warning Indicator",
+        "description": "Set font color for driver events of note",
+        "success": [],
+        "danger": [
+          "system driver loaded"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      },
+      {
+        "default_indicator": "info",
+        "indicator": "alert_severity",
+        "type": "detectionPrimary",
+        "title": "Primary Detection Indicator",
+        "description": "Primary detection indicator template",
+        "success": [],
+        "danger": [
+          "critical"
+        ],
+        "info": [],
+        "primary": [],
+        "warning": [],
+        "default": []
+      }
+    ],
+    "summaryView": [
+      {
+        "title": "authentication logon",
+        "description": "Logon message summary view",
+        "summary_template": "[authentication.logon] application_name:{application_name} | source_reference:{source_reference} | user_domain:{user_domain} | user_name:{user_name} | event_outcome:{event_outcome}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "authentication",
+        "sub_category": "logon"
+      },
+      {
+        "title": "authentication credential validation",
+        "description": "Authentication:Credential Validation summary view configuration",
+        "summary_template": "[authentication.credential validation] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_domain:{user_domain} | user_name:{user_name} | event_outcome:{event_outcome}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "authentication",
+        "sub_category": "credential validation"
+      },
+      {
+        "title": "authentication access notice",
+        "description": "Access notice events provide supplemental information generated during authentication that does not directly represent a logon or credential validation. These events add context about the authentication process, such as when a logon occurs with elevated privileges (\"special logon\") or when the system generates an advisory error.\n\nAccess notices should be treated as contextual events: they provide important security-relevant details but do not by themselves indicate a successful or failed authentication attempt.\n",
+        "summary_template": "[authentication.access notice] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "authentication",
+        "sub_category": "access notice"
+      },
+      {
+        "title": "authentication access policy",
+        "description": "Access policy messages",
+        "summary_template": "[authentication.access policy] application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "authentication",
+        "sub_category": "access policy"
+      },
+      {
+        "title": "authentication kerberos request",
+        "description": "Kerberos request message summary template",
+        "summary_template": "[authentication.kerberos request] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "authentication",
+        "sub_category": "kerberos request"
+      },
+      {
+        "title": "authentication logoff",
+        "description": "A user has logged off from a system or session",
+        "summary_template": "[authentication.logoff] {event_source_product} - application_name:{application_name} | source_reference:{source_reference} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "authentication",
+        "sub_category": "logoff"
+      },
+      {
+        "title": "authentication default",
+        "description": "Messages related to authentication",
+        "summary_template": "[authentication.default] {event_source_product} - user_name:{user_name} | event_outcome:{event_outcome}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "authentication",
+        "sub_category": "default"
+      },
+      {
+        "title": "iamObjectCreate",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "summaryTemplate.iamEvents",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "object create"
+      },
+      {
+        "title": "iamObjectDelete",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "summaryTemplate.iamEvents",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "object delete"
+      },
+      {
+        "title": "iamobjectModify",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] event_source_product:{event_source_product} | source_user_name:{source_user_name} | user_name:{user_name} | vendor_event_description:{vendor_event_description}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "object modify"
+      },
+      {
+        "title": "iamObjectDisable",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "summaryTemplate.iamEvents",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "object disable"
+      },
+      {
+        "title": "iamObjectEnable",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "summaryTemplate.iamEvents",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "object enable"
+      },
+      {
+        "title": "iamInformation",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] event_source_product:{event_source_product} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "information"
+      },
+      {
+        "title": "iamDefault",
+        "description": "IAM Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] event_source_product:{event_source_product} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "iam",
+        "sub_category": "default"
+      },
+      {
+        "title": "network network connection",
+        "description": "Network connection summary view",
+        "summary_template": "[network.network connection] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "network connection"
+      },
+      {
+        "title": "network network routing",
+        "description": "Network routing summary view",
+        "summary_template": "summaryTemplate.networkDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "routing"
+      },
+      {
+        "title": "network connection open",
+        "description": "Network connection open summary view",
+        "summary_template": "[network.open] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "open"
+      },
+      {
+        "title": "network connection close",
+        "description": "A network connection has closed",
+        "summary_template": "[network.close] source_reference:{source_reference} | destination_reference:{destination_reference} | destination_port:{destination_port} [{network_transport}]",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "close"
+      },
+      {
+        "title": "network flow",
+        "description": "Network Flow Record",
+        "summary_template": "summaryTemplate.networkConnection",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "flow"
+      },
+      {
+        "title": "network ICMP request summary",
+        "description": "Network ICMP request summary",
+        "summary_template": "[ICMP Request] source_reference:{source_reference} - destination_reference:{destination_reference} - network_icmp_request_type_number:{network_icmp_request_type_number} network_icmp_request_code_number:{network_icmp_request_code_number}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "icmp_request"
+      },
+      {
+        "title": "network ICMP reply summary",
+        "description": "Network ICMP reply summary",
+        "summary_template": "[ICMP Reply] source_reference:{source_reference} - destination_reference:{destination_reference} - network_icmp_reply_type_number:{network_icmp_reply_type_number} network_icmp_reply_code_number:{network_icmp_reply_code_number}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "icmp_reply"
+      },
+      {
+        "title": "network default",
+        "description": "network default event summary view",
+        "summary_template": "[{gim_event_type}] {source_reference} - {destination_reference}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "network",
+        "sub_category": "default"
+      },
+      {
+        "title": "messaging email",
+        "description": "Messages related to emails being sent",
+        "summary_template": "summaryTemplate.default",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "messaging",
+        "sub_category": "email"
+      },
+      {
+        "title": "messaging default",
+        "description": "Event log messages related to the sending of messages",
+        "summary_template": "summaryTemplate.default",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "messaging",
+        "sub_category": "default"
+      },
+      {
+        "title": "name resolution dns request",
+        "description": "DNS request summary view",
+        "summary_template": "[name resolution.dns request] event source:{source} | source_reference:{source_reference} | query_request:{query_request}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "name resolution",
+        "sub_category": "dns request"
+      },
+      {
+        "title": "name resolution dns answer",
+        "description": "DNS response summary view",
+        "summary_template": "[{gim_event_type}] source:{source} | query_response:{query_response}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "name resolution",
+        "sub_category": "dns answer"
+      },
+      {
+        "title": "nameResDNSError",
+        "description": "DNS response summary view",
+        "summary_template": "[{gim_event_type}] source:{source} | event_error_code:{event_error_code}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "name resolution",
+        "sub_category": "error"
+      },
+      {
+        "title": "name resolution ddns update",
+        "description": "Dynamic DNS update summary view",
+        "summary_template": "[{gim_event_type}] {message}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "name resolution",
+        "sub_category": "ddns update"
+      },
+      {
+        "title": "name resolution default",
+        "description": "Default name resolution event summary view",
+        "summary_template": "[{gim_event_type}] query_request:{query_request}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "name resolution",
+        "sub_category": "default"
+      },
+      {
+        "title": "database query",
+        "description": "database query summary",
+        "summary_template": "",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "database",
+        "sub_category": "query"
+      },
+      {
+        "title": "database update",
+        "description": "database update summary",
+        "summary_template": "summaryTemplate.database",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "database",
+        "sub_category": "update"
+      },
+      {
+        "title": "database add",
+        "description": "database add data summary",
+        "summary_template": "summaryTemplate.database",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "database",
+        "sub_category": "add"
+      },
+      {
+        "title": "database delete",
+        "description": "database delete data summary",
+        "summary_template": "summaryTemplate.database",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "database",
+        "sub_category": "delete"
+      },
+      {
+        "title": "database default",
+        "description": "Messages related to database",
+        "summary_template": "summaryTemplate.database",
+        "indicator_template": null,
+        "default_indicator": "info",
+        "category": "database",
+        "sub_category": "default"
+      },
+      {
+        "title": "alert network alert",
+        "description": "Network alert summary",
+        "summary_template": "[{gim_event_type}] {event_source_product} alert:{alert_signature} severity:{alert_severity} from source_reference:{source_reference} to destination_reference:{destination_reference}",
+        "indicator_template": "indicatorTemplate.alertPrimary",
+        "default_indicator": null,
+        "category": "alert",
+        "sub_category": "network alert"
+      },
+      {
+        "title": "alert host alert",
+        "description": "Host alert summary",
+        "summary_template": "[{gim_event_type}] {event_source_product} alert:{alert_signature} severity:{alert_severity} on host_reference:{host_reference}",
+        "indicator_template": "indicatorTemplate.alertPrimary",
+        "default_indicator": null,
+        "category": "alert",
+        "sub_category": "host alert"
+      },
+      {
+        "title": "alert default",
+        "description": "Default alert summary",
+        "summary_template": "[alert.default] {event_source_product} alert:{alert_signature} severity:{alert_severity}",
+        "indicator_template": "indicatorTemplate.alertPrimary",
+        "default_indicator": null,
+        "category": "alert",
+        "sub_category": "default"
+      },
+      {
+        "title": "httpDefault",
+        "description": "HTTP Default Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] source_reference:{source_reference} | http_request_method:{http_request_method}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "http",
+        "sub_category": "default"
+      },
+      {
+        "title": "httpRequest",
+        "description": "HTTP Request Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] source_reference:{source_reference} | http_request_method:{http_request_method} | http_request_path:{http_request_path}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "http",
+        "sub_category": "request"
+      },
+      {
+        "title": "httpCommunication",
+        "description": "HTTP Communication Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] source_reference:{source_reference} | http_response_code:{http_response_code} | http_request_method:{http_request_method} | http_request_path:{http_request_path}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "http",
+        "sub_category": "communication"
+      },
+      {
+        "title": "httpProxied",
+        "description": "HTTP Proxied Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] event_action:{event_action} | source_reference:{source_reference} | http_request_method:{http_request_method} | http_request_path:{http_request_path}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "http",
+        "sub_category": "proxied"
+      },
+      {
+        "title": "processExecuteSummary",
+        "description": "Process Execute Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] process_name:{process_name} | user_name:{user_name} | process_parent_path:{process_parent_path}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "process",
+        "sub_category": "execute"
+      },
+      {
+        "title": "processEndSummary",
+        "description": "Process End Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] process_name:{process_name} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "process",
+        "sub_category": "end"
+      },
+      {
+        "title": "processInteractionSummary",
+        "description": "Process Interaction Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] event_action:{event_action} | process_name:{process_name} | process_target_name:{process_target_name} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "process",
+        "sub_category": "interaction"
+      },
+      {
+        "title": "processActionSummary",
+        "description": "Process Action Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] process_name:{process_name} | event_action:{event_action} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.processActionIndicator",
+        "default_indicator": null,
+        "category": "process",
+        "sub_category": "action"
+      },
+      {
+        "title": "processDefaultSummary",
+        "description": "Process Default Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] process_name:{process_name} | user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "process",
+        "sub_category": "default"
+      },
+      {
+        "title": "fileCreateSummary",
+        "description": "Summary for a file was created",
+        "summary_template": "summaryTemplate.fileCategory01",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "file",
+        "sub_category": "create"
+      },
+      {
+        "title": "fileDeleteSummary",
+        "description": "File deletion summary",
+        "summary_template": "summaryTemplate.fileCategory01",
+        "indicator_template": "indicatorTemplate.fileDangerIndicator",
+        "default_indicator": null,
+        "category": "file",
+        "sub_category": "delete"
+      },
+      {
+        "title": "fileModifySummary",
+        "description": "File modification summary",
+        "summary_template": "summaryTemplate.fileCategory01",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "file",
+        "sub_category": "modify"
+      },
+      {
+        "title": "fileIntegritySummary",
+        "description": "File integrity summary",
+        "summary_template": "summaryTemplate.fileCategory00",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "file",
+        "sub_category": "integrity"
+      },
+      {
+        "title": "fileDefaultSummary",
+        "description": "File default summary",
+        "summary_template": "summaryTemplate.fileCategory00",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "file",
+        "sub_category": "default"
+      },
+      {
+        "title": "serviceStart",
+        "description": "Service Start Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.serviceCategory",
+        "indicator_template": "indicatorTemplate.serviceStateIndicator",
+        "default_indicator": null,
+        "category": "service",
+        "sub_category": "start"
+      },
+      {
+        "title": "serviceStop",
+        "description": "Service Stop Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.serviceCategory",
+        "indicator_template": "indicatorTemplate.serviceStateIndicator",
+        "default_indicator": null,
+        "category": "service",
+        "sub_category": "stop"
+      },
+      {
+        "title": "serviceConfig",
+        "description": "Service Configuration Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.serviceCategory",
+        "indicator_template": "indicatorTemplate.serviceStateIndicator",
+        "default_indicator": null,
+        "category": "service",
+        "sub_category": "configuration"
+      },
+      {
+        "title": "serviceState",
+        "description": "Service State Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.serviceCategory",
+        "indicator_template": "indicatorTemplate.serviceStateIndicator",
+        "default_indicator": null,
+        "category": "service",
+        "sub_category": "state"
+      },
+      {
+        "title": "serviceDefault",
+        "description": "Service Default Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.serviceCategory",
+        "indicator_template": "indicatorTemplate.serviceStateIndicator",
+        "default_indicator": null,
+        "category": "service",
+        "sub_category": "default"
+      },
+      {
+        "title": "auditIntegrity",
+        "description": "Audit Integrity (schema v3.0)",
+        "summary_template": "[audit.integrity] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.auditIndicator",
+        "default_indicator": null,
+        "category": "audit",
+        "sub_category": "integrity"
+      },
+      {
+        "title": "auditState",
+        "description": "Audit service state (schema v3.0)",
+        "summary_template": "[audit.state] {event_source_product} - vendor_event_action:{vendor_event_action}",
+        "indicator_template": "indicatorTemplate.auditIndicator",
+        "default_indicator": null,
+        "category": "audit",
+        "sub_category": "state"
+      },
+      {
+        "title": "auditPolicy",
+        "description": "Audit policy (schema v3.1)",
+        "summary_template": "[audit.policy] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.auditIndicator",
+        "default_indicator": null,
+        "category": "audit",
+        "sub_category": "policy"
+      },
+      {
+        "title": "auditDefault",
+        "description": "Default audit events (schema v3.1)",
+        "summary_template": "[audit.default] {event_source_product} - vendor_event_action:{vendor_event_action} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.auditIndicator",
+        "default_indicator": null,
+        "category": "audit",
+        "sub_category": "default"
+      },
+      {
+        "title": "pipeAddSummary",
+        "description": "Named pipe add (schema v3.1)",
+        "summary_template": "summaryTemplate.pipeCategory",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "pipe",
+        "sub_category": "add"
+      },
+      {
+        "title": "pipeRemoveSummary",
+        "description": "Named pipe remove (schema v3.1)",
+        "summary_template": "summaryTemplate.pipeCategory",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "pipe",
+        "sub_category": "remove"
+      },
+      {
+        "title": "pipeStateSummary",
+        "description": "Named pipe state (schema v3.1)",
+        "summary_template": "summaryTemplate.pipeCategory",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "pipe",
+        "sub_category": "state"
+      },
+      {
+        "title": "pipeDefaultSummary",
+        "description": "Named pipe default (schema v3.1)",
+        "summary_template": "summaryTemplate.pipeCategory",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "pipe",
+        "sub_category": "default"
+      },
+      {
+        "title": "wmiFilter",
+        "description": "WMI Filter (schema v3.0)",
+        "summary_template": "[{gim_event_type}] user_name:{user_name} | wmi_filter_name:{wmi_filter_name} | wmi_filter_query:{wmi_filter_query}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "wmi",
+        "sub_category": "filter"
+      },
+      {
+        "title": "wmiConsumer",
+        "description": "WMI Consumer (schema v3.0)",
+        "summary_template": "[{gim_event_type}] user_name:{user_name} | wmi_consumer_name:{wmi_consumer_name} | wmi_consumer_destination:{wmi_consumer_destination}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "wmi",
+        "sub_category": "consumer"
+      },
+      {
+        "title": "wmiBinding",
+        "description": "WMI Binding (schema v3.0)",
+        "summary_template": "[{gim_event_type}] user_name:{user_name} | wmi_consumer:{wmi_consumer} | wmi_filter:{wmi_filter}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "wmi",
+        "sub_category": "binding"
+      },
+      {
+        "title": "wmiDefault",
+        "description": "WMI Default (schema v3.0)",
+        "summary_template": "[{gim_event_type}] user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "wmi",
+        "sub_category": "default"
+      },
+      {
+        "title": "registryValueChange",
+        "description": "Registry Value Change Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.registryCategory",
+        "indicator_template": "indicatorTemplate.registryWarningIndicator",
+        "default_indicator": null,
+        "category": "registry",
+        "sub_category": "value_change"
+      },
+      {
+        "title": "registryKeyChange",
+        "description": "Registry Key Change Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.registryCategory",
+        "indicator_template": "indicatorTemplate.registryWarningIndicator",
+        "default_indicator": null,
+        "category": "registry",
+        "sub_category": "key_change"
+      },
+      {
+        "title": "registryObjectRename",
+        "description": "Registry Object Rename Summary (schema v3.1)",
+        "summary_template": "[{gim_event_type}] registry_path:{registry_path} | registry_path_new:{registry_path_new} | process_path:{process_path} | user_name:{user_name}",
+        "indicator_template": "indicatorTemplate.registryWarningIndicator",
+        "default_indicator": null,
+        "category": "registry",
+        "sub_category": "object_renamed"
+      },
+      {
+        "title": "registryDefault",
+        "description": "Registry Default Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.registryCategory",
+        "indicator_template": "indicatorTemplate.registryWarningIndicator",
+        "default_indicator": null,
+        "category": "registry",
+        "sub_category": "default"
+      },
+      {
+        "title": "systemTimeChange",
+        "description": "System Time - Time Change Events (schema v3.1)",
+        "summary_template": "[system_time.time_change] user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "system_time",
+        "sub_category": "time_change"
+      },
+      {
+        "title": "systemTimeDefault",
+        "description": "System Time Default Events (schema v3.1)",
+        "summary_template": "[{gim_event_type}] user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "system_time",
+        "sub_category": "default"
+      },
+      {
+        "title": "driverLoaded",
+        "description": "Driver Loaded Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.driverCategoryTemplate",
+        "indicator_template": "indicatorTemplate.driverWarningIndicator",
+        "default_indicator": null,
+        "category": "driver",
+        "sub_category": "loaded"
+      },
+      {
+        "title": "driverUnloaded",
+        "description": "Driver Unloaded Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.driverCategoryTemplate",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "driver",
+        "sub_category": "unloaded"
+      },
+      {
+        "title": "driverDefault",
+        "description": "Driver Unloaded Summary (schema v3.1)",
+        "summary_template": "summaryTemplate.driverCategoryTemplate",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "driver",
+        "sub_category": "default"
+      },
+      {
+        "title": "agentActivity",
+        "description": "Agent Activity (schema v3.1)",
+        "summary_template": "[agent.activity] {event_source_product} - event_action:{event_action} | event_outcome:{event_outcome} | event_component:{event_component}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "agent",
+        "sub_category": "activity"
+      },
+      {
+        "title": "agentUpdateSummary",
+        "description": "Agent Default (schema v3.1)",
+        "summary_template": "[agent.update] {event_source_product} - event_action:{event_action} | event_outcome:{event_outcome} | event_component:{event_component}",
+        "indicator_template": "indicatorTemplate.eventOutcome",
+        "default_indicator": null,
+        "category": "agent",
+        "sub_category": "update"
+      },
+      {
+        "title": "agentStatus",
+        "description": "Agent Status (schema v3.1)",
+        "summary_template": "[agent.status] {event_source_product}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "agent",
+        "sub_category": "status"
+      },
+      {
+        "title": "agentDefault",
+        "description": "Agent Default (schema v3.1)",
+        "summary_template": "[agent.default] {event_source_product}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "agent",
+        "sub_category": "default"
+      },
+      {
+        "title": "dhcpRequest",
+        "description": "DHCP Request (schema v3.1)",
+        "summary_template": "summaryTemplate.dhcpDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "dhcp",
+        "sub_category": "request"
+      },
+      {
+        "title": "dhcpOffer",
+        "description": "DHCP Offer (schema v3.1)",
+        "summary_template": "summaryTemplate.dhcpDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "dhcp",
+        "sub_category": "offer"
+      },
+      {
+        "title": "dhcpDiscovery",
+        "description": "DHCP Discovery (schema v3.1)",
+        "summary_template": "summaryTemplate.dhcpDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "dhcp",
+        "sub_category": "discovery"
+      },
+      {
+        "title": "dhcpAck",
+        "description": "DHCP Acknowledgement (schema v3.1)",
+        "summary_template": "summaryTemplate.dhcpDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "dhcp",
+        "sub_category": "acknowledgement"
+      },
+      {
+        "title": "dhcpDefault",
+        "description": "DHCP Default (schema v3.1)",
+        "summary_template": "summaryTemplate.dhcpDefault",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "dhcp",
+        "sub_category": "default"
+      },
+      {
+        "title": "detection network detection",
+        "description": "Network detection summary",
+        "summary_template": "[network_detection] {event_source_product} detection:{alert_signature} severity:{alert_severity} from source_reference:{source_reference} to destination_reference:{destination_reference}",
+        "indicator_template": "indicatorTemplate.detectionPrimary",
+        "default_indicator": null,
+        "category": "detection",
+        "sub_category": "network_detection"
+      },
+      {
+        "title": "detection host detection",
+        "description": "Host detection summary",
+        "summary_template": "[host_detection] {event_source_product} detection:{alert_signature} severity:{alert_severity} on host_reference:{host_reference}",
+        "indicator_template": "indicatorTemplate.detectionPrimary",
+        "default_indicator": null,
+        "category": "detection",
+        "sub_category": "host_detection"
+      },
+      {
+        "title": "detection default",
+        "description": "Default detection summary",
+        "summary_template": "[detection] {event_source_product} detection:{alert_signature} severity:{alert_severity}",
+        "indicator_template": "indicatorTemplate.detectionPrimary",
+        "default_indicator": null,
+        "category": "detection",
+        "sub_category": "default"
+      }
+    ]
+  }
+}
