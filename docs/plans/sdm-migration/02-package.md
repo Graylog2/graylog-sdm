@@ -41,7 +41,7 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
 1. **Refactor, no behavior change:** steps 2–7, 11a and 12a (packaging, imports, rename, repo-root discovery, config loading, a CLI with only the `build` subcommand, moving tests). Step 11a has to be in this commit because the `build-sdm` console script from step 2 points at `build_sdm.cli:main`. Without it, `uv run build-sdm build` can't run the parity check.
    - The parity check runs **at this commit**. Every plugin's output must be byte-identical to Illuminate's at the PR 1 SHA (see Verification).
    - Record the result in the PR description, because a squash merge loses this intermediate state on `main`.
-1b. **Imported test fixes:** step 12b. Test-only; kept out of commit 1 so the move stays a pure move. Tool output is unchanged.
+1b. **Imported test and latent-defect fixes:** step 12b. Kept out of commit 1 so the move stays a pure move. Tool output is unchanged (the hint fix affects no current data).
 2. **Fatal plugin failures:** step 9. If parity at commit 1 revealed a plugin that was failing silently, this commit surfaces it.
 3. **Optional MadCap output path:** step 8, including the `--madcap-output-dir` flag on `build`. It's additive, and the default output is unchanged.
 4. **CLI additions:** step 11b.
@@ -57,7 +57,7 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
    - dev dependency group: pytest, pytest-mock, ruff, mypy
    - build backend (hatchling) with package dir `tools/build_sdm` mapped to `build_sdm`, and package data for `html_templates/**` and `configs/*.toml`
    - `[project.scripts] build-sdm = "build_sdm.cli:main"`
-   - move `[tool.ruff]`, `[tool.mypy]` (pydantic plugin) and the legacy per-module exemptions over from the tool's pyproject, updating module paths to `build_sdm.*`
+   - move `[tool.ruff]`, `[tool.mypy]` (pydantic plugin) and the legacy per-module exemptions over from the tool's pyproject, updating module paths to `build_sdm.*`; set ruff `target-version = "py313"` and mypy `python_version = "3.13"` (imported as 3.11, flagged in the PR 1 Copilot review)
    - `[tool.pytest.ini_options] testpaths = ["tests"]`
    - delete `tools/build_sdm/{pyproject.toml,uv.lock,.python-version}`; add root `.python-version` (3.13); generate the root `uv.lock`
 3. Turn `tools/build_sdm/` into a package:
@@ -75,7 +75,7 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
    - `configs/build_gim.toml` → `configs/build_sdm.toml`
    - key `gim_source_dir` → `sdm_source_dir` = `"src/sdm"`
    - `output_dir = "build/sdm_artifacts"`, with the code defaults at `runner.py:49,86` updated to match
-   - README, docstrings, log strings and the argparse prog name
+   - README, docstrings, log strings and the argparse prog name; also fix the "configuruation" typo in `json_file_output/plugin.py:32`
    - `grep -rn "build_gim\|gim_artifacts\|_meta/gim" tools/ tests/ src/ pyproject.toml` until it returns nothing. Docs (`docs/`, ADRs, plans) are left out of this search on purpose, because they mention the old names as history.
 6. Find the repo root without counting parent directories:
    - add `build_sdm.utils.paths.find_repo_root()`, which walks up from the current working directory and then from `__file__` until it finds a `pyproject.toml` with `name = "build-sdm"`
@@ -112,6 +112,8 @@ This PR combines a pure refactor with behavior changes. To keep the parity check
     - **12b (commit 1b).** Fix two imported test defects found in the PR 1 Copilot review (PR #3):
       - `test_category_csv_missing_event_data.py`: `test_missing_event_type_codes_raises_runtime_error` is defined twice (lines 5 and 91 at import), so the first definition never runs. Rename the second to describe its case (empty `event_type_codes` dict vs. missing key). The restored test has never run; if it fails, fix the test or record the underlying bug, don't delete it.
       - `output_madcap/test_madcap_output_html_subdir.py`: has no test functions or assertions; it validates a local copy of the model in import-time loops. Replace it with parametrized tests against the real `TopLevelGimSectionMetadata` and `TopLevelFieldSchemaSectionMetadata` (`madcap_html_output/models.py`, `SafeSubdir`), asserting acceptance or `ValidationError` per the real contract. Check that contract in the code; don't copy the local model's regex.
+      - `utils/transform.py:39`: the duplicate (type, category) `ValueError` has no test. Add one that feeds two entries with the same type and category and asserts the error.
+      - `html_templates/macros/top_level_page_sections.j2:33`: the `hint` branch indexes `section.content` as a list, but the model requires a string (`field_schema_model.py:137-139`), so a hint renders one character per line. Split on `\n` as the `warning` branch does, and add a render test. No current data uses a hint, so output is unchanged.
 13. Add a determinism check: run `build` twice and diff the results. If anything nondeterministic shows up (timestamps, dict or set ordering), fix it.
 14. Run `uv run build-sdm build` and commit `generated/MadcapHtmlOutput/`. Add `build/` to `.gitignore` if it isn't there.
 15. Update the standards files:
