@@ -56,7 +56,34 @@ def test_format_diff_names_files_and_fix() -> None:
     assert "changed" in report and "a.html" in report
     assert "stale" in report and "old.html" in report
     assert "missing" in report and "b.html" in report
-    assert "rm -rf 'generated/MadcapHtmlOutput' && uv run build-sdm build" in report
+    assert "  uv run build-sdm build\n" in report
+    assert "  git rm -- generated/MadcapHtmlOutput/old.html\n" in report
+
+
+def test_format_diff_never_suggests_clearing_the_directory() -> None:
+    """The fix deletes only the listed stale files, never the whole output directory."""
+    diff = TreeDiff(stale=[Path("old.html")])
+
+    report = format_diff(diff, ".")
+
+    assert "rm -rf" not in report
+    assert "git rm -- ./old.html" in report
+
+
+def test_format_diff_quotes_paths_for_the_shell() -> None:
+    """Paths with spaces or quotes stay a single, literal shell argument."""
+    diff = TreeDiff(stale=[Path("Graylog Information Models/it's.html")])
+
+    report = format_diff(diff, "generated/Madcap")
+
+    assert "git rm -- 'generated/Madcap/Graylog Information Models/it'\"'\"'s.html'" in report
+
+
+def test_format_diff_omits_git_rm_without_stale_files() -> None:
+    """With nothing stale, the fix is just rebuild and commit."""
+    report = format_diff(TreeDiff(changed=[Path("a.html")]), "generated/MadcapHtmlOutput")
+
+    assert "git rm" not in report
 
 
 @pytest.fixture
@@ -115,6 +142,21 @@ def test_check_fails_on_stale_file(
     assert _check(config_dir) == 1
     out = capsys.readouterr().out
     assert "stale" in out and "removed_category.html" in out
+
+
+def test_check_fix_repeats_non_default_config_dir(
+    config_dir: Path, generated: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """The suggested rebuild uses the same config directory the check ran with."""
+    (generated / "removed_category.html").write_text("old", encoding="utf-8")
+
+    assert _check(config_dir) == 1
+    assert f"uv run build-sdm build --config_dir {config_dir.resolve()}" in capsys.readouterr().out
+
+
+def test_build_command_omits_default_config_dir(repo_root: Path) -> None:
+    """With the package's own configs, the suggested rebuild is the plain build command."""
+    assert cli._build_command(cli.DEFAULT_CONFIG_DIR, repo_root) == "uv run build-sdm build"
 
 
 def test_check_fails_on_missing_file(

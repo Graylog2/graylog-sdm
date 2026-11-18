@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import shlex
 import tempfile
 from pathlib import Path
 
@@ -166,6 +167,22 @@ def _display_path(path: Path, repo_root: Path) -> str:
     return path.relative_to(repo_root).as_posix() if path.is_relative_to(repo_root) else str(path)
 
 
+def _build_command(config_dir: Path, repo_root: Path) -> str:
+    """Return the build command that reproduces a check run with config_dir.
+
+    Args:
+        config_dir: The resolved config directory the check used.
+        repo_root: Repository root.
+
+    Returns:
+        The command, with --config_dir only when it isn't the default.
+    """
+    command = "uv run build-sdm build"
+    if config_dir == DEFAULT_CONFIG_DIR:
+        return command
+    return f"{command} --config_dir {shlex.quote(_display_path(config_dir, repo_root))}"
+
+
 def _cmd_check_generated(args: argparse.Namespace) -> int:
     """Run the check-generated command.
 
@@ -203,7 +220,7 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
     if diff.clean:
         logger.info("%s is up to date", display)
         return 0
-    print(format_diff(diff, display))
+    print(format_diff(diff, display, _build_command(config_dir, repo_root)))
     return 1
 
 
