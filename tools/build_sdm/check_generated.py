@@ -1,5 +1,6 @@
 """Compare a fresh build's output tree with the committed one (build-sdm check-generated)."""
 
+import shlex
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -63,13 +64,17 @@ def compare_trees(committed: Path, fresh: Path) -> TreeDiff:
     )
 
 
-def format_diff(diff: TreeDiff, committed: str) -> str:
+def format_diff(diff: TreeDiff, committed: str, build_command: str = "uv run build-sdm build") -> str:
     """Describe a non-clean TreeDiff and how to fix it.
+
+    The fix names the stale files individually rather than clearing the directory, so a
+    misconfigured output_dir can never turn the suggested command into a broad delete.
 
     Args:
         diff: The differences found.
         committed: The committed output directory as shown to the user, e.g. its
             repo-relative path.
+        build_command: The command that rebuilds the output with the same configuration.
 
     Returns:
         A multi-line report.
@@ -84,6 +89,11 @@ def format_diff(diff: TreeDiff, committed: str) -> str:
         if paths:
             lines.append(f"  {title}:")
             lines.extend(f"    {p.as_posix()}" for p in paths)
-    # The build never deletes files, so clear the directory first to drop stale ones.
-    lines.append(f"Fix: rm -rf '{committed}' && uv run build-sdm build, then commit '{committed}'.")
+    lines.append("Fix, from the repository root:")
+    lines.append(f"  {build_command}")
+    if diff.stale:
+        # The build never deletes files, so stale ones must be removed explicitly.
+        stale = " ".join(shlex.quote(f"{committed}/{p.as_posix()}") for p in diff.stale)
+        lines.append(f"  git rm -- {stale}")
+    lines.append(f"  then commit {shlex.quote(committed)}.")
     return "\n".join(lines)
