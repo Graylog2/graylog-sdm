@@ -3,7 +3,6 @@ import logging
 import importlib
 from build_sdm import output_plugins
 import pkgutil
-import traceback
 from build_sdm.base_output import OutputPlugin
 from pydantic import ValidationError
 
@@ -13,22 +12,19 @@ logger = logging.getLogger(__name__)
 
 def safe_execute(method):
     '''
-    Decorator that logs a plugin method's failure with the plugin name, then re-raises it.
+    Decorator that notes the plugin name on a plugin method's failure, then re-raises it.
 
     Plugin failures are fatal (ADR 0002): the error propagates so the build exits non-zero
-    instead of finishing without the plugin's output.
+    instead of finishing without the plugin's output. The CLI logs it once.
     '''
     @functools.wraps(method)
     def wrapper(*args, **kwargs):
-        plugin_instance = args[0]
+        # A bound method (instance.generate) carries its plugin; an unbound one gets it first.
+        plugin_instance = getattr(method, '__self__', None) or args[0]
         try:
             return method(*args, **kwargs)
         except Exception as e:
-            logger.error(f'[{plugin_instance.__class__.__name__}] Plugin execution failed: {str(e)}')
-
-            if logger.isEnabledFor(logging.DEBUG):
-                tb = traceback.format_exc()
-                logger.debug(f'[{plugin_instance.__class__.__name__}] Full traceback:\n{tb}')
+            e.add_note(f'in output plugin {plugin_instance.__class__.__name__}')
             raise
 
     return wrapper
@@ -75,16 +71,8 @@ def load_plugins_with_config(plugin_config: dict, mode='default_only'):
                         try:
                             validated_config = cls.config_schema.parse_obj(config)
                         except ValidationError as e:
-                            logger.error(
-                                '[%s] Invalid configuration for plugin detected',
-                                plugin_name
-                                )
-                            for error in e.errors():
-                                field = '.'.join(str(loc) for loc in error['loc'])
-                                logger.error(
-                                    '[%s] Field [%s]: %s',
-                                    plugin_name, field, error['msg']
-                                    )
+                            # The ValidationError text lists every invalid field.
+                            e.add_note(f'in the configuration for output plugin {plugin_name}')
                             raise
                     else:
                         logger.debug('[%s] has no config_schema defined', plugin_name)

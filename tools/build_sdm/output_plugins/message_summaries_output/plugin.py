@@ -145,9 +145,7 @@ class MessageSummariesOutput(OutputPlugin[MessageSummaryOutputConfig]):
                 summary_template_ids.add(template_id)
                 summary_templates.append(validated.dict())
             except Exception as e:
-                self.logger.warning(
-                    'Invalid summary template in GIM category [%s]: %s', gim_category['name'], e
-                    )
+                e.add_note(f'in summary template of GIM category [{gim_category["name"]}]')
                 raise
 
         for indicator_config in gim_category.get('indicators'):
@@ -164,9 +162,7 @@ class MessageSummariesOutput(OutputPlugin[MessageSummaryOutputConfig]):
                 indicator_template_ids.add(template_id)
                 indicator_templates.append(validated.dict())
             except Exception as e:
-                self.logger.warning(
-                    'Invalid indicator template in GIM category [%s]: %s', gim_category['name'], e
-                )
+                e.add_note(f'in indicator template of GIM category [{gim_category["name"]}]')
                 raise
 
         for subcat_code in gim_category.get('subcategories'):
@@ -189,10 +185,8 @@ class MessageSummariesOutput(OutputPlugin[MessageSummaryOutputConfig]):
                     summary_view_ids.add(template_id)
                     summary_views.append(validated.dict())
                 except Exception as e:
-                    self.logger.warning(
-                        'Invalid summary view in GIM category [%s.%s]',
-                        gim_category['name'], gim_category['subcategories'][subcat_code]['name']
-                    )
+                    subcat_name = gim_category['subcategories'][subcat_code]['name']
+                    e.add_note(f'in summary view of GIM category [{gim_category["name"]}.{subcat_name}]')
                     raise
 
         # Define the core message summary dict structure if it is not yet defined.
@@ -240,10 +234,6 @@ class MessageSummariesOutput(OutputPlugin[MessageSummaryOutputConfig]):
 
         # Write the file output
         output_file = output_dir / plugin_config.output_filename
-        try:
-            write_file(output_file, json.dumps(summary_data, indent=plugin_config.json_indent))
-        except OSError as e:
-            self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-            raise
+        write_file(output_file, json.dumps(summary_data, indent=plugin_config.json_indent))
 
         self.logger.debug('Plugin processing completed.')

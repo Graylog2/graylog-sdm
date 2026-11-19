@@ -215,7 +215,8 @@ def test_generate_category_pages_handles_write_errors(
     monkeypatch: pytest.MonkeyPatch
 ) -> None:
     '''
-    Should log an error and re-raise if write_file raises OSError (plugin failures are fatal).
+    Should re-raise if write_file raises OSError (plugin failures are fatal), without logging:
+    the CLI logs the failure once.
     '''
     cfg = gim_config()
 
@@ -226,4 +227,4 @@ def test_generate_category_pages_handles_write_errors(
 
     with pytest.raises(OSError, match='Disk full'):
         mock_plugin._generate_category_pages(cfg, tmp_path)
-    mock_plugin.logger.error.assert_called()
+    mock_plugin.logger.error.assert_not_called()

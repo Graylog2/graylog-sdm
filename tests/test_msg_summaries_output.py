@@ -370,5 +370,5 @@ def test_generate_file_write_failure(tmp_path: Path, caplog):
     with pytest.raises(OSError):
         plugin.generate(gim_config, bad_output_dir, plugin_config)
 
-    errors = [rec for rec in caplog.records if rec.levelname == 'ERROR']
-    assert any('Unable to write' in rec.getMessage() for rec in errors)
+    # The OSError propagates; the CLI logs it once (F18).
+    assert not [rec for rec in caplog.records if rec.levelname == 'ERROR']

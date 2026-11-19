@@ -59,7 +59,7 @@ def test_ensure_output_dir_success():
 
 def test_ensure_output_dir_failure(caplog):
     '''
-    Should raise an exception and log an error if mkdir fails.
+    Should raise if mkdir fails, without logging: the CLI logs the failure once.
     '''
     script_config = {'global': {'output_dir': 'fail/here'}}
     repo_dir = Path('/repo/root')
@@ -68,4 +68,4 @@ def test_ensure_output_dir_failure(caplog):
         with pytest.raises(OSError, match='Permission denied'):
             _ensure_output_dir(repo_dir, script_config)
 
-    assert any('Error creating output directory' in message for message in caplog.messages)
+    assert caplog.messages == []

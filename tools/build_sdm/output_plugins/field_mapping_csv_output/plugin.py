@@ -100,7 +100,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
 
         if "gim" not in gim_config or not isinstance(gim_config["gim"], dict):
             error_msg = 'Missing or invalid top-level "gim" key in gim_config; expected dictionary.'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         rows = []
@@ -145,7 +144,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
         """
         if "field_schema" not in gim_config or not isinstance(gim_config["field_schema"], dict):
             error_msg = 'Missing or invalid top-level "field_schema" key in gim_config; expected dictionary.'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         field_schema: dict[str, Any] = gim_config["field_schema"]
@@ -189,7 +187,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
         """
         if field_name in field_schema_map:
             error_msg = f'Field "{field_name}" is defined more than once in field_schema.'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
         field_schema_map[field_name] = {
             "field_type": field["field_type"],
@@ -290,7 +287,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
 
         if not subcat.get("event_type_codes"):
             error_msg = f'Subcategory "{full_subcat_name}" is missing event_type_codes or has no entries.'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         subcat_field_status = self._build_field_status_map(subcat, f'subcategory "{full_subcat_name}"')
@@ -363,7 +359,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
                 'is a wildcard pattern, which is only allowed for "recommended" or '
                 '"optional" fields, never "required".'
             )
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         matches = sorted(fnmatch.filter(field_schema_map.keys(), field_name))
@@ -372,7 +367,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
                 f'Wildcard field "{field_name}" referenced by subcategory '
                 f'"{full_subcat_name}" matched no field_schema entries.'
             )
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         return matches
@@ -418,7 +412,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
                     f'Field "{field_name}" referenced by subcategory '
                     f'"{full_subcat_name}" has no matching field_schema entry.'
                 )
-                self.logger.error(error_msg)
                 raise ValueError(error_msg)
 
         return [
@@ -456,7 +449,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
                         f'Field "{field_name}" is listed in more than one tier '
                         f"({field_status[field_name]} and {status}) for {context}."
                     )
-                    self.logger.error(error_msg)
                     raise ValueError(error_msg)
                 field_status[field_name] = status
 
@@ -504,7 +496,6 @@ class FieldMappingCSVOutput(OutputPlugin[FieldMappingCSVOutputConfig]):  # type:
                         f'"{full_subcat_name}" - a subcategory cannot loosen a '
                         "category-level requirement."
                     )
-                    self.logger.error(error_msg)
                     raise ValueError(error_msg)
                 elif sub_rank == cat_rank:
                     field_rows.append((field_name, cat_status))

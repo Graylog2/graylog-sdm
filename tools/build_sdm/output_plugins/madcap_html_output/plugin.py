@@ -6,8 +6,6 @@ from jinja2 import (
     FileSystemLoader,
     select_autoescape,
     Template,
-    TemplateNotFound,
-    TemplateSyntaxError,
     TemplateError
 )
 import markdown as md
@@ -83,7 +81,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             self._generate_category_pages(gim_config, output_dir)
             self._generate_field_schema_entity_pages(gim_config, output_dir, plugin_config)
         except Exception as e:
-            self.logger.critical('Fatal error while generating category pages: %s', e, exc_info=True)
             raise RuntimeError('Failed during GIM category page generation') from e
 
         self.logger.debug('Plugin processing completed.')
@@ -119,16 +116,13 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         category: str
     ) -> MadcapHtmlOutputPluginConfig:
         '''
-        Validate the plugin configuration for a specific category or entity. Log and re-raise
-        on validation failure (plugin failures are fatal).
+        Validate the plugin configuration for a specific category or entity. On validation
+        failure, note the category on the error and re-raise (plugin failures are fatal).
         '''
         try:
             return MadcapHtmlOutputPluginConfig(**raw_config or {})
         except ValidationError as e:
-            self.logger.error(
-                'Validation failed for plugin config in category/entity [%s]: %s',
-                category, e.errors()
-            )
+            e.add_note(f'in MadCap plugin config for category/entity [{category}]')
             raise
 
     def _initialize_jinja_environment(self, template_dir: Path | None = None) -> None:
@@ -160,19 +154,13 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
 
     def _load_template(self, template_name: str, category: str) -> Template:
         '''
-        Load and return the Jinja2 template for a given category. Log and re-raise on failure
-        (plugin failures are fatal).
+        Load and return the Jinja2 template for a given category. On failure, note the
+        template and category on the error and re-raise (plugin failures are fatal).
         '''
         try:
             template = self._env.get_template(template_name)
-        except TemplateNotFound:
-            self.logger.error('Template not found [%s] for category [%s]', template_name, category)
-            raise
-        except TemplateSyntaxError as e:
-            self.logger.error('Syntax error in [%s] line %s: %s', template_name, e.lineno, e.message)
-            raise
         except TemplateError as e:
-            self.logger.error('Template error while loading [%s]: %s', template_name, e)
+            e.add_note(f'loading template [{template_name}] for category [{category}]')
             raise
         else:
             self.logger.debug('Using HTML template [%s] for category [%s]', template_name, category)
@@ -189,7 +177,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         '''
         Render the provided Jinja2 template using context variables.
         Additional variables may be injected via `extra_context`.
-        Log and re-raise on failure (plugin failures are fatal).
+        On failure, note the category on the error and re-raise (plugin failures are fatal).
         '''
         try:
             context = {
@@ -203,10 +191,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             return template.render(**context)
 
         except Exception as e:
-            self.logger.error(
-                'Failed to render template for entry type [%s]: %s',
-                category, e
-            )
+            e.add_note(f'rendering template for entry type [{category}]')
             raise
 
     def _indent_list_items(self, html: str, indent_width: int = 4) -> str:
@@ -366,21 +351,13 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
                 self.logger.debug('Checking path %s', section_output_dir)
                 Path(section_output_dir).mkdir(parents=True, exist_ok=True)
             except OSError as e:
-                self.logger.error(
-                    'Unable to create directory %s, error %s',
-                    section_output_dir, e
-                )
                 raise RuntimeError(
                     f'Failed to create directory {section_output_dir}'
                 ) from e
 
             output_file = section_output_dir / output_filename
 
-            try:
-                write_file(output_file, postprocessor.clean(html))
-            except OSError as e:
-                self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-                raise
+            write_file(output_file, postprocessor.clean(html))
 
     def _generate_category_pages(
         self,
@@ -402,10 +379,6 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             gim_output_dir.mkdir(parents=True, exist_ok=True)
             self.logger.info('Writing category pages to %s', gim_output_dir)
         except OSError as e:
-            self.logger.critical(
-                'Unable to create HTML output directory %s: %s',
-                html_output_subdir, e
-            )
             raise RuntimeError(
                 f'Failed to create output directory [{gim_output_dir}]'
             ) from e
@@ -442,11 +415,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
 
             postprocessor = DocumentPostprocessor()
 
-            try:
-                write_file(output_file, postprocessor.clean(html))
-            except OSError as e:
-                self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-                raise
+            write_file(output_file, postprocessor.clean(html))
 
     def _merge_field_lists(self, category: dict, subcat_code: dict) -> dict[str, list[str]]:
         '''
@@ -662,16 +631,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
 
             postprocessor = DocumentPostprocessor()
 
-            try:
-                write_file(output_file, postprocessor.clean(html))
-            except OSError as e:
-                self.logger.error(
-                    'Unable to write field schema entity [%s] page [%s] due to write error [%s]',
-                    entity_name,
-                    output_file,
-                    e
-                )
-                raise
+            write_file(output_file, postprocessor.clean(html))
 
             self.logger.debug('Wrote field schema entity [%s] page [%s]', entity_name, output_file)
 
@@ -721,12 +681,10 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         for line in fields:
             if not isinstance(line, dict):
                 error_msg = f'Invalid schema line in [{entity_name}]: not a dict: {line}'
-                self.logger.error(error_msg)
                 raise ValueError(error_msg)
 
             if not line.get('field_suffix'):
                 error_msg = f'Invalid schema line in [{entity_name}]: missing field_suffix: {line}'
-                self.logger.error(error_msg)
                 raise ValueError(error_msg)
 
             if entity_type == 'reserved':

@@ -133,21 +133,17 @@ class PlainTextOutput(OutputPlugin[PlainTextOutputConfig]):
                 category_config = PlainTextOutputPluginConfig(**raw_plugin_config)
                 self.logger.debug('Using category config for %s: %s', category, category_config)
             except ValidationError as e:
-                # Plugin failures are fatal (ADR 0002): log, then let the build fail.
-                self.logger.error('Invalid category config for [%s]: %s', category, e)
+                # Plugin failures are fatal (ADR 0002): note the category and let the build fail.
+                e.add_note(f'in plain text plugin config for category [{category}]')
                 raise
 
         # Determine the final output path
         output_path = output_dir / plugin_config.output_filename
 
-        try:
-            with output_path.open('w', encoding='utf-8') as f:
-                f.write('=== GIM CONFIG DUMP ===\n\n')
-                for key, value in gim_config.items():
-                    f.write(f'{key}:\n{value}\n\n')
-            self.logger.info('Saved plain text output to: %s', output_path)
-        except OSError as e:
-            self.logger.error('Failed to write plain text output file: %s', e)
-            raise
+        with output_path.open('w', encoding='utf-8') as f:
+            f.write('=== GIM CONFIG DUMP ===\n\n')
+            for key, value in gim_config.items():
+                f.write(f'{key}:\n{value}\n\n')
+        self.logger.info('Saved plain text output to: %s', output_path)
 
         self.logger.debug('Plugin processing completed.')

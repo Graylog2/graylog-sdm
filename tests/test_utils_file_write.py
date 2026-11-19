@@ -73,9 +73,9 @@ def test_write_file_raises_oserror(monkeypatch, tmp_path):
     assert target.parent.exists()
 
 
-def test_write_file_logs_error_on_failure(monkeypatch, tmp_path, caplog):
+def test_write_file_failure_propagates_without_logging(monkeypatch, tmp_path, caplog):
     '''
-    Should log an error message when file writing fails.
+    Should raise when file writing fails, without logging: the CLI logs the failure once.
     '''
     target = tmp_path / 'failing.txt'
 
@@ -84,8 +84,7 @@ def test_write_file_logs_error_on_failure(monkeypatch, tmp_path, caplog):
 
     monkeypatch.setattr(Path, 'write_text', fake_write_text)
 
-    with pytest.raises(OSError):
+    with pytest.raises(OSError, match='Permission denied'):
         write_file(target, 'content')
 
-    assert any('Failed to write output file' in msg for msg in caplog.messages)
-    assert any('Permission denied' in msg for msg in caplog.messages)
+    assert not [r for r in caplog.records if r.levelname == 'ERROR']

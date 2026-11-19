@@ -136,6 +136,31 @@ def _resolve_config_dir(config_dir: Path) -> Path | None:
     return resolved
 
 
+def describe_exception(error: BaseException) -> str:
+    """Describe an exception and its causes, with any notes added on the way up.
+
+    Args:
+        error: The exception that ended the build.
+
+    Returns:
+        One line per exception in the chain, outermost first, each followed by its notes.
+    """
+    lines: list[str] = []
+    current: BaseException | None = error
+    while current is not None:
+        prefix = "" if current is error else "caused by "
+        lines.append(f"{prefix}{type(current).__name__}: {current}")
+        lines.extend(f"  {note}" for note in getattr(current, "__notes__", []))
+        current = current.__cause__ or (None if current.__suppress_context__ else current.__context__)
+    return "\n".join(lines)
+
+
+def _log_failure(error: BaseException) -> None:
+    """Log a fatal build error once: its description, then the traceback at debug level."""
+    logger.error("Build failed: %s", describe_exception(error))
+    logger.debug("Traceback", exc_info=error)
+
+
 def _cmd_build(args: argparse.Namespace) -> int:
     """Run the build command.
 
@@ -155,9 +180,9 @@ def _cmd_build(args: argparse.Namespace) -> int:
 
     try:
         run_build(find_repo_root(), config_dir, dry_run=args.dry_run, output_dir_overrides=overrides)
-    except Exception:
-        # Plugin and loader failures are fatal (ADR 0002); report once at the boundary.
-        logger.critical("Build failed", exc_info=True)
+    except Exception as e:
+        # Plugin and loader failures are fatal (ADR 0002); this is the one place they are logged.
+        _log_failure(e)
         return 1
     return 0
 
@@ -237,8 +262,8 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
                 output_dir_overrides={MADCAP_PLUGIN: fresh},
                 output_root=Path(tmp) / "other",
             )
-        except Exception:
-            logger.critical("Build failed", exc_info=True)
+        except Exception as e:
+            _log_failure(e)
             return 1
         if not fresh.is_dir():
             # Comparing against nothing would report every committed file as stale.

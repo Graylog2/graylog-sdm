@@ -1,5 +1,6 @@
 """`build-sdm build` exits non-zero when a plugin fails (ADR 0002: plugin failures are fatal)."""
 
+import logging
 import shutil
 from pathlib import Path
 
@@ -61,5 +62,58 @@ def test_safe_execute_reraises() -> None:
     # safe_execute is legacy code without annotations (see the mypy overrides).
     wrapped = safe_execute(Exploding.generate)  # type: ignore[no-untyped-call]
 
-    with pytest.raises(RuntimeError, match="boom"):
+    with pytest.raises(RuntimeError, match="boom") as excinfo:
         wrapped(plugin)
+
+    assert excinfo.value.__notes__ == ["in output plugin Exploding"]
+
+
+def test_safe_execute_names_the_plugin_of_a_bound_method() -> None:
+    """The loader wraps bound methods, whose first argument is gim_config, not the plugin."""
+
+    class Exploding:
+        def generate(self, gim_config: dict[str, object]) -> None:
+            raise RuntimeError("boom")
+
+    wrapped = safe_execute(Exploding().generate)  # type: ignore[no-untyped-call]
+
+    with pytest.raises(RuntimeError) as excinfo:
+        wrapped({"gim": {}})
+
+    assert excinfo.value.__notes__ == ["in output plugin Exploding"]
+
+
+def test_failure_is_logged_once_with_context(
+    config_dir: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """One failure produces exactly one error-level record, naming the cause and the plugin (F18)."""
+
+    def failing_write_file(*_args: object, **_kwargs: object) -> None:
+        raise OSError("disk full")
+
+    monkeypatch.setattr("build_sdm.output_plugins.json_file_output.plugin.write_file", failing_write_file)
+
+    assert cli.main(["build", "-c", str(config_dir), "-ll", "info"]) == 1
+
+    errors = [r for r in caplog.records if r.levelno >= logging.ERROR]
+    assert len(errors) == 1
+    assert "OSError: disk full" in errors[0].getMessage()
+    assert "in output plugin JsonFileOutput" in errors[0].getMessage()
+
+
+def test_describe_exception_includes_causes_and_notes() -> None:
+    """The description walks the cause chain, outermost first, with each exception's notes."""
+    try:
+        try:
+            raise ValueError("bad value")
+        except ValueError as inner:
+            inner.add_note("in category [network]")
+            raise RuntimeError("generation failed") from inner
+    except RuntimeError as outer:
+        description = cli.describe_exception(outer)
+
+    assert description.splitlines() == [
+        "RuntimeError: generation failed",
+        "caused by ValueError: bad value",
+        "  in category [network]",
+    ]

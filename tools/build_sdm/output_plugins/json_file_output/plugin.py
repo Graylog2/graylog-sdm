@@ -39,10 +39,6 @@ class JsonFileOutput(OutputPlugin[JsonFileOutputConfig]):
 
         output_file = output_dir / plugin_config.output_filename
 
-        try:
-            write_file(output_file, json.dumps(gim_config, indent=plugin_config.json_indent))
-        except OSError as e:
-            self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-            raise
+        write_file(output_file, json.dumps(gim_config, indent=plugin_config.json_indent))
 
         self.logger.debug('Plugin processing completed.')

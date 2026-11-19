@@ -19,7 +19,6 @@ def restructure_gim_config(gim_config: Dict[str, Dict[str, Any]]) -> Dict[str, D
     for filename, entry in gim_config.items():
         type_value = entry.get('type')
         if not type_value:
-            logger.error('Entry %s is missing a "type" field', filename)
             raise ValueError(f'Missing "type" field in file: {filename}')
 
         # Extract category keys (everything except 'type')
@@ -35,7 +34,6 @@ def restructure_gim_config(gim_config: Dict[str, Dict[str, Any]]) -> Dict[str, D
 
         for category_name, data in categories.items():
             if category_name in structured[type_value]:
-                logger.fatal('Collision detected: type "%s" already has category "%s"', type_value, category_name)
                 raise ValueError(f'Collision: type="{type_value}" already contains category="{category_name}"')
 
             structured[type_value][category_name] = data
