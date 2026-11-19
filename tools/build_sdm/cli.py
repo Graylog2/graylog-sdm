@@ -6,6 +6,7 @@ import os
 import shlex
 import tempfile
 from pathlib import Path
+from typing import Any
 
 from build_sdm.check_generated import compare_trees, format_diff
 from build_sdm.config_loader import load_script_config_files
@@ -187,17 +188,34 @@ def _cmd_build(args: argparse.Namespace) -> int:
     return 0
 
 
-def _committed_madcap_dir(config_dir: Path, repo_root: Path) -> Path | None:
-    """Return the MadCap plugin's configured output_dir, resolved against the repo root.
+def _script_config(config_dir: Path) -> dict[str, Any] | None:
+    """Load the script config, logging the failure if it doesn't load.
 
     Args:
         config_dir: Script config directory.
+
+    Returns:
+        The script config, or None if a file in it can't be loaded.
+    """
+    try:
+        config: dict[str, Any] = load_script_config_files(config_dir)
+    except ValueError as e:
+        _log_failure(e)
+        return None
+    return config
+
+
+def _committed_madcap_dir(script_config: dict[str, Any], repo_root: Path) -> Path | None:
+    """Return the MadCap plugin's configured output_dir, resolved against the repo root.
+
+    Args:
+        script_config: Loaded script config.
         repo_root: Repository root.
 
     Returns:
         The committed MadCap output directory, or None if none is configured.
     """
-    plugin = load_script_config_files(config_dir).get("plugins", {}).get(MADCAP_PLUGIN, {})
+    plugin = script_config.get("plugins", {}).get(MADCAP_PLUGIN, {})
     configured = plugin.get("output_dir")
     if not configured:
         return None
@@ -247,7 +265,10 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
     if config_dir is None:
         return 1
     repo_root = find_repo_root()
-    committed = _committed_madcap_dir(config_dir, repo_root)
+    script_config = _script_config(config_dir)
+    if script_config is None:
+        return 1
+    committed = _committed_madcap_dir(script_config, repo_root)
     if committed is None:
         logger.fatal("%s has no output_dir configured; nothing to check", MADCAP_PLUGIN)
         return 1
@@ -283,16 +304,16 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
     return 1
 
 
-def _source_dir(config_dir: Path) -> str:
+def _source_dir(script_config: dict[str, Any]) -> str:
     """Return the configured SDM source directory, relative to the repo root.
 
     Args:
-        config_dir: Script config directory.
+        script_config: Loaded script config.
 
     Returns:
-        global.sdm_source_dir from the script config, or "src/sdm".
+        global.sdm_source_dir from the script config, or "src/sdm" if it isn't set.
     """
-    configured = load_script_config_files(config_dir).get("global", {}).get("sdm_source_dir")
+    configured = script_config.get("global", {}).get("sdm_source_dir")
     return str(configured or "src/sdm")
 
 
@@ -331,7 +352,10 @@ def _cmd_validate(args: argparse.Namespace) -> int:
     if config_dir is None:
         return 1
     repo_root = find_repo_root()
-    source_dir = _source_dir(config_dir)
+    script_config = _script_config(config_dir)
+    if script_config is None:
+        return 1
+    source_dir = _source_dir(script_config)
 
     try:
         head = check_tree(repo_root, source_dir)
