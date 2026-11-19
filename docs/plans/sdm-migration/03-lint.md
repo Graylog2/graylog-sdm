@@ -1,7 +1,7 @@
 # SDM Migration — PR 3 of 5: Source-data linting (`build-sdm validate`) + TOML formatting
 
 Status: done
-Tracking: (PR link)
+Tracking: https://github.com/Graylog2/graylog-sdm/pull/5
 
 Overview: `docs/plans/sdm-migration/README.md`. Depends on PR 2 (`02-package.md`). Next: `04-ci.md`.
 
