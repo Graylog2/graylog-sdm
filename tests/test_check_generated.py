@@ -144,6 +144,20 @@ def test_check_fails_on_stale_file(
     assert "stale" in out and "removed_category.html" in out
 
 
+def test_check_fails_when_plugin_produces_no_output(
+    config_dir: Path, generated: Path, caplog: pytest.LogCaptureFixture, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A disabled MadCap plugin is an error, not a report that every committed file is stale."""
+    madcap_config = config_dir / "madcap_html_output.toml"
+    madcap_config.write_text(
+        madcap_config.read_text(encoding="utf-8").replace("enabled = 1", "enabled = 0"), encoding="utf-8"
+    )
+
+    assert cli.main(["check-generated", "-c", str(config_dir), "-ll", "critical"]) == 1
+    assert "produced no MadcapHtmlOutput output" in caplog.text
+    assert "git rm" not in capsys.readouterr().out
+
+
 def test_check_fix_repeats_non_default_config_dir(
     config_dir: Path, generated: Path, capsys: pytest.CaptureFixture[str]
 ) -> None:

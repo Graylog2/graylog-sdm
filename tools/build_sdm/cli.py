@@ -214,6 +214,14 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
         except Exception:
             logger.critical("Build failed", exc_info=True)
             return 1
+        if not fresh.is_dir():
+            # Comparing against nothing would report every committed file as stale.
+            logger.fatal(
+                "The build produced no %s output; check that the plugin is enabled in %s",
+                MADCAP_PLUGIN,
+                config_dir,
+            )
+            return 1
         diff = compare_trees(committed, fresh)
 
     display = _display_path(committed, repo_root)
