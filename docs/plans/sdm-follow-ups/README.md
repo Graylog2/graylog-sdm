@@ -119,6 +119,8 @@ Not covered here:
 - Fall back to no base when it's the all-zero SHA (first push or new branch).
 - Update `04-ci.md`.
 
+**Status:** done in PR 4 (2026-11-19). On push, `data-lint` passes `github.event.before` as the base ref. When that is the all-zero SHA, or a commit missing after a force push, it compares against `HEAD` with a warning instead of using no base: with no base, every existing violation is an error and the job would always fail. Runs on `main` are not cancelled by later pushes, so no pushed range goes unchecked.
+
 ## F7. Pydantic v1 on Python 3.13; schedule v2
 
 **Problem:** the plan keeps pydantic v1 and pins Python 3.13. That combination has to be confirmed rather than assumed, and pydantic v1 has no long-term future.
