@@ -1,0 +1,21 @@
+# TOML formatting for SDM source and build-sdm configs (uv run taplo fmt).
+# tests/test_taplo_roundtrip.py checks that formatting never changes a parsed value.
+include = ["src/sdm/**/*.toml", "tools/build_sdm/configs/*.toml"]
+
+[formatting]
+# Keep authored structure: no key reordering, no aligning of entries or comments, no collapsing
+# of hand-wrapped arrays.
+reorder_keys = false
+align_entries = false
+align_comments = false
+array_auto_collapse = false
+array_auto_expand = true
+array_trailing_comma = true
+compact_arrays = true
+column_width = 110
+indent_tables = false
+indent_entries = false
+indent_string = "    "
+allowed_blank_lines = 2
+trailing_newline = true
+crlf = false
