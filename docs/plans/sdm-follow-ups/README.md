@@ -32,6 +32,7 @@ Not covered here:
 | F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | After migration | Yes: key format |
 | F17 | Decide whether to narrow `allowed_field_types` | Low | After migration | Yes: SDM change policy |
 | F18 | Log build errors once, at the CLI, instead of at every layer | Low | PR 3 | No |
+| F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | After migration | No |
 
 ---
 
@@ -269,3 +270,15 @@ Raised during the PR 2 review.
 **Decision needed:** none.
 
 **Status:** done in PR 3 (2026-11-19). The CLI logs one error record with the exception chain and notes, and the traceback at debug level; lower layers add context with `add_note()`. `tests/test_cli_build_failures.py` checks that one failure produces one error record.
+
+## F19. Line numbers for `validate` violations
+
+**Problem:** a violation carries a file but no line. In CI, its `::error` annotation is attached to the file at line 0, so GitHub shows it only on the Checks tab, not inline in the PR diff next to the change that caused it. The loader parses with tomlkit and normalizes to plain Python values, which drops source positions. Seen on the PR 4 test PR (#8).
+
+**Activity:**
+- Add an optional `line` to `Violation` and pass it as `line=` in `format_github_annotations` and in the text report.
+- Find the line after the fact rather than threading positions through the loader: from the `entry_key` (for example `gim:26.01/name`), locate the table header for that entry in the source file (`[system_time.subcategories.01]`), then the key within that table. Fall back to no line when the lookup fails.
+- Keep `entry_key` as the identity for the base-ref comparison. A line number changes whenever lines above it move, so it must not affect whether a violation counts as new.
+- Tests: a violation in a subcategory, an event type, and a schema field each get the right line; an entry that can't be located gets none.
+
+**Decision needed:** none.
