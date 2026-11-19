@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Fail when uv.lock is out of date with pyproject.toml instead of re-resolving it.
+  UV_LOCKED: "1"
+
+concurrency:
+  # PR runs are superseded by the next push to the PR. Runs on main are not cancelled:
+  # each push validates only its own commits, so a cancelled run would leave a gap.
+  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+# Job names are stable: branch protection lists them as required checks.
+jobs:
+  data-lint:
+    name: data-lint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # validate --base-ref reads the base commit's source from history.
+          fetch-depth: 0
+      # The default enable-cache (auto) caches on PRs and pushes, but not on events where
+      # an untrusted run could poison the cache, such as pull_request_target.
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Install Python
+        run: uv python install
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Check TOML formatting
+        run: uv run taplo fmt --check
+      - name: Validate SDM data
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          case "$EVENT_NAME" in
+            pull_request)
+              base="origin/$BASE_REF"
+              ;;
+            push)
+              # Compare against the commit before the push, so every pushed commit is covered.
+              if [[ "$BEFORE" =~ ^0+$ ]] || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+                # No base: without one every existing violation is an error, so compare
+                # against HEAD instead. Structure is still checked; violations are warnings.
+                echo "::warning title=validate::No previous commit for this push; comparing against HEAD"
+                base=HEAD
+              else
+                base="$BEFORE"
+              fi
+              ;;
+            *)
+              base="$(git merge-base HEAD origin/main)"
+              ;;
+          esac
+          uv run build-sdm validate --base-ref "$base"
+
+  generated-fresh:
+    name: generated-fresh
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Install Python
+        run: uv python install
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Check generated output is up to date
+        id: check
+        run: |
+          set -o pipefail
+          # The report, with the fix, is on stdout; the build's log lines go to stderr.
+          uv run build-sdm check-generated | tee "$RUNNER_TEMP/check-generated.txt"
+      - name: Show the fix in the job summary
+        if: failure() && steps.check.outcome == 'failure'
+        run: |
+          {
+            echo "## check-generated failed"
+            echo
+            if [[ -s "$RUNNER_TEMP/check-generated.txt" ]]; then
+              echo "CI does not commit generated output. Run the fix below from the repository root and commit the result."
+              echo
+              echo '```'
+              cat "$RUNNER_TEMP/check-generated.txt"
+              echo '```'
+            else
+              echo "The check failed before it could compare the output; see the job log."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  python-qa:
+    name: python-qa
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.3
+      - name: Install Python
+        run: uv python install
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Ruff lint
+        run: uv run ruff check
+      - name: Ruff format
+        run: uv run ruff format --check
+      - name: Mypy
+        run: uv run mypy
+      - name: Pytest
+        run: uv run pytest
