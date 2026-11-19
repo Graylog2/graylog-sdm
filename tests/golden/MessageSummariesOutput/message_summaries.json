@@ -888,6 +888,15 @@
         "sub_category": "time_change"
       },
       {
+        "title": "systemTimeBadName",
+        "description": "System Time - CI check, do not merge",
+        "summary_template": "[system_time.bad_name] user_name:{user_name}",
+        "indicator_template": null,
+        "default_indicator": "default",
+        "category": "system_time",
+        "sub_category": "Bad-Name"
+      },
+      {
         "title": "systemTimeDefault",
         "description": "System Time Default Events (schema v3.1)",
         "summary_template": "[{gim_event_type}] user_name:{user_name}",

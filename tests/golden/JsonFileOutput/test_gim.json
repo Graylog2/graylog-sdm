@@ -2371,6 +2371,26 @@
             }
           }
         },
+        "01": {
+          "name": "Bad-Name",
+          "description": "CI check only: a subcategory whose name breaks the naming rule. Do not merge.",
+          "class": "endpoint",
+          "required_fields": [],
+          "recommended_fields": [],
+          "optional_fields": [],
+          "summary": {
+            "title": "systemTimeBadName",
+            "description": "System Time - CI check, do not merge",
+            "summary_template": "[system_time.bad_name] user_name:{user_name}",
+            "default_indicator": "default"
+          },
+          "event_type_codes": {
+            "00": {
+              "name": "ci_check_bad_name",
+              "description": "CI check only. Do not merge."
+            }
+          }
+        },
         "99": {
           "name": "default",
           "description": "System time messages",

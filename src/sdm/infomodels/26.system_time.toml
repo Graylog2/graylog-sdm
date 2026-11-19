@@ -63,6 +63,24 @@ summary.default_indicator = "default"
 00.description = "The system clock was changed, either manually by a user or automatically by a synchronization service."
 
 
+[system_time.subcategories.01]
+name = "Bad-Name"
+description = "CI check only: a subcategory whose name breaks the naming rule. Do not merge."
+class = "endpoint"
+required_fields = []
+recommended_fields = []
+optional_fields = []
+
+summary.title = "systemTimeBadName"
+summary.description = "System Time - CI check, do not merge"
+summary.summary_template = "[system_time.bad_name] user_name:{user_name}"
+summary.default_indicator = "default"
+
+[system_time.subcategories.01.event_type_codes]
+00.name = "ci_check_bad_name"
+00.description = "CI check only. Do not merge."
+
+
 [system_time.subcategories.99]
 name = "default"
 description = "System time messages"

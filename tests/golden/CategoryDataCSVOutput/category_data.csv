@@ -134,6 +134,7 @@
 251000,"gim_event_class=endpoint,gim_event_category=registry,gim_event_subcategory=registry.object_renamed,gim_event_type=registry object renamed"
 259999,"gim_event_class=endpoint,gim_event_category=registry,gim_event_subcategory=registry.default,gim_event_type=registry event"
 260000,"gim_event_class=endpoint,gim_event_category=system_time,gim_event_subcategory=system_time.time_change,gim_event_type=system time changed"
+260100,"gim_event_class=endpoint,gim_event_category=system_time,gim_event_subcategory=system_time.Bad-Name,gim_event_type=ci_check_bad_name"
 269999,"gim_event_class=endpoint,gim_event_category=system_time,gim_event_subcategory=system_time.default,gim_event_type=system time event"
 270000,"gim_event_class=endpoint,gim_event_category=driver,gim_event_subcategory=driver.loaded,gim_event_type=system driver loaded"
 270100,"gim_event_class=endpoint,gim_event_category=driver,gim_event_subcategory=driver.unloaded,gim_event_type=system driver unloaded"
