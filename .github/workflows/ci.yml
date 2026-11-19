@@ -63,6 +63,11 @@ jobs:
               ;;
             *)
               base="$(git merge-base HEAD origin/main)"
+              # On main itself the merge base is HEAD, and comparing HEAD with itself would
+              # make every violation a warning. Check the last commit instead.
+              if [[ "$base" == "$(git rev-parse HEAD)" ]] && git rev-parse -q --verify HEAD~1 >/dev/null; then
+                base=HEAD~1
+              fi
               ;;
           esac
           uv run build-sdm validate --base-ref "$base"
