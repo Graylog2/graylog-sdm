@@ -2,14 +2,26 @@
 
 import argparse
 import logging
+import os
 import shlex
 import tempfile
 from pathlib import Path
 
 from build_sdm.check_generated import compare_trees, format_diff
 from build_sdm.config_loader import load_script_config_files
+from build_sdm.rules import Violation
 from build_sdm.runner import run_build
 from build_sdm.utils.paths import find_repo_root
+from build_sdm.validate import (
+    BaseRefError,
+    StructuralError,
+    check_tree,
+    compare,
+    format_github_annotations,
+    format_report,
+    format_step_summary,
+    violations_at_ref,
+)
 
 __all__ = ["DEFAULT_CONFIG_DIR", "MADCAP_PLUGIN", "build_parser", "main"]
 
@@ -77,7 +89,21 @@ def build_parser() -> argparse.ArgumentParser:
     )
     _add_common_options(check)
 
-    subparsers.add_parser("validate", help="Validate SDM source data (not implemented until PR 3)")
+    validate = subparsers.add_parser(
+        "validate",
+        help="Validate SDM source data and lint it against the SDM authoring rules",
+        description="Load the SDM source as build does (without output plugins), then run the lint "
+        "rules. With --base-ref, violations already present at that ref are warnings and only new "
+        "ones fail; any rule whose violation count goes up also fails. Without it, every violation "
+        "is an error.",
+    )
+    _add_common_options(validate)
+    validate.add_argument(
+        "--base-ref",
+        default=None,
+        metavar="REF",
+        help="Git revision to compare against, e.g. origin/main",
+    )
     return parser
 
 
@@ -232,17 +258,76 @@ def _cmd_check_generated(args: argparse.Namespace) -> int:
     return 1
 
 
-def _cmd_validate(_args: argparse.Namespace) -> int:
-    """Placeholder for the validate command, implemented in PR 3.
+def _source_dir(config_dir: Path) -> str:
+    """Return the configured SDM source directory, relative to the repo root.
 
     Args:
-        _args: Parsed arguments (unused).
+        config_dir: Script config directory.
 
     Returns:
-        2, so a pipeline calling it cannot mistake it for a passing check.
+        global.sdm_source_dir from the script config, or "src/sdm".
     """
-    print("build-sdm validate is not implemented yet (planned for PR 3).")
-    return 2
+    configured = load_script_config_files(config_dir).get("global", {}).get("sdm_source_dir")
+    return str(configured or "src/sdm")
+
+
+def _base_violations(
+    repo_root: Path, base_ref: str, source_dir: str
+) -> tuple[list[Violation] | None, str | None]:
+    """Return the base ref's violations, or (None, reason) if its source doesn't load.
+
+    Args:
+        repo_root: Repository root.
+        base_ref: Git revision to compare against.
+        source_dir: SDM source directory relative to the repo root.
+
+    Returns:
+        (violations, None), or (None, reason) when the base tree fails to load.
+
+    Raises:
+        BaseRefError: If base_ref doesn't name a commit.
+    """
+    try:
+        return violations_at_ref(repo_root, base_ref, source_dir), None
+    except StructuralError as e:
+        return None, str(e)
+
+
+def _cmd_validate(args: argparse.Namespace) -> int:
+    """Run the validate command.
+
+    Args:
+        args: Parsed arguments for the validate subcommand.
+
+    Returns:
+        0 if there are no new violations and no rule count went up, 1 otherwise.
+    """
+    config_dir = _resolve_config_dir(args.config_dir)
+    if config_dir is None:
+        return 1
+    repo_root = find_repo_root()
+    source_dir = _source_dir(config_dir)
+
+    try:
+        head = check_tree(repo_root, source_dir)
+        base, base_problem = (None, None)
+        if args.base_ref is not None:
+            base, base_problem = _base_violations(repo_root, args.base_ref, source_dir)
+    except StructuralError as e:
+        print(f"ERROR structural {source_dir}: {e}")
+        return 1
+    except BaseRefError as e:
+        print(f"ERROR {e}")
+        return 1
+
+    result = compare(head, base, base_problem)
+    print("\n".join(format_report(result, args.base_ref)))
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        print("\n".join(format_github_annotations(result)))
+    if summary_path := os.environ.get("GITHUB_STEP_SUMMARY"):
+        with Path(summary_path).open("a", encoding="utf-8") as f:
+            f.write(format_step_summary(result, args.base_ref))
+    return 1 if result.failed else 0
 
 
 def main(argv: list[str] | None = None) -> int:

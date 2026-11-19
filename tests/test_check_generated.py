@@ -183,8 +183,3 @@ def test_check_fails_on_missing_file(
     assert _check(config_dir) == 1
     out = capsys.readouterr().out
     assert "missing" in out and page.name in out
-
-
-def test_validate_placeholder_exits_2() -> None:
-    """The validate command is not implemented yet and must not look like a passing check."""
-    assert cli.main(["validate"]) == 2
