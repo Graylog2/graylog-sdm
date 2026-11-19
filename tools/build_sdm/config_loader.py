@@ -216,6 +216,18 @@ def load_gim_config_files(
     result = {}
     errors = []
 
+    if not merge:
+        # Results are keyed by file name, so a second file with the same name in another
+        # subdirectory would silently replace the first.
+        by_name: Dict[str, list] = {}
+        for file in toml_files:
+            by_name.setdefault(file.name, []).append(file)
+        errors.extend(
+            f'{name}: file name is used more than once: ' + ', '.join(str(f.relative_to(directory)) for f in files)
+            for name, files in sorted(by_name.items())
+            if len(files) > 1
+        )
+
     for file in toml_files:
         try:
             raw_data = _parse_toml_file(file)
@@ -266,14 +278,18 @@ def load_script_config_files(config_dir: Path) -> dict:
 
     Returns:
         dict containing merged or per-file parsed TOML data.
+
+    Raises:
+        ValueError: If a file can't be read or parsed, or a [plugin] table has no name. A
+            broken config must stop the command, not fall back to defaults.
     '''
     config_dir = Path(config_dir).expanduser().resolve()
     config_files = sorted([*config_dir.rglob('*.toml'), *config_dir.rglob('*.tml')])
 
-    try:
-        config = {'plugins': {}, 'global': {}}
-        for file in config_files:
-            logger.debug('Loading script config file %s', file)
+    config = {'plugins': {}, 'global': {}}
+    for file in config_files:
+        logger.debug('Loading script config file %s', file)
+        try:
             with file.open('r', encoding='utf-8') as f:
                 snippet = parse(f.read())
             if 'plugin' in snippet:
@@ -281,8 +297,7 @@ def load_script_config_files(config_dir: Path) -> dict:
                 config['plugins'][plugin_name] = snippet['plugin']
             elif 'global' in snippet:
                 config['global'].update(snippet['global'])
-    except Exception as e:
-        logger.fatal('Unable to load configuration from %s', config_dir)
-        return {}
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            raise ValueError(f'Unable to load script configuration file {file}: {e}') from e
 
     return config
