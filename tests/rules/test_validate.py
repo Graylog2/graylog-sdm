@@ -64,7 +64,10 @@ required_fields = ["user_name"]
 
 def _git(repo: Path, *args: str) -> None:
     """Run a git command in repo, failing the test on error."""
-    subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+    # CI runners have no git identity, and a developer's signing setup must not apply.
+    identity = ["-c", "user.name=build-sdm tests", "-c", "user.email=tests@example.invalid"]
+    signing = ["-c", "commit.gpgsign=false"]
+    subprocess.run(["git", "-C", str(repo), *identity, *signing, *args], check=True, capture_output=True)
 
 
 def _write_gim(repo: Path, text: str) -> None:
