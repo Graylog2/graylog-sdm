@@ -40,7 +40,7 @@ Events that describe the operational activity of a system agent, such as scannin
 or enforcement actions. These events often include both the performed action and its outcome,
 indicating whether the task completed successfully or failed.
 """
-required_fields = ["event_action","event_outcome"]
+required_fields = ["event_action", "event_outcome"]
 recommended_fields = []
 optional_fields = ["event_component"]
 
@@ -66,7 +66,7 @@ Events that record update activity by a system agent, including updates to signa
 threat intelligence data, configuration, or the agent software itself.
 Monitoring update events helps confirm that agents remain current and functioning correctly.
 """
-required_fields = ["event_action","event_outcome"]
+required_fields = ["event_action", "event_outcome"]
 recommended_fields = []
 optional_fields = ["event_component"]
 
@@ -92,7 +92,7 @@ with its management infrastructure.
 """
 required_fields = []
 recommended_fields = []
-optional_fields = ["event_action","event_outcome","event_component"]
+optional_fields = ["event_action", "event_outcome", "event_component"]
 
 summary.title = "agentStatus"
 summary.description = "Agent Status (schema v3.1)"
@@ -113,7 +113,7 @@ These may include initialization messages, generic alerts, or vendor-specific te
 """
 required_fields = []
 recommended_fields = []
-optional_fields = ["event_action","event_outcome","event_component"]
+optional_fields = ["event_action", "event_outcome", "event_component"]
 
 summary.title = "agentDefault"
 summary.description = "Agent Default (schema v3.1)"

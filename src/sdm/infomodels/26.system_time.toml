@@ -9,7 +9,7 @@ System time integrity is critical for maintaining reliable event sequencing and 
 Changes to the system clock may occur through legitimate synchronization mechanisms (such as NTP or domain time sync) 
 or as the result of administrative action or malicious tampering.
 """
-required_fields = [ "source", "user_name" ]
+required_fields = ["source", "user_name"]
 recommended_fields = []
 optional_fields = []
 

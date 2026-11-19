@@ -35,7 +35,7 @@ These events typically contain minimal details (such as request method and sourc
 and act as a fallback to ensure that all HTTP-related activity can be normalized
 within the model.
 """
-required_fields = ["http_request_method","source_reference"]
+required_fields = ["http_request_method", "source_reference"]
 recommended_fields = []
 optional_fields = []
 

@@ -8,7 +8,7 @@ The authentication category covers events where accounts or services attempt to 
 This includes, but is not limited to, logon activity, credential validation, and related events such as logoff, Kerberos requests, or policy checks.
 Authentication events in this category are account-centric: each event must identify a user or service account (`user_name`) and the application or system (`application_name`) where the activity occurred.
 """
-required_fields = [ "application_name", "user_name" ]
+required_fields = ["application_name", "user_name"]
 recommended_fields = []
 optional_fields = []
 
@@ -47,10 +47,12 @@ Mapping guidance:
 - If the event reflects resuming an existing session without re-validating credentials (for example, a session reconnect), assign only the 'logon' code.
 """
 required_fields = [
-    'event_outcome', 'source_reference', 'destination_reference'
+    'event_outcome',
+    'source_reference',
+    'destination_reference',
 ]
 recommended_fields = []
-optional_fields = [ "user_domain" ]
+optional_fields = ["user_domain"]
 
 summary.title = "authentication logon"
 summary.description = "Logon message summary view"
@@ -75,7 +77,7 @@ Credential validation events represent the act of an authentication system check
 
 Credential validation is distinct from logon. A system may emit both a credential validation event and a separate logon event (for example, Windows with Kerberos or NTLM), or it may emit only a logon event that implies credential validation. In the latter case, the logon description provides mapping guidance for assigning both codes to the single logon event.
 """
-required_fields = [ 'event_outcome', 'source_reference' ]
+required_fields = ['event_outcome', 'source_reference']
 recommended_fields = []
 optional_fields = []
 summary.title = "authentication credential validation"
@@ -164,7 +166,7 @@ Kerberos request events represent authentication activity specific to the Kerber
 
 Kerberos request events are distinct from generic credential validation or logon events. They should be assigned when the authenticator records Kerberos-specific ticket activity, even if additional logon or credential validation events are also present.
 """
-required_fields = [ 'event_outcome', 'source_reference' ]
+required_fields = ['event_outcome', 'source_reference']
 recommended_fields = []
 optional_fields = []
 

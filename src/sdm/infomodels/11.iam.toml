@@ -8,9 +8,9 @@ The Identity and Access Management (IAM) category covers events where accounts, 
 
 IAM events are account-centric: each event must identify the account being acted upon (`user_name`), and in most cases, the initiating account (`source_user_name`). These events are highly security-relevant because they directly reflect changes to identities and their access capabilities.
 """
-required_fields = [ "user_name" ]
+required_fields = ["user_name"]
 recommended_fields = []
-optional_fields = [ "user_type", "user_domain" ]
+optional_fields = ["user_type", "user_domain"]
 
 [iam._meta]
 validation_file = "iam.json"
@@ -33,7 +33,7 @@ Mapping guidance:
 - If a platform emits separate events for request/approval and final creation, map the final creation to 'account created' or 'group created' and map earlier workflow steps to your vendor-specific fields; do not use object create for pending states.
 - Service-initiated provisioning (for example, automated sync from HRIS) should still be mapped to object create; the initiating service account should populate `source_user_name`.
 """
-required_fields = [ "user_name", "source_user_name" ]
+required_fields = ["user_name", "source_user_name"]
 recommended_fields = []
 optional_fields = []
 
@@ -64,7 +64,7 @@ Mapping guidance:
 - Do not use this for accounts that are disabled or locked; see the object disable subcategory instead.
 - For platforms that support staged deletion (soft delete), map the final deletion event here. Retention, recycle-bin, or disable operations should not be mapped to object delete.
 """
-required_fields = [ "user_name", "source_user_name" ]
+required_fields = ["user_name", "source_user_name"]
 recommended_fields = []
 optional_fields = []
 
@@ -91,7 +91,7 @@ Mapping guidance:
 - Privilege assignments and removals, group membership changes, and password resets should all be mapped here.
 - Use object enable/disable for changes to account status, and object delete for removal of objects.
 """
-required_fields = [ "source_user_name", "user_name" ]
+required_fields = ["source_user_name", "user_name"]
 recommended_fields = []
 optional_fields = []
 
@@ -141,7 +141,7 @@ Mapping guidance:
 - Use this subcategory for directory or identity provider events that mark an account as unusable without deleting it.
 - Do not use this for session termination (logoff) or for permanent account deletion; see the corresponding subcategories instead.
 """
-required_fields = [ "source_user_name", "user_name" ]
+required_fields = ["source_user_name", "user_name"]
 recommended_fields = []
 optional_fields = []
 
@@ -168,7 +168,7 @@ Mapping guidance:
 - Use this subcategory when an existing account is made active again, either through an administrative action or an automatic unlock.
 - Do not use this for new account creation; see the object create subcategory instead.
 """
-required_fields = [ "source_user_name", "user_name" ]
+required_fields = ["source_user_name", "user_name"]
 recommended_fields = []
 optional_fields = []
 
