@@ -63,8 +63,7 @@ def _load_script_config(config_dir: Path) -> Dict[str, Any]:
     script_config = load_script_config_files(config_dir)
 
     if not (script_config.get('global') and script_config.get('plugins')):
-        logger.fatal('No script configuration was read, exiting.')
-        raise RuntimeError('Invalid or missing script config.')
+        raise RuntimeError(f'Invalid or missing script config in {config_dir}.')
 
     return script_config
 
@@ -73,11 +72,7 @@ def _ensure_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
     output_subdir = script_config.get('global', {}).get('output_dir') or 'build/sdm_artifacts'
     output_dir = repo_dir / Path(output_subdir)
 
-    try:
-        output_dir.mkdir(parents=True, exist_ok=True)
-    except Exception as e:
-        logger.fatal('Error creating output directory %s: %s', output_dir, e)
-        raise
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     logger.info('Saving output to %s', output_dir)
     return output_dir
@@ -124,14 +119,9 @@ def _load_and_transform_gim_config(
     gim_dir = repo_dir / source_dir_setting
 
     if not gim_dir.is_dir():
-        logger.fatal('Path %s is not a directory', gim_dir)
         raise NotADirectoryError(f'GIM directory not found: {gim_dir}')
 
-    try:
-        gim_config = load_gim_config_files(gim_dir, merge=False)
-    except Exception as e:
-        logger.fatal('Unable to load GIM source data from %s, error: %s', gim_dir, e)
-        raise
+    gim_config = load_gim_config_files(gim_dir, merge=False)
 
     if config_dir is not None:
         gim_config.update(

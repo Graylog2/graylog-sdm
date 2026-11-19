@@ -73,8 +73,8 @@ def test_missing_field_suffix_raises(plugin, caplog):
     with pytest.raises(ValueError, match='missing field_suffix'):
         plugin._build_schema_table_lines(entity_name, 'top', entity_data)
 
-    errors = [rec for rec in caplog.records if rec.levelname == 'ERROR']
-    assert any('missing field_suffix:' in rec.getMessage().lower() for rec in errors)
+    # The exception carries the message; nothing is logged below the CLI (F18).
+    assert not [rec for rec in caplog.records if rec.levelname == 'ERROR']
 
 
 @pytest.mark.parametrize('bad_entry', ['this is not a dict', 123, None])
@@ -98,8 +98,7 @@ def test_unexpected_entry_shape_raises(plugin, caplog, bad_entry):
     with pytest.raises(ValueError, match='not a dict'):
         plugin._build_schema_table_lines(entity_name, 'top', entity_data)
 
-    errors = [rec for rec in caplog.records if rec.levelname == 'ERROR']
-    assert any('Invalid schema line ' in rec.getMessage() for rec in errors)
+    assert not [rec for rec in caplog.records if rec.levelname == 'ERROR']
 
 
 def test_build_schema_table_lines_reserved_no_prefix(plugin):

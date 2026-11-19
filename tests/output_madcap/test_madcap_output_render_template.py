@@ -30,7 +30,7 @@ def test_render_template_success(caplog):
 
 def test_render_template_failure(caplog):
     '''
-    Verify that _render_template logs an error and re-raises
+    Verify that _render_template notes the category on the error and re-raises
     when rendering fails due to a template logic error (e.g. undefined variable).
     '''
     plugin = MadcapHtmlOutput()
@@ -45,7 +45,8 @@ def test_render_template_failure(caplog):
     category_data = {}
     config = {}
 
-    with pytest.raises(UndefinedError):
+    with pytest.raises(UndefinedError) as excinfo:
         plugin._render_template(template, category, category_data, config)
 
-    assert f'Failed to render template for entry type [{category}]' in caplog.text
+    assert f'rendering template for entry type [{category}]' in excinfo.value.__notes__
+    assert caplog.text == ''

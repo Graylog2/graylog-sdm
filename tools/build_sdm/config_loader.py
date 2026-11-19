@@ -220,9 +220,7 @@ def load_gim_config_files(
         try:
             raw_data = _parse_toml_file(file)
         except Exception as e:
-            msg = f'Unable to parse file {file}: {e}'
-            logger.error(msg)
-            errors.append(msg)
+            errors.append(f'Unable to parse file {file}: {e}')
             continue
 
         entry_type = raw_data.get('type')
@@ -247,12 +245,13 @@ def load_gim_config_files(
 
             _merge_or_store(result, file, data, merge)
         except (ValidationError, ValueError) as e:
-            logger.error('Validation error in file %s: %s', file.name, e)
             errors.append(f'{file.name}: {e}')
 
     if errors:
-        logger.fatal('One or more configuration files failed validation or parsing.')
-        raise ValueError('GIM configuration aborted due to validation errors.')
+        # Every failing file is reported, not just the first.
+        raise ValueError(
+            f'{len(errors)} configuration file(s) failed validation or parsing:\n' + '\n'.join(errors)
+        )
 
     return result
 

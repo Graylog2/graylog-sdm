@@ -42,7 +42,6 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
 
         if 'gim' not in gim_config or not isinstance(gim_config['gim'], dict):
             error_msg = 'Missing or invalid top-level "gim" key in gim_config; expected dictionary.'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         for category in gim_config['gim']:
@@ -55,16 +54,11 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
                 lookup_data.extend(cat_lines)
             else:
                 error_msg = f'Unable to generate lookup data for category {category}'
-                self.logger.error(error_msg)
                 raise RuntimeError(error_msg)
 
         lookup_data.sort()
 
-        try:
-            write_file(output_file, '\n'.join(lookup_data))
-        except OSError as e:
-            self.logger.error('Unable to write [%s] due to write error %s', output_file, e)
-            raise
+        write_file(output_file, '\n'.join(lookup_data))
 
         self.logger.info('Saved CSV to file %s', output_file)
         self.logger.debug('Plugin processing completed.')
@@ -81,7 +75,6 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
 
         if 'code' not in gim_entry:
             error_msg = f'Missing "code" in category [{category}]'
-            self.logger.error(error_msg)
             raise ValueError(error_msg)
 
         cat_code = gim_entry['code']
@@ -95,7 +88,6 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
 
             if 'name' not in subcat:
                 error_msg = f'Subcategory [{subcat_code}] under category [{category}] is missing a "name" field.'
-                self.logger.error(error_msg)
                 raise RuntimeError(error_msg)
 
             subcat_name = subcat['name']
@@ -106,13 +98,11 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
                     f'Subcategory [{subcat_code}] under category [{category}] '
                     'is missing event_type_codes or has no entries.'
                 )
-                self.logger.error(error_msg)
                 raise RuntimeError(error_msg)
 
             # Define the category name
             if 'name' not in gim_entry:
                 error_msg = f'Property "name" not defined for category [{category}]'
-                self.logger.error(error_msg)
                 raise ValueError(error_msg)
 
             category_name = gim_entry['name']
@@ -124,7 +114,6 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
                         f'GIM event category [{category}] '
                         f'type [{cat_code}{subcat_code}{type_code}] is missing a "name" property'
                     )
-                    self.logger.error(error_msg)
                     raise ValueError(error_msg)
 
                 event_type_info = subcat['event_type_codes'][type_code]
@@ -135,7 +124,6 @@ class CategoryDataCSVOutput(OutputPlugin[CategoryDataCSVOutputConfig]):
                         f'GIM event category [{category}] type [{cat_code}{subcat_code}{type_code}] '
                         'has an empty or missing name property.'
                     )
-                    self.logger.error(error_msg)
                     raise RuntimeError(error_msg)
 
                 # Build the category map lookup entries - if there is a class defined,

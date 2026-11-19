@@ -5,6 +5,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
+from jinja2 import TemplateNotFound
+
 from build_sdm.output_plugins.madcap_html_output import MadcapHtmlOutput, MadcapHtmlOutputConfig
 
 
@@ -89,15 +91,14 @@ def test_generate_template_not_found(caplog):
                           side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
                               plugin, template_dir=template_dir
                           )):
-            with pytest.raises(RuntimeError, match='Failed during GIM category page generation'):
+            with pytest.raises(RuntimeError, match='Failed during GIM category page generation') as excinfo:
                 plugin.generate(gim_config=gim_config, output_dir=output_dir, plugin_config=plugin_config)
 
-        expected_error = f'Template not found [missing_template.j2] for category [network]'
-
-        # Assert error was logged about template failure
-        assert any(
-            expected_error in message for message in caplog.messages
-        ), 'Expected template load failure to be logged'
+        # The cause carries the template and category; the CLI logs it once (F18).
+        cause = excinfo.value.__cause__
+        assert isinstance(cause, TemplateNotFound)
+        assert 'loading template [missing_template.j2] for category [network]' in cause.__notes__
+        assert not [r for r in caplog.records if r.levelno >= logging.ERROR]
 
         # Assert no output file was created
         output_file = output_dir / 'network.html'
