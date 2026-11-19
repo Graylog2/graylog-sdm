@@ -9,9 +9,9 @@ These events indicate whether the audit service is running, if its policies have
 Unlike user activity logs, audit category events reflect the state of the mechanisms that record and preserve those logs. 
 Monitoring these events is critical for ensuring compliance, detecting tampering, and verifying that audit controls remain active and trustworthy.
 """
-required_fields = [ "source" ]
+required_fields = ["source"]
 recommended_fields = []
-optional_fields = [ "user_name" ]
+optional_fields = ["user_name"]
 
 [audit._meta]
 validation_file = "audit.json"
@@ -21,8 +21,10 @@ type = "auditIndicator"
 title = "Audit events default indicator template"
 description = "Define summary font colors for audit events"
 danger = [
-    "audit error","audit service stopped","audit log cleared"
-    ]
+    "audit error",
+    "audit service stopped",
+    "audit log cleared",
+]
 success = ["audit service started"]
 warning = ["audit policy changed"]
 indicator = "gim_event_type"
@@ -48,7 +50,7 @@ Integrity events differ from audit service state changes in that they focus on t
 not the operational status of the audit subsystem. 
 Such events are critical for detecting potential tampering or attempts to conceal activity.
 """
-required_fields = [ "vendor_event_action" ]
+required_fields = ["vendor_event_action"]
 recommended_fields = []
 optional_fields = []
 
@@ -72,7 +74,7 @@ Events that describe the operational state of a system’s audit subsystem, such
 These events reflect whether the auditing process responsible for generating or storing audit logs is running and functioning properly. 
 Monitoring these state transitions is essential for ensuring audit continuity — if the audit service is stopped or fails, no further audit data can be collected.
 """
-required_fields = [ "vendor_event_action" ]
+required_fields = ["vendor_event_action"]
 recommended_fields = []
 optional_fields = []
 
@@ -115,7 +117,7 @@ These changes can significantly affect visibility and compliance posture —
 for example, disabling process tracking or account logon auditing reduces the scope of collected evidence. 
 Policy change events should be closely monitored and correlated with administrative actions to detect unauthorized modifications.
 """
-required_fields = [ "vendor_event_action" ]
+required_fields = ["vendor_event_action"]
 recommended_fields = []
 optional_fields = []
 

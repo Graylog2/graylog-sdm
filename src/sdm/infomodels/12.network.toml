@@ -35,8 +35,13 @@ They provide the foundation for analyzing session-oriented traffic, distinct fro
 protocols such as ICMP or summarized records such as NetFlow and IPFIX.
 """
 required_fields = [
-    "destination_reference", "destination_port", "event_action", "event_source",
-    "network_transport", "source_reference", "source_port"
+    "destination_reference",
+    "destination_port",
+    "event_action",
+    "event_source",
+    "network_transport",
+    "source_reference",
+    "source_port",
 ]
 recommended_fields = []
 optional_fields = []
@@ -87,8 +92,11 @@ destination addresses, ports, and the transport protocol (such as TCP or UDP).
 They are useful for identifying when communication was attempted, regardless of whether the session was later completed or closed.
 """
 required_fields = [
-    "source_reference", "destination_reference", "source_port", "destination_port",
-    "network_transport"
+    "source_reference",
+    "destination_reference",
+    "source_port",
+    "destination_port",
+    "network_transport",
 ]
 recommended_fields = []
 optional_fields = []
@@ -143,8 +151,13 @@ a time window, reporting metrics such as byte and packet counts, start and end t
 Flow data is valuable for understanding traffic volume, detecting anomalies, and correlating activity across large-scale environments.
 """
 required_fields = [
-    "source_reference", "destination_reference", "source_port", "destination_port",
-    "network_transport", "network_bytes", "network_packets"
+    "source_reference",
+    "destination_reference",
+    "source_port",
+    "destination_port",
+    "network_transport",
+    "network_bytes",
+    "network_packets",
 ]
 recommended_fields = []
 optional_fields = []
@@ -174,11 +187,14 @@ These events are important for identifying connectivity checks, troubleshooting 
 Unlike TCP or UDP, ICMP is a connectionless protocol and does not involve ports.
 """
 required_fields = [
-    "network_transport", "network_icmp_request_type_number", "network_icmp_request_code_number",
-    "source_reference", "destination_reference"
+    "network_transport",
+    "network_icmp_request_type_number",
+    "network_icmp_request_code_number",
+    "source_reference",
+    "destination_reference",
 ]
 recommended_fields = [
-    "network_icmp_request_message"
+    "network_icmp_request_message",
 ]
 optional_fields = []
 
@@ -204,10 +220,13 @@ other ICMP message types depending on the request. These events are important fo
 measuring responsiveness, and identifying whether a target host or device is actively responding to probes.
 """
 required_fields = [
-    "network_transport", "network_icmp_reply_type_number", "network_icmp_reply_code_number",
-    "source_reference", "destination_reference"
+    "network_transport",
+    "network_icmp_reply_type_number",
+    "network_icmp_reply_code_number",
+    "source_reference",
+    "destination_reference",
 ]
-recommended_fields = [ "network_icmp_reply_message" ]
+recommended_fields = ["network_icmp_reply_message"]
 optional_fields = []
 
 summary.title = "network ICMP reply summary"

@@ -28,7 +28,7 @@ content = [
     "The GIM can be understood as an information modeling layer: it abstracts diverse vendor log formats into a consistent, structured schema. This aligns raw event log messages with normalized categories, subcategories, and event type codes that describe the semantics of the activity.",
     "Field tiers (required, recommended, optional) reflect a deliberate least-common-denominator approach. Required fields are those nearly universal across event sources, ensuring that dashboards, alerts, and reports work consistently. Recommended and optional fields preserve vendor richness without making content brittle or dependent on data that may not always exist.",
     "This design represents a trade-off. Normalization simplifies multi-vendor analysis but may collapse vendor-specific detail. Optional fields capture that detail, but content built on them risks fragmentation. For cross-platform consistency, content should rely heavily on required fields, while recommended fields can be used to enhance content when present, but should not be treated as universally available. Optional fields provide depth in environments where they are available.",
-    "In practice, GIM supports not only dashboards and alerts but also investigative workflows. By unifying fields such as user, source, destination, and outcome, GIM allows analysts to pivot seamlessly across authentication, IAM, and network activity regardless of vendor log source."
+    "In practice, GIM supports not only dashboards and alerts but also investigative workflows. By unifying fields such as user, source, destination, and outcome, GIM allows analysts to pivot seamlessly across authentication, IAM, and network activity regardless of vendor log source.",
 ]
 
 [[gim_config.documentation.sections]]
@@ -38,7 +38,7 @@ content = [
     "Each GIM category defines a set of fields that may appear in event log messages. These are organized into three tiers: required, recommended, and optional.",
     "Required fields form the foundation of the model. They represent the least common denominator of data available across most vendors and are guaranteed to be present for all events in the category. Content built on top of GIM, such as dashboards or alerts, will always rely on required fields to function consistently.",
     "Recommended fields provide additional context that is frequently available but not universal. These fields improve the fidelity of dashboards and reports when present, but GIM content is not dependent on them.",
-    "Optional fields capture extra details that may only appear in specific products or environments. They allow for richer analysis when available, while still preserving compatibility across diverse event sources."
+    "Optional fields capture extra details that may only appear in specific products or environments. They allow for richer analysis when available, while still preserving compatibility across diverse event sources.",
 ]
 
 [[gim_config.documentation.sections]]
@@ -47,7 +47,7 @@ section_header = "Vendor Uniqueness"
 content = [
     "Event log messages are produced differently by each vendor, even when describing the same type of activity. For example, one vendor may report a failed logon attempt with a specific error code, while another may only record it as a generic failure.",
     "The Graylog Information Model addresses this by normalizing event data into consistent categories and fields. This allows content such as dashboards, correlation rules, and alerts to work reliably across different vendors without requiring custom logic for each one.",
-    "Vendor-specific details are not lost. They can still be preserved in optional fields or in vendor-specific extensions, but the core GIM mapping ensures that the most important attributes (such as the user, source, destination, and outcome) are consistently available for analysis."
+    "Vendor-specific details are not lost. They can still be preserved in optional fields or in vendor-specific extensions, but the core GIM mapping ensures that the most important attributes (such as the user, source, destination, and outcome) are consistently available for analysis.",
 ]
 
 [[gim_config.documentation.sections]]
@@ -56,5 +56,5 @@ section_header = "GIM Category List"
 content = [
     "The following sections describe each category in the Graylog Information Model (GIM). Categories group related types of activity into a consistent structure, making it easier to build dashboards, alerts, and reports across multiple event sources.",
     "Each category contains one or more subcategories, which provide finer distinctions within the activity type. Subcategories define the required, recommended, and optional fields for their events, along with event type codes that capture specific actions (for example, logon, logoff, or credential validation).",
-    "By organizing events into categories and subcategories, GIM ensures that related activities are normalized in a way that balances consistency with flexibility. This allows analysts to work with a clear, predictable structure while still preserving vendor-specific detail where available."
+    "By organizing events into categories and subcategories, GIM ensures that related activities are normalized in a way that balances consistency with flexibility. This allows analysts to work with a clear, predictable structure while still preserving vendor-specific detail where available.",
 ]

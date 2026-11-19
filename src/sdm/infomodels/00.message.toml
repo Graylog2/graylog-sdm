@@ -44,10 +44,10 @@ type = "eventOutcome"
 title = "Event Outcome Indicator Template"
 description = "Basic event outcome message summary indicator"
 success = [
-    "success"
+    "success",
 ]
 danger = [
-    "failure"
+    "failure",
 ]
 indicator = "event_outcome"
 default_indicator = "warning"

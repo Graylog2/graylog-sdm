@@ -6,10 +6,29 @@ type = "config"
 # set build_gim accepted (hard-coded) before the list moved here; narrowing it is an SDM
 # change policy decision (see docs/plans/sdm-follow-ups/README.md, F17).
 allowed_field_types = [
-    "text", "keyword", "keyword/lowercase", "integer", "long", "short",
-    "byte", "double", "float", "half_float", "scaled_float", "date",
-    "boolean", "binary", "integer_range", "float_range", "long_range",
-    "double_range", "date_range", "ip", "object", "nested", "alias"
+    "text",
+    "keyword",
+    "keyword/lowercase",
+    "integer",
+    "long",
+    "short",
+    "byte",
+    "double",
+    "float",
+    "half_float",
+    "scaled_float",
+    "date",
+    "boolean",
+    "binary",
+    "integer_range",
+    "float_range",
+    "long_range",
+    "double_range",
+    "date_range",
+    "ip",
+    "object",
+    "nested",
+    "alias",
 ]
 
 [field_schema_config.documentation]
@@ -22,7 +41,7 @@ type = "paragraphs"
 section_header = "About the Graylog Field Mapping Schema"
 content = [
     "The Graylog Field Mapping Schema defines the standard field names used to normalize log data across different sources. Normalization ensures that events from different systems can be analyzed, searched, and visualized consistently.",
-    "This schema is designed for both content builders and end users. Builders use it to map raw log data into consistent field names, while analysts and administrators benefit from predictable fields in dashboards, alerts, and reports."
+    "This schema is designed for both content builders and end users. Builders use it to map raw log data into consistent field names, while analysts and administrators benefit from predictable fields in dashboards, alerts, and reports.",
 ]
 
 [[field_schema_config.documentation.sections]]
@@ -31,7 +50,7 @@ section_header = "Why Normalization Matters"
 content = [
     "Without a schema, each log source may use different field names for the same concept (e.g., `src_ip` vs. `client_address`). Normalization creates a common language so queries, dashboards, and alerts work across all sources without custom adjustments.",
     "The higher level operations in Graylog Illuminate, and much of the content, relies on the schema to operate.",
-    "A common schema is also very useful in reducing friction when searching logs, having a common reference for event log data makes searching and analyzing data, even across multiple sources, more straightforward."
+    "A common schema is also very useful in reducing friction when searching logs, having a common reference for event log data makes searching and analyzing data, even across multiple sources, more straightforward.",
 ]
 
 [[field_schema_config.documentation.sections]]
@@ -40,7 +59,7 @@ section_header = "How Field Names Are Structured"
 content = [
     "Field names are built from prefixes that represent entities (such as 'source' or 'destination') combined with properties that describe those entities (such as 'ip' or 'hostname'). The parts are joined with underscores.",
     "For example, the field `source_ip` identifies the IP address of the originator of network traffic. Similarly, `destination_hostname` refers to the hostname of the target system.",
-    "Some properties are always subordinate and never appear as top-level entities. For example, geolocation fields are always tied to another entity such as 'source' or 'destination'."
+    "Some properties are always subordinate and never appear as top-level entities. For example, geolocation fields are always tied to another entity such as 'source' or 'destination'.",
 ]
 
 [[field_schema_config.documentation.sections]]
@@ -48,5 +67,5 @@ type = "paragraphs"
 section_header = "Graylog Field Mapping Schema Entities"
 content = [
     "The entities in the schema serve as prefixes for field names. They represent common objects such as a source, destination, process, or file. Each entity may have multiple properties, such as IP, hostname, or path.",
-    "The following is a generated list of all entities defined in the Graylog Field Mapping Schema."
+    "The following is a generated list of all entities defined in the Graylog Field Mapping Schema.",
 ]

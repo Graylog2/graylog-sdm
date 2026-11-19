@@ -10,9 +10,9 @@ thread injection, and modifications to running processes. These events are commo
 operating system auditing features and endpoint detection and response (EDR) tools, and they are
 critical for detecting malicious activity such as unauthorized execution, privilege escalation, or code injection.
 """
-required_fields = [ "process_name", "user_name" ]
-recommended_fields = [ "process_parent_name" ]
-optional_fields = [ "process_command_line" ]
+required_fields = ["process_name", "user_name"]
+recommended_fields = ["process_parent_name"]
+optional_fields = ["process_command_line"]
 
 [process._meta]
 validation_file = "process.json"

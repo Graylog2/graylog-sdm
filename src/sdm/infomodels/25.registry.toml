@@ -13,7 +13,7 @@ used by attackers.
 This category provides visibility into both administrative and programmatic interactions 
 with the registry to support detection, investigation, and change auditing.
 """
-required_fields = [ "registry_path" ]
+required_fields = ["registry_path"]
 recommended_fields = []
 optional_fields = []
 
@@ -33,7 +33,7 @@ description = "Set font color for registry events of note"
 danger = [
     "registry value deleted",
     "registry value modified",
-    "registry value set"
+    "registry value set",
 ]
 success = []
 indicator = "gim_event_type"

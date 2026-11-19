@@ -12,8 +12,8 @@ Monitoring named pipe activity is valuable for detecting abnormal IPC behavior,
 such as unauthorized process communications or persistence mechanisms used by malicious software.
 """
 
-required_fields = [ "pipe_name" ]
-recommended_fields = [ "process_name", "user_name" ]
+required_fields = ["pipe_name"]
+recommended_fields = ["process_name", "user_name"]
 optional_fields = []
 
 [pipe._meta]
@@ -56,7 +56,6 @@ This typically occurs when an application or process sets up an interprocess com
 through the filesystem. Creation events can indicate legitimate application behavior or the setup 
 of a custom communication channel by malware or scripts.
 """
-
 
 
 [pipe.subcategories.01]

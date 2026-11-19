@@ -30,7 +30,7 @@ These events capture the fact that a query was made to a DNS server, regardless 
 They provide visibility into what domains or services a system is trying to reach,
 which can be critical for investigations, threat hunting, or identifying unusual communication patterns.
 """
-required_fields = [ "query_request" ]
+required_fields = ["query_request"]
 recommended_fields = []
 optional_fields = []
 class = "protocol"
@@ -55,7 +55,7 @@ or negative results such as NXDOMAIN or SERVFAIL, which are still considered val
 Capturing both successful and unsuccessful responses allows analysts to track resolution outcomes,
 detect attempts to reach malicious or non-existent domains, and troubleshoot connectivity problems.
 """
-required_fields = [ "query_response" ]
+required_fields = ["query_response"]
 recommended_fields = []
 optional_fields = []
 class = "protocol"
