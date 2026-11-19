@@ -60,7 +60,7 @@ Before claiming work is done, run the commands above that are available and conf
 
 ## CI
 
-`.github/workflows/ci.yml` runs on every PR into `main`, on every push to `main`, and on demand. CI never commits; fix failures locally and push. Each job, and how to reproduce it locally:
+`.github/workflows/ci.yml` runs on every PR into `main`, on every push to `main`, and on demand. CI never commits; fix failures locally and push. Retargeting a PR to `main` doesn't start a run; push a commit, or close and reopen the PR. Each job, and how to reproduce it locally:
 
 | Job | Runs | Locally |
 |---|---|---|
