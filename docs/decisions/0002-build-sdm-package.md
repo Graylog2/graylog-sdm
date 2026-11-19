@@ -12,6 +12,7 @@ Date: 2026-11-17
 - pydantic v1 is kept. Migrating to v2 is out of scope.
 - Python 3.13 only.
 - Plugin failures are fatal: the build exits non-zero if any plugin fails. This covers errors a plugin catches itself (write failures, template errors, invalid per-entity config) and an enabled plugin whose config is invalid.
+- A fatal error is logged once, by the CLI, with its cause chain. Lower layers don't log before re-raising; they add context with `add_note()` or `raise ... from`. (Added in PR 3, follow-up F18.)
 - Build output is deterministic: source files load in sorted path order, and recorded paths are repo-relative, so the same commit builds byte-identical output on any machine. (Added in PR 2, which found `message_summaries.json` ordered by filesystem listing order.)
 
 ## Consequences

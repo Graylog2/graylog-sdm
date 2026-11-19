@@ -12,7 +12,12 @@ This repo is the source of truth for the Graylog Security Data Model (SDM). Down
 
 ## What not to comment on
 
-Do not comment on things CI enforces: formatting, naming patterns, and generated-output freshness. Focus on judgment calls: whether a classification is justified, description quality, and whether a change is really additive.
+Do not comment on things CI enforces:
+- TOML formatting (`taplo fmt --check`) and Python lint, formatting and types (ruff, mypy).
+- Generated-output freshness (`build-sdm check-generated`).
+- The `build-sdm validate` rules, which fail on new violations: `naming`, `ascii-meta`, `unique-names`, `default-99`, `default-baseline`, `fields-exist`, `wildcards`, `codes`. Existing violations are known and are reported as warnings; don't ask a PR to fix ones it didn't introduce.
+
+Focus on judgment calls: whether a classification is justified, description quality, and whether a change is really additive.
 
 ## Plans
 

@@ -108,6 +108,8 @@ Not covered here:
   - CI fails if any count goes up, even where every individual violation is "existing".
   - The counts go in the PR job summary.
 
+**Status:** done in PR 3 (2026-11-19). GIM `entry_key`s use codes (`gim:10.05/name`); field references use the full field name. `validate --base-ref` prints per-rule base and head counts, fails when any count goes up, and writes the counts to the GitHub job summary. Tests cover a rename (stays a warning) and a renumber (becomes an error).
+
 ## F6. Correct base ref for push events
 
 **Problem:** on push to `main`, `04-ci.md` compares against `HEAD~1`. That misses all but the last commit when several are pushed at once.
@@ -261,3 +263,5 @@ Raised during the PR 2 review.
 - Add a test that one failure produces a single error-level log record.
 
 **Decision needed:** none.
+
+**Status:** done in PR 3 (2026-11-19). The CLI logs one error record with the exception chain and notes, and the traceback at debug level; lower layers add context with `add_note()`. `tests/test_cli_build_failures.py` checks that one failure produces one error record.
