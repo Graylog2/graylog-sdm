@@ -31,6 +31,7 @@ Not covered here:
 | F15 | Review `system_time` required `user_name` | Medium | After migration | Yes: field classification |
 | F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | After migration | Yes: key format |
 | F17 | Decide whether to narrow `allowed_field_types` | Low | After migration | Yes: SDM change policy |
+| F18 | Log build errors once, at the CLI, instead of at every layer | Low | PR 3 | No |
 
 ---
 
@@ -243,3 +244,20 @@ Narrowing the list rejects definitions that build today. The PR 2 Copilot review
 - Update the list and `tests/test_field_types.py::test_allowlist_keeps_every_previously_accepted_type`.
 
 **Decision needed:** the allowed set, and its change classification.
+
+## F18. Log build errors once, at the CLI
+
+**Problem:** PR 2 made plugin failures fatal by adding a bare `raise` after the log call in each legacy `except` handler. The re-raises are correct, but every layer still logs, so one failure is reported several times. A failed write logs in `write_file`, again in the plugin's handler, again in `plugin_loader.safe_execute`, and finally in the CLI with the traceback. Related inconsistencies:
+- `message_summaries_output/plugin.py` logs invalid templates at warning level, then fails the build.
+- `safe_execute` formats its log messages with f-strings.
+- `runner.py` and `safe_execute` catch `Exception` only to log and re-raise.
+
+Raised during the PR 2 review.
+
+**Activity:**
+- Log errors once, in the CLI (`Build failed`, with the traceback at debug or always).
+- In lower layers, drop log-and-re-raise handlers. Where a handler adds useful context (plugin name, category, file), raise a project exception with `raise ... from e` instead of logging.
+- Make `message_summaries_output` validation failures errors, not warnings.
+- Add a test that one failure produces a single error-level log record.
+
+**Decision needed:** none.
