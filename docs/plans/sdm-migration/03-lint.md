@@ -23,7 +23,7 @@ Today the only checks on SDM data are the pydantic models, and nobody runs them 
    - collect errors (fail fast is acceptable for parse errors)
 3. Rules framework in `tools/build_sdm/rules/`:
    - `Violation(rule_id: str, entry_key: str, message: str, file: Path)`
-   - `entry_key` is a stable logical path that doesn't depend on line numbers. GIM entries are keyed by code, not name, so a rename keeps the key (F5): `gim:10` (category), `gim:10.05` (subcategory), `gim:10.05.03` (event type), then an attribute and optionally a list item, e.g. `gim:10.05/name` or `gim:10.05/required_fields/user_name`. Schema entries are keyed by entity and full field name, e.g. `schema:source/fields/source_bytes_sent`.
+   - `entry_key` is a stable logical path that doesn't depend on line numbers. GIM entries are keyed by code, not name, so a rename keeps the key (F5): `gim:10` (category), `gim:10.05` (subcategory), `gim:10.05.03` (event type), then an attribute and optionally a list item, e.g. `gim:10.05/name` or `gim:10.05/required_fields/user_name`. Schema entries are keyed by entity and field suffix, e.g. `schema:source/fields/bytes_sent/description`; the suffix is unique within an entity, and sub entities have no single full field name.
    - `file` is repo-relative, e.g. `src/sdm/infomodels/10.authentication.toml`
    - each rule is a function `(model) -> Iterable[Violation]`, registered in a list
 4. Rules (IDs are stable and appear in output and docs):

@@ -53,8 +53,8 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 - Check generated output is fresh: `uv run build-sdm check-generated`. If it fails, run the fix commands it prints from the repo root: a rebuild, plus `git rm` for each stale file, which the build never deletes.
 - Tests: `uv run pytest`. If a change alters plugin output on purpose, refresh the snapshots with `uv run pytest tests/test_golden_outputs.py --update-golden` and commit `tests/golden/` with the change.
 - Lint and types: `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`
-- Validate SDM data: `uv run build-sdm validate --base-ref origin/main` (available after PR 3)
-- Format TOML: `uv run taplo fmt` (available after PR 3)
+- Validate SDM data: `uv run build-sdm validate --base-ref origin/main`. Violations already on `origin/main` are warnings; new ones fail, and so does any rule whose violation count goes up. Without `--base-ref`, every violation is an error, so plain `validate` exits 1 on the current data.
+- Format TOML: `uv run taplo fmt`; check with `uv run taplo fmt --check`.
 
 Before claiming work is done, run the commands above that are available and confirm they pass.
 
