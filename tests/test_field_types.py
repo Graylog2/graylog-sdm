@@ -97,3 +97,17 @@ def test_allowlist_keeps_every_previously_accepted_type(repo_root: Path) -> None
     result = _load_and_transform_gim_config(repo_root, {"global": {"sdm_source_dir": "src/sdm"}})
 
     assert set(result["config"]["field_schema_config"]["allowed_field_types"]) == PREVIOUSLY_ACCEPTED_TYPES
+
+
+@pytest.mark.parametrize(
+    "allowed",
+    ["keyword", ["keyword", 1], ["keyword", ["long"]], {"keyword": True}],
+    ids=["string", "non-string-item", "nested-list", "table"],
+)
+def test_malformed_allowlist_raises(allowed: Any) -> None:
+    """An allowlist that isn't a list of strings is rejected, not silently reinterpreted."""
+    gim_config = _gim_config(["keyword"], {"id": "keyword"})
+    gim_config["config"]["field_schema_config"]["allowed_field_types"] = allowed
+
+    with pytest.raises(ValueError, match="must be a list of strings"):
+        validate_field_types(gim_config)
