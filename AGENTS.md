@@ -58,6 +58,18 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 
 Before claiming work is done, run the commands above that are available and confirm they pass.
 
+## CI
+
+`.github/workflows/ci.yml` runs on every PR into `main`, on every push to `main`, and on demand. CI never commits; fix failures locally and push. Each job, and how to reproduce it locally:
+
+| Job | Runs | Locally |
+|---|---|---|
+| `data-lint` | TOML formatting, then `validate` against the PR's base branch (on a push to `main`, the commit before the push) | `uv run taplo fmt --check` and `uv run build-sdm validate --base-ref origin/main` |
+| `generated-fresh` | `check-generated`; on failure, the fix goes in the job summary | `uv run build-sdm check-generated` |
+| `python-qa` | ruff, ruff format, mypy, pytest | `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`, `uv run pytest` |
+
+Keep the job names stable: branch protection lists jobs by name as required checks, so renaming one silently drops it from the protection rules.
+
 ## Plans and decisions
 
 - Durable decisions live in `docs/decisions/` (ADRs) and are authoritative.
