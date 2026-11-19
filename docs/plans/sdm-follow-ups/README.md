@@ -185,6 +185,8 @@ Not covered here:
 - After formatting, confirm that every source file still parses to the same values (a parse → compare script, not just a check that the output is unchanged) and that `generated/` is byte-identical.
 - Add the parse-equivalence check as a test, so future formatter upgrades are covered too.
 
+**Status:** done in PR 3 (2026-11-19). `taplo.toml` turns off key reordering and entry and comment alignment. `tests/test_taplo_roundtrip.py` formats a copy of every included file and checks that each parses to the same values. The format commit changed no parsed value in any of the 18 files it touched, and `generated/` and the golden snapshots were unchanged.
+
 ## F13. Fix the field-schema index stylesheet path
 
 **Problem:** `field_schema_top_template.j2:6` uses `{{ resource_path }}`, but the template defines `resources_path`. The link renders as `/TableStyles/Alternate-Row-Color.css`, so the field-schema index page loads no table styles. Found in the PR 1 Copilot review (PR #3). The migration keeps output unchanged, so it isn't fixed there.
