@@ -24,7 +24,13 @@ build-backend = "hatchling.build"
 packages = ["tools/build_sdm"]
 
 [dependency-groups]
-dev = ["pytest>=7.0", "pytest-mock>=3.6", "ruff>=0.8", "mypy>=1.13"]
+dev = [
+    "pytest>=7.0",
+    "pytest-mock>=3.6",
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "taplo>=0.9.3",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
