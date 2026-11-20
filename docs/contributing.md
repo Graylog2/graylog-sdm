@@ -149,7 +149,8 @@ See ADR 0003.
 
 The existing data has known violations. With `--base-ref`:
 - A violation that already exists at the base ref is a warning. One that doesn't is an error.
-- A violation is identified by its rule and its entry, keyed by GIM code (`gim:26.01/name`) or field (`schema:user/fields/name/description`). Renaming an entry keeps its existing violations as warnings; renumbering it makes them new.
+- A violation is identified by its rule and its entry. GIM entries are keyed by code (`gim:26.01/name`), so renaming a category, subcategory or event type keeps its existing violations as warnings, and renumbering it makes them new.
+- Schema entries are keyed by name (`schema:user/fields/name/description`), and so are field references in GIM lists (`gim:26.01/required_fields/user_name`). Renaming a schema entity or field makes its existing violations new, so fix them in the same change.
 - If any rule's violation count goes up, that fails too, even when each violation already existed.
 
 Without `--base-ref`, every violation is an error, so plain `validate` exits 1 on the current data. See ADR 0004.
