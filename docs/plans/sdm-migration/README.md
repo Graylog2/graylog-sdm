@@ -1,6 +1,6 @@
 # SDM Migration to graylog-sdm — Overview
 
-Status: active
+Status: done
 Created: 2026-11-09
 Tracking: (issue link)
 
@@ -87,7 +87,7 @@ build/sdm_artifacts/<Plugin>/    # gitignored
 | 2 | `02-package.md`: package, rename, paths, optional MadCap path | done |
 | 3 | `03-lint.md`: `build-sdm validate` + TOML formatting | done |
 | 4 | `04-ci.md`: CI workflow | done |
-| 5 | `05-docs.md`: docs + proposals; archive this plan | active |
+| 5 | `05-docs.md`: docs + proposals; archive this plan | done |
 
 ## Verification (end to end)
 After PR 5:

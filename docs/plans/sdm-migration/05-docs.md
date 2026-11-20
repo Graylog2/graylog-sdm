@@ -1,6 +1,6 @@
 # SDM Migration — PR 5 of 5: Contributor docs, follow-up proposals, plan removal
 
-Status: active
+Status: done
 Tracking: (PR link)
 Overview: `docs/plans/sdm-migration/README.md`. Depends on PR 4 (`04-ci.md`).
 
