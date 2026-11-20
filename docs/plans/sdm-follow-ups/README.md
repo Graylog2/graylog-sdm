@@ -12,27 +12,49 @@ Not covered here:
 
 ## Summary
 
-| # | Follow-up | Priority | Target | Decision needed |
-|---|---|---|---|---|
-| F1 | Golden-file tests for all output plugins | High | Live-data snapshots in PR 2; fixture-based tests later | No |
-| F2 | Compatibility checker + enforced `sdm_version` bump | High | After PR 3 (extends `validate --base-ref`) | Yes: versioning policy |
-| F3 | Minimal CI from PR 2; branch protection now | High | Now / PR 2 | Yes: CI sequencing |
-| F4 | Safe writes for the MadCap output path | High | PR 2 | No |
-| F5 | Robust violation fingerprints + violation ratchet | Medium | PR 3 | No |
-| F6 | Correct base ref for push events | Medium | PR 4 | No |
-| F7 | Check that pydantic v1 works on Python 3.13; schedule v2 | Medium | Before PR 2 | Yes: v2 date |
-| F8 | Semantic validation rules | Medium | After migration | No |
-| F9 | Machine-readable contract: JSON export, JSON Schema, release artifact | Medium | After migration (before Illuminate cutover) | Yes: artifact format |
-| F10 | Reconsider the `src/sdm` directory name | Low | Before PR 1 | Yes |
-| F11 | Collapse generated output in PR diffs | Low | PR 2 | No |
-| F12 | Check that taplo preserves multiline strings | Low | PR 3 | No |
-| F13 | Fix the field-schema index stylesheet path | Low | After migration | No |
-| F14 | Replace non-ASCII characters in SDM meta text | Low | After PR 3 | No |
-| F15 | Review `system_time` required `user_name` | Medium | After migration | Yes: field classification |
-| F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | After migration | Yes: key format |
-| F17 | Decide whether to narrow `allowed_field_types` | Low | After migration | Yes: SDM change policy |
-| F18 | Log build errors once, at the CLI, instead of at every layer | Low | PR 3 | No |
-| F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | After migration | No |
+The migration is done (2026-11-20), so each Target below is for the remaining work. Targets that named a migration PR the item missed now say "Any time".
+
+| # | Follow-up | Priority | Status | Target | Decision needed |
+|---|---|---|---|---|---|
+| F1 | Golden-file tests for all output plugins | High | Partly done | Fixture-based tests before tool refactors (F7 v2, F16) | No |
+| F2 | Compatibility checker + enforced `sdm_version` bump | High | Open | After F8's deprecation fields | Yes: versioning policy |
+| F3 | Minimal CI from PR 2; branch protection now | High | Partly done | Required checks before more data PRs | Yes: required checks |
+| F4 | Safe writes for the MadCap output path | High | Open | Any time | No |
+| F5 | Robust violation fingerprints + violation ratchet | Medium | Done | | No |
+| F6 | Correct base ref for push events | Medium | Done | | No |
+| F7 | Check that pydantic v1 works on Python 3.13; schedule v2 | Medium | Partly done | v2 before F9's JSON Schema | Yes: v2 date |
+| F8 | Semantic validation rules | Medium | Open | Deprecation fields before F2 | No |
+| F9 | Machine-readable contract: JSON export, JSON Schema, release artifact | Medium | Open | After F2; before Illuminate cutover | Yes: artifact format |
+| F10 | Reconsider the `src/sdm` directory name | Low | Done (kept) | | No |
+| F11 | Collapse generated output in PR diffs | Low | Open | Any time | No |
+| F12 | Check that taplo preserves multiline strings | Low | Done | | No |
+| F13 | Fix the field-schema index stylesheet path | Low | Open | Any time | No |
+| F14 | Replace non-ASCII characters in SDM meta text | Low | Open | Any time | No |
+| F15 | Review `system_time` required `user_name` | Medium | Open | After F2's versioning policy | Yes: field classification |
+| F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | Open | Any time | Yes: key format |
+| F17 | Decide whether to narrow `allowed_field_types` | Low | Open | After F2's versioning policy | Yes: SDM change policy |
+| F18 | Log build errors once, at the CLI, instead of at every layer | Low | Done | | No |
+| F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | Open | Any time | No |
+
+## Order and dependencies
+
+The F numbers are the order the items were recorded, not the order to work them. Most items are independent. These are not:
+
+- **F8 before F2.** F2 detects deprecations from the `deprecated` and `replaced_by` fields that F8 adds to the schema model.
+- **F2 before F9's release artifact.** F9 tags a release on each `sdm_version` bump, which only means something once F2 ties the bump to the change class.
+- **F2's versioning policy before F15 and F17.** Both need a change classification and an `sdm_version` decision; the policy ADR answers them instead of one-off judgments.
+- **F9 before the Illuminate cutover**, and before the long-term option in `docs/proposals/illuminate-skills-update.md` (a published artifact).
+- **F7's v2 migration before F9's JSON Schema**, or plan for rework: v2 changes how JSON Schema is generated from the models. F8's new model fields are also cheaper to write once, after v2.
+- **F1's fixture-based tests before tool refactors** (F7 v2, F16), so behavior changes show up independently of data changes.
+
+F13, F14 and F16 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
+
+Suggested order:
+1. Quick, independent fixes: F11, F13, F4, F19.
+2. The rest of F3 (required checks), before more data PRs land.
+3. F14, as a data-only PR.
+4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
+5. F8 (deprecation fields) → F2 → F9.
 
 ---
 
@@ -96,6 +118,8 @@ Not covered here:
 4. Add tests for the refuse, force and marker cases.
 
 **Done when:** running with `--madcap-output-dir` pointed at a non-empty directory without a marker exits non-zero and changes nothing.
+
+**Status:** open (2026-11-20). Planned for PR 2 but not done: the tool has no marker file and no `--force`. Only step 1 (the check) is complete.
 
 ## F5. Robust violation fingerprints and a violation ratchet
 
@@ -173,6 +197,8 @@ Not covered here:
 
 **Decision needed:** keep or rename. If you rename, update the plans and ADR 0001.
 
+**Status:** done (2026-11-20): kept. The migration shipped with `src/sdm/` and ADR 0001 records it. The tool config, docs and the path-scoped Copilot instructions all use it; renaming it now is a separate decision with its own ADR.
+
 ## F11. Collapse generated output in PR diffs
 
 **Problem:** committed MadCap HTML produces large diffs that reviewers will skim, and that bury the source changes.
@@ -180,6 +206,8 @@ Not covered here:
 **Activity:**
 - Add `.gitattributes` with `generated/** linguist-generated=true`. GitHub then collapses those files in PR diffs and leaves them out of language stats.
 - `check-generated` still guards their correctness.
+
+**Status:** open (2026-11-20). Planned for PR 2 but not done: there is no `.gitattributes`.
 
 ## F12. Check that taplo preserves multiline strings
 
