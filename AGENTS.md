@@ -8,8 +8,6 @@ This repo is the authoritative source for the Graylog Security Data Model (SDM):
 
 ## Layout
 
-Target layout (in progress, see docs/plans/):
-
 ```
 AGENTS.md                      # canonical dev standards (this file)
 CLAUDE.md                      # imports AGENTS.md and .github/copilot-instructions.md
@@ -22,7 +20,9 @@ tools/build_sdm/               # build-sdm package; configs/ incl. MadCap plugin
 tests/
 docs/
   decisions/NNNN-*.md          # ADRs (authoritative)
+  contributing.md              # how to change the SDM; commands, lint rules, CI
   plans/                       # active plans and archive
+  proposals/                   # changes awaiting a decision
   templates/category.toml.template
 build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 ```
@@ -48,6 +48,8 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 
 ## Commands
 
+For file shapes, examples and how to fix each kind of CI failure, see `docs/contributing.md`.
+
 - Set up: `uv sync`
 - Build: `uv run build-sdm build`. Writes `generated/MadcapHtmlOutput/` (committed) and `build/sdm_artifacts/<Plugin>/` (gitignored).
 - Check generated output is fresh: `uv run build-sdm check-generated`. If it fails, run the fix commands it prints from the repo root: a rebuild, plus `git rm` for each stale file, which the build never deletes.
@@ -68,7 +70,7 @@ Before claiming work is done, run the commands above that are available and conf
 | `generated-fresh` | `check-generated`; on failure, the fix goes in the job summary | `uv run build-sdm check-generated` |
 | `python-qa` | ruff, ruff format, mypy, pytest | `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`, `uv run pytest` |
 
-Keep the job names stable: branch protection lists jobs by name as required checks, so renaming one silently drops it from the protection rules.
+Keep the job names stable: required status checks select jobs by name, so renaming a job silently drops it from the checks.
 
 ## Plans and decisions
 
