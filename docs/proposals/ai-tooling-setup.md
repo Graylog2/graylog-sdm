@@ -36,6 +36,9 @@ A few rules appear in both `AGENTS.md` and the Copilot files on purpose, because
 
 ```json
 {
+  "env": {
+    "UV_LOCKED": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(uv run build-sdm:*)",
@@ -52,7 +55,8 @@ A few rules appear in both `AGENTS.md` and the Copilot files on purpose, because
 }
 ```
 
-- The allow rules cover the commands in `AGENTS.md`. They run only repo code and its locked dependencies.
+- The allow rules cover the commands in `AGENTS.md`. They run repo code and its dependencies.
+- `UV_LOCKED=1` keeps those dependencies the locked ones. Without it, `uv run` re-locks when `uv.lock` is out of date with `pyproject.toml` and installs whatever it resolves, so an automatically allowed command could pull in new packages. With it, the command fails instead, as it does in CI.
 - The deny rules stop Claude from hand-editing generated output. `build-sdm build` still writes it, because the build runs as a shell command, not through Edit or Write.
 - `uv run build-sdm build` writes into the repo. That's expected; review the diff before committing.
 
