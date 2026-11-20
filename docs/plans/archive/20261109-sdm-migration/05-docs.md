@@ -1,7 +1,7 @@
 # SDM Migration — PR 5 of 5: Contributor docs, follow-up proposals, plan removal
 
 Status: done
-Tracking: (PR link)
+Tracking: https://github.com/Graylog2/graylog-sdm/pull/9
 Overview: `docs/plans/sdm-migration/README.md`. Depends on PR 4 (`04-ci.md`).
 
 ## Context
