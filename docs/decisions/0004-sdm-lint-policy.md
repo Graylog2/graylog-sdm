@@ -8,12 +8,13 @@ Nothing validated the SDM data automatically. Several authoring rules existed on
 
 ## Decision
 - `build-sdm validate` runs structural validation and a codified rule set derived from the authoring rules.
-- TOML formatting is enforced with taplo.
+- TOML formatting is enforced with taplo, configured in `taplo.toml` so it never reorders keys and never collapses hand-wrapped arrays. A test formats a copy of every included file and checks that each still parses to the same values, which also guards future taplo upgrades. (Added in PR 3, follow-up F12.)
 - A violation is identified by `rule_id` + `entry_key`. It fails only when it is new relative to a base ref. Violations that already exist at the base ref are reported as warnings.
 - GIM `entry_key`s use codes, not names (`gim:10.05/name`), so renaming an entry keeps its existing violations as warnings; renumbering it makes them new. (Added in PR 3, follow-up F5.)
 - Ratchet: with a base ref, the check also fails if any rule's violation count goes up, even when every individual violation already existed. (Added in PR 3, follow-up F5.)
 - If the base ref's source fails to load, every violation is treated as new.
 - Without a base ref, every violation is an error.
+- CI picks the base ref per event: the PR's base branch, or on push the commit before the push (ADR 0006).
 
 ## Consequences
 - New content must conform; existing violations can be fixed over time without blocking unrelated PRs.
