@@ -24,7 +24,7 @@ CI (`.github/workflows/ci.yml`) runs `data-lint`, `generated-fresh` and `python-
 Proposed additions to the ruleset:
 
 1. **Required status checks:** `data-lint`, `generated-fresh` and `python-qa`.
-   - Select them by job name. Renaming a job silently drops it from the rule; `AGENTS.md` says to keep the names stable.
+   - Select them by job name. If a required job is renamed, the rule keeps waiting for the old name, and every PR shows it as expected but never reported, so nothing can merge. An intentional rename has to update the ruleset at the same time. `AGENTS.md` says to keep the names stable.
    - Require branches to be up to date before merging. `validate` compares against the PR's base, so a PR checked against an older `main` can pass and still add a violation once merged. The repo's PR volume is low, so the extra rebases cost little.
    - Without required checks, a PR retargeted to `main` that never ran CI can merge with only an approval.
 2. **Human approval:** keep 1 approval from someone other than the author. AI reviews (Copilot, Claude) are advisory and never count as the approval.
