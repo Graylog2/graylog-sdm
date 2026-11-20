@@ -83,6 +83,8 @@ Not covered here:
 
 **Decision needed:** whether to move CI earlier. This changes the scope of PRs 2 and 4.
 
+**Status:** partly done (2026-11-20). CI wasn't moved earlier; it arrived in PR 4 as planned. A ruleset on `main` already requires a PR with 1 approval and resolved review threads, and blocks force pushes and deletion. Still open: making `data-lint`, `generated-fresh` and `python-qa` required checks, proposed in `docs/proposals/repo-governance.md`.
+
 ## F4. Safe writes for the MadCap output path
 
 **Problem:** `--madcap-output-dir` replaces the default location. If the plugin clears or overwrites its output directory, pointing it at a Flare project could destroy hand-written content.
