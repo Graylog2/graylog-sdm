@@ -4,11 +4,11 @@ Status: active
 Created: 2026-11-10
 Tracking: (issue link)
 
-Follow-up activities from a tech-lead review of the SDM migration plan (`docs/plans/sdm-migration/`). The review's core point: the SDM is a **data contract** consumed by Illuminate's pipelines and lookups, not just documentation. Most items move it toward machine-enforced compatibility.
+Follow-up activities from a tech-lead review of the SDM migration plan (`docs/plans/archive/20261109-sdm-migration/`). The review's core point: the SDM is a **data contract** consumed by Illuminate's pipelines and lookups, not just documentation. Most items move it toward machine-enforced compatibility.
 
 Not covered here:
 - **Two sources of truth / drift with Illuminate:** handled by the planned Illuminate issue to remove the SDM artifacts and tools once graylog-sdm can publish docs.
-- **PR 2 bundling a refactor with behavior changes:** handled in `docs/plans/sdm-migration/02-package.md` with ordered commits and a parity check across all plugins.
+- **PR 2 bundling a refactor with behavior changes:** handled in `docs/plans/archive/20261109-sdm-migration/02-package.md` with ordered commits and a parity check across all plugins.
 
 ## Summary
 
