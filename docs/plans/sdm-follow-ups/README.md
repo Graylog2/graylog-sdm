@@ -26,15 +26,16 @@ The migration is done (2026-11-20), so each Target below is for the remaining wo
 | F8 | Semantic validation rules | Medium | Open | Deprecation fields before F2 | No |
 | F9 | Machine-readable contract: JSON export, JSON Schema, release artifact | Medium | Open | After F2; before Illuminate cutover | Yes: artifact format |
 | F10 | Reconsider the `src/sdm` directory name | Low | Done (kept) | | No |
-| F11 | Collapse generated output in PR diffs | Low | Open | Any time | No |
+| F11 | Collapse generated output in PR diffs | Low | Done | | No |
 | F12 | Check that taplo preserves multiline strings | Low | Done | | No |
-| F13 | Fix the field-schema index stylesheet path | Low | Open | Any time | No |
+| F13 | Fix the field-schema index stylesheet path | Low | Done | | No |
 | F14 | Replace non-ASCII characters in SDM meta text | Low | Open | Any time | No |
 | F15 | Review `system_time` required `user_name` | Medium | Open | After F2's versioning policy | Yes: field classification |
 | F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | Open | Any time | Yes: key format |
 | F17 | Decide whether to narrow `allowed_field_types` | Low | Open | After F2's versioning policy | Yes: SDM change policy |
 | F18 | Log build errors once, at the CLI, instead of at every layer | Low | Done | | No |
 | F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | Open | Any time | No |
+| F20 | MadCap pages link resources at two different depths | Low | Open | Any time | Yes: Flare project layout |
 
 ## Order and dependencies
 
@@ -47,10 +48,10 @@ The F numbers are the order the items were recorded, not the order to work them.
 - **F7's v2 migration before F9's JSON Schema**, or plan for rework: v2 changes how JSON Schema is generated from the models. F8's new model fields are also cheaper to write once, after v2.
 - **F1's fixture-based tests before tool refactors** (F7 v2, F16), so behavior changes show up independently of data changes.
 
-F13, F14 and F16 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
+F14, F16 and F20 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
 
 Suggested order:
-1. Quick, independent fixes: F11, F13, F4, F19.
+1. Quick, independent fixes: F4, F19.
 2. The rest of F3 (required checks), before more data PRs land.
 3. F14, as a data-only PR.
 4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
@@ -207,7 +208,7 @@ Suggested order:
 - Add `.gitattributes` with `generated/** linguist-generated=true`. GitHub then collapses those files in PR diffs and leaves them out of language stats.
 - `check-generated` still guards their correctness.
 
-**Status:** open (2026-11-20). Planned for PR 2 but not done: there is no `.gitattributes`.
+**Status:** done (2026-11-23). `.gitattributes` marks `generated/**` as `linguist-generated`.
 
 ## F12. Check that taplo preserves multiline strings
 
@@ -229,6 +230,8 @@ Suggested order:
 - Regenerate `generated/MadcapHtmlOutput/` and check that only the field-schema index page changes.
 
 **Done when:** the generated field-schema index links `../../Resources/TableStyles/Alternate-Row-Color.css`.
+
+**Status:** done (2026-11-23). The template uses `resources_path`, and only the field-schema index page changed in `generated/`. `tests/output_madcap/test_madcap_resource_links.py` checks that every stylesheet reference in the generated pages is relative. The fix uses the path the template defines; whether that depth is right is F20.
 
 ## F14. Replace non-ASCII characters in SDM meta text
 
@@ -312,3 +315,18 @@ Raised during the PR 2 review.
 - Tests: a violation in a subcategory, an event type, and a schema field each get the right line; an entry that can't be located gets none.
 
 **Decision needed:** none.
+
+## F20. MadCap pages link resources at two different depths
+
+**Problem:** every generated page sits one directory below the output root (`Graylog Information Models/` or `Field Schema Entities/`), but the pages reference `Resources/` at two depths:
+- the 21 category pages link their stylesheets with `../Resources/` (`gim_category_template.j2`)
+- every table's `mc-table-style` uses `../../Resources/` (the default in `macros/tables.html.j2`), which the two top-level templates also set
+
+At most one depth can be right for a given Flare project, so either the category page stylesheets or every table style resolves to a missing file. Which one depends on where the output is placed in the Flare project, and nothing in this repo records that (ADR 0003 leaves delivery to Flare out of scope). Found while fixing F13.
+
+**Activity:**
+- Find out from the Flare project where the generated folders go, relative to its `Resources/` folder.
+- Set one `resources_path` for all templates, passed in from the plugin config rather than set in each template, and pass it to `render_table`.
+- Regenerate `generated/` and record the layout in ADR 0003.
+
+**Decision needed:** the Flare project layout, from whoever maintains the Flare project.
