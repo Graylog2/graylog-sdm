@@ -44,6 +44,16 @@ def test_os_metadata_does_not_hide_other_files(tmp_path: Path) -> None:
         check_output_dir(tmp_path)
 
 
+@pytest.mark.parametrize("name", [".DS_Store", "Thumbs.db", "desktop.ini"])
+def test_metadata_named_subdirectory_is_refused(tmp_path: Path, name: str) -> None:
+    """Only files are exempt: a subdirectory with a metadata name is content, so it's refused."""
+    (tmp_path / name).mkdir()
+    (tmp_path / name / "hand-written.htm").write_text("keep me", encoding="utf-8")
+
+    with pytest.raises(UnsafeOutputDirError, match="--force"):
+        check_output_dir(tmp_path)
+
+
 def test_marked_dir_is_safe(tmp_path: Path) -> None:
     """A directory holding the marker and earlier output is safe; it is already marked."""
     mark_output_dir(tmp_path)

@@ -26,7 +26,8 @@ def check_output_dir(directory: Path, force: bool = False) -> bool:
 
     A directory is safe when it doesn't exist, is empty, or holds the marker file
     build-sdm writes into directories it created output in. A directory holding only OS
-    metadata files (.DS_Store, Thumbs.db, desktop.ini) counts as empty.
+    metadata files (.DS_Store, Thumbs.db, desktop.ini) counts as empty; a subdirectory with
+    one of those names does not.
 
     Args:
         directory: The output directory.
@@ -43,7 +44,7 @@ def check_output_dir(directory: Path, force: bool = False) -> bool:
         return True
     if not directory.is_dir():
         raise UnsafeOutputDirError(f"{directory} exists and is not a directory")
-    if all(entry.name in _OS_METADATA_NAMES for entry in directory.iterdir()):
+    if all(entry.name in _OS_METADATA_NAMES and entry.is_file() for entry in directory.iterdir()):
         return True
     if (directory / MARKER_NAME).is_file() or force:
         return False
