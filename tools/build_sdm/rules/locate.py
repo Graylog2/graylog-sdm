@@ -19,6 +19,14 @@ _KEY = re.compile(rf"^\s*({_PART}(?:\s*\.\s*{_PART})*)\s*=\s*(.*)$")
 _PARTS = re.compile(_PART)
 _QUOTED = re.compile(r""""(?:[^"\\]|\\.)*"|'[^']*'""")
 _SCALAR = re.compile(r"""^"((?:[^"\\]|\\.)*)"|^'([^']*)'""")
+# A string token, or the # that starts a comment (only reached outside strings).
+_TOKEN = re.compile(r""""(?:[^"\\]|\\.)*"|'[^']*'|#""")
+# The end of a multiline string. In a basic string, a """ preceded by an odd number of
+# backslashes is an escaped quote, not the end; literal strings have no escapes.
+_CLOSING = {
+    '"""': re.compile(r'(?:^|[^\\])(?:\\\\)*"""'),
+    "'''": re.compile("'''"),
+}
 
 # Keys whose value identifies an element of an array of tables, e.g. [[agent.fields]].
 ID_KEYS = ("field_suffix", "template_id", "type")
@@ -29,6 +37,15 @@ KeyPath = tuple[str, ...]
 def _split(dotted: str) -> KeyPath:
     """Split a dotted TOML key or header into its parts, without quotes."""
     return tuple(p.strip("\"'") for p in _PARTS.findall(dotted))
+
+
+def _physical_lines(text: str) -> list[str]:
+    """Split text into source lines on LF only, dropping a CR before it.
+
+    str.splitlines() would also split on characters such as U+2028, which can appear
+    inside TOML strings and are not line breaks in the file.
+    """
+    return [line.removesuffix("\r") for line in text.split("\n")]
 
 
 def _bracket_depth(text: str) -> int:
@@ -58,7 +75,7 @@ class SourceIndex:
     @classmethod
     def from_text(cls, text: str) -> "SourceIndex":
         """Index TOML text line by line, skipping the contents of multiline strings and arrays."""
-        index = cls(text=text.splitlines())
+        index = cls(text=_physical_lines(text))
         table: KeyPath = ()
         lines = index.text
         i = 0
@@ -85,8 +102,9 @@ class SourceIndex:
             end = number
             delimiter = next((d for d in ('"""', "'''") if value.startswith(d)), None)
             if delimiter is not None:
-                if value.count(delimiter) < 2:
-                    while i < len(lines) and delimiter not in lines[i]:
+                closing = _CLOSING[delimiter]
+                if not closing.search(value[len(delimiter) :]):
+                    while i < len(lines) and not closing.search(lines[i]):
                         i += 1
                     i += 1
                     end = min(i, len(lines))
@@ -116,15 +134,17 @@ class SourceIndex:
         return None
 
     def _item_line(self, path: KeyPath, item: str) -> int | None:
-        """Return the line of a quoted item within an array-valued key."""
+        """Return the line of a string item within an array-valued key, ignoring comments."""
         first, last = self.spans[path]
-        pattern = re.compile(rf"""(["']){re.escape(item)}\1""")
         for number in range(first, last + 1):
             line = self.text[number - 1]
             if number == first:
                 line = line.split("=", 1)[1]
-            if pattern.search(line):
-                return number
+            for token in _TOKEN.finditer(line):
+                if token.group() == "#":
+                    break
+                if token.group()[1:-1] == item:
+                    return number
         return None
 
     def find(self, segments: KeyPath) -> int | None:

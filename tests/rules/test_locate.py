@@ -166,6 +166,45 @@ def test_text_inside_a_multiline_string_is_not_indexed() -> None:
     assert index.find(("authentication", "name")) == _line(GIM, 'name = "authentication"')
 
 
+def test_unicode_line_separators_are_not_line_breaks() -> None:
+    """U+2028 and U+0085 inside a string don't shift the numbering of later lines."""
+    text = '[t]\ndescription = "one\u2028two\x85three"\nname = "x"\n'
+
+    assert SourceIndex.from_text(text).find(("t", "name")) == 3
+
+
+def test_crlf_line_endings() -> None:
+    """CRLF files number the same as LF files."""
+    text = '[t]\r\ndescription = """\r\nText.\r\n"""\r\nname = "x"\r\n'
+
+    assert SourceIndex.from_text(text).find(("t", "name")) == 5
+
+
+def test_escaped_delimiter_does_not_end_a_multiline_string() -> None:
+    """An escaped triple quote inside a basic multiline string isn't its end."""
+    text = '[t]\ndescription = """\nQuote: \\"""\nname = "inside the string"\n"""\nname = "real"\n'
+    index = SourceIndex.from_text(text)
+
+    assert index.find(("t", "name")) == 6
+    assert index.spans[("t", "description")] == (2, 5)
+
+
+def test_escaped_backslash_before_delimiter_still_ends_the_string() -> None:
+    """An escaped backslash followed by a triple quote ends the string."""
+    text = '[t]\ndescription = """\nPath: C:\\\\"""\nname = "real"\n'
+
+    assert SourceIndex.from_text(text).find(("t", "name")) == 4
+
+
+def test_comments_in_arrays_are_not_items() -> None:
+    """A quoted name in a comment doesn't match; a name found only in a comment falls back to the key."""
+    text = '[t]\nrequired_fields = [\n    # was "user_name", "user_id"\n    "user_name",\n]\n'
+    index = SourceIndex.from_text(text)
+
+    assert index.find(("t", "required_fields", "user_name")) == 4
+    assert index.find(("t", "required_fields", "user_id")) == 2
+
+
 @pytest.mark.parametrize(
     ("entry_key", "file"),
     [
