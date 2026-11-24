@@ -78,9 +78,15 @@ def _load_script_config(config_dir: Path) -> Dict[str, Any]:
     return script_config
 
 
-def _ensure_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
+def build_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
+    '''Return the build's output directory: the configured global output_dir, or
+    build/sdm_artifacts, resolved against the repository root.'''
     output_subdir = script_config.get('global', {}).get('output_dir') or 'build/sdm_artifacts'
-    output_dir = repo_dir / Path(output_subdir)
+    return repo_dir / Path(output_subdir)
+
+
+def _ensure_output_dir(repo_dir: Path, script_config: Dict[str, Any]) -> Path:
+    output_dir = build_output_dir(repo_dir, script_config)
 
     output_dir.mkdir(parents=True, exist_ok=True)
 

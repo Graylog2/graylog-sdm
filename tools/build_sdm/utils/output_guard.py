@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-__all__ = ["MARKER_NAME", "UnsafeOutputDirError", "check_output_dir", "mark_output_dir"]
+__all__ = ["MARKER_NAME", "UnsafeOutputDirError", "check_output_dir", "mark_output_dir", "paths_overlap"]
 
 MARKER_NAME = ".build-sdm-output"
 
@@ -46,6 +46,16 @@ def check_output_dir(directory: Path, force: bool = False) -> bool:
         "build-sdm didn't write, which the build would overwrite. Use an empty directory, "
         "or pass --force to write there anyway."
     )
+
+
+def paths_overlap(a: Path, b: Path) -> bool:
+    """Return True if a and b are the same directory or one contains the other.
+
+    Args:
+        a: An absolute, resolved path.
+        b: An absolute, resolved path.
+    """
+    return a == b or a in b.parents or b in a.parents
 
 
 def mark_output_dir(directory: Path) -> None:

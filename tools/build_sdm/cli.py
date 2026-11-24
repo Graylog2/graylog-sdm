@@ -11,8 +11,8 @@ from typing import Any
 from build_sdm.check_generated import compare_trees, format_diff
 from build_sdm.config_loader import load_script_config_files
 from build_sdm.rules import Violation
-from build_sdm.runner import run_build
-from build_sdm.utils.output_guard import UnsafeOutputDirError, check_output_dir
+from build_sdm.runner import build_output_dir, run_build
+from build_sdm.utils.output_guard import UnsafeOutputDirError, check_output_dir, paths_overlap
 from build_sdm.utils.paths import find_repo_root
 from build_sdm.validate import (
     BaseRefError,
@@ -193,8 +193,22 @@ def _cmd_build(args: argparse.Namespace) -> int:
         # Check early, so an unsafe PATH fails before the source loads. The runner checks
         # again just before MadCap writes, and only then marks a new or empty directory, so
         # a forced write into existing content never makes it look like build-sdm output.
+        script_config = _script_config(config_dir)
+        if script_config is None:
+            return 1
         try:
             madcap_dir = args.madcap_output_dir.resolve()
+            output_root = build_output_dir(find_repo_root(), script_config).resolve()
+            # The other plugins write under output_root, so an overlapping PATH would mix
+            # their output with the MadCap pages. --force doesn't apply: it's a config conflict.
+            if paths_overlap(madcap_dir, output_root):
+                logger.fatal(
+                    "--madcap-output-dir %s overlaps the build's output directory %s, where the "
+                    "other plugins write. Choose a path outside it.",
+                    madcap_dir,
+                    output_root,
+                )
+                return 1
             check_output_dir(madcap_dir, force=args.force)
         except UnsafeOutputDirError as e:
             logger.fatal("%s", e)
