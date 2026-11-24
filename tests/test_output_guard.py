@@ -1,5 +1,6 @@
 """--madcap-output-dir refuses to overwrite a non-empty directory build-sdm didn't write (F4)."""
 
+import os
 import shutil
 from pathlib import Path
 
@@ -126,6 +127,53 @@ def test_dry_run_checks_but_writes_no_marker(tmp_path: Path, config_dir: Path) -
     assert _build(config_dir, unsafe, "--dry-run") == 1
     assert _build(config_dir, safe, "--dry-run") == 0
     assert not safe.exists()
+
+
+def test_disabled_madcap_leaves_no_marker(tmp_path: Path, config_dir: Path) -> None:
+    """With the MadCap plugin disabled, the build writes nothing to PATH, marker included."""
+    madcap_config = config_dir / "madcap_html_output.toml"
+    madcap_config.write_text(
+        madcap_config.read_text(encoding="utf-8").replace("enabled = 1", "enabled = 0"),
+        encoding="utf-8",
+    )
+    target = tmp_path / "new"
+
+    assert _build(config_dir, target) == 0
+
+    assert not (target / MARKER_NAME).exists()
+
+
+def test_failure_before_generation_leaves_no_marker(tmp_path: Path, config_dir: Path) -> None:
+    """A build that fails while loading the source never marks PATH."""
+    (config_dir / "build_sdm.toml").write_text(
+        f'[global]\nsdm_source_dir = "does/not/exist"\noutput_dir = "{(tmp_path / "out").as_posix()}"\n',
+        encoding="utf-8",
+    )
+    target = tmp_path / "new"
+
+    assert _build(config_dir, target) == 1
+
+    assert not (target / MARKER_NAME).exists()
+
+
+def test_path_under_a_file_fails_cleanly(tmp_path: Path, config_dir: Path) -> None:
+    """A PATH whose parent is a regular file exits 1 instead of raising."""
+    parent = tmp_path / "file"
+    parent.write_text("x", encoding="utf-8")
+
+    assert _build(config_dir, parent / "sub") == 1
+
+
+@pytest.mark.skipif(os.geteuid() == 0, reason="root can list unreadable directories")
+def test_unreadable_dir_fails_cleanly(tmp_path: Path, config_dir: Path) -> None:
+    """A PATH the build can't list exits 1 instead of raising."""
+    target = tmp_path / "locked"
+    target.mkdir()
+    target.chmod(0)
+    try:
+        assert _build(config_dir, target) == 1
+    finally:
+        target.chmod(0o755)
 
 
 def test_force_without_madcap_output_dir_is_an_error(config_dir: Path) -> None:
