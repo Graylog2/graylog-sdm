@@ -3,13 +3,13 @@ import logging
 import importlib
 import pkgutil
 from pathlib import Path
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Optional
 
 from build_sdm.config_loader import load_gim_config_files, load_script_config_files
 from build_sdm.gim_schema.field_types import validate_field_types
 from build_sdm.gim_schema.sub_fields import validate_applies_to
 from build_sdm.plugin_loader import load_plugins_with_config
-from build_sdm.utils.output_guard import mark_output_dir
+from build_sdm.utils.output_guard import check_output_dir, mark_output_dir
 from build_sdm.utils.serialization import to_serializable
 from build_sdm.utils.transform import restructure_gim_config
 from build_sdm import output_plugins
@@ -23,7 +23,7 @@ def run_build(
         dry_run: bool = False,
         output_dir_overrides: Optional[Dict[str, Path]] = None,
         output_root: Optional[Path] = None,
-        marked_plugins: Optional[Set[str]] = None
+        guarded_plugins: Optional[Dict[str, bool]] = None
     ) -> None:
     '''
     Main entry point for building GIM documentation and artifacts.
@@ -36,9 +36,13 @@ def run_build(
             flag). Takes precedence over the plugin's configured and default directory.
         output_root: Replaces the configured global output_dir (e.g. a temporary
             directory, so a check build doesn't touch build/).
-        marked_plugins: Plugin class names whose output directory gets the build-sdm
-            marker just before the plugin generates. A disabled plugin, a dry run, or a
-            failure before generation leaves no marker.
+        guarded_plugins: Plugin class name -> force, for plugins whose output directory is
+            checked with check_output_dir immediately before the plugin generates, then
+            marked if it was new or empty. A disabled plugin, a dry run, or a failure before
+            generation leaves no marker.
+
+    Raises:
+        UnsafeOutputDirError: A guarded directory gained files build-sdm didn't write.
     '''
     _scan_and_import_plugins()
     script_config = _load_script_config(config_dir)
@@ -55,7 +59,7 @@ def run_build(
         dry_run=dry_run,
         repo_dir=repo_dir,
         output_dir_overrides=output_dir_overrides,
-        marked_plugins=marked_plugins
+        guarded_plugins=guarded_plugins
     )
 
 # --- Helper functions below ---
@@ -152,7 +156,7 @@ def _run_plugins(
         dry_run: bool=False,
         repo_dir: Optional[Path] = None,
         output_dir_overrides: Optional[Dict[str, Path]] = None,
-        marked_plugins: Optional[Set[str]] = None
+        guarded_plugins: Optional[Dict[str, bool]] = None
     ) -> None:
     logger.debug('Scanning and loading output plugin modules')
     plugins = load_plugins_with_config(script_config['plugins'], mode='default_only')
@@ -168,8 +172,12 @@ def _run_plugins(
                 plugin.__class__.__name__, plugin_output_dir
                 )
         else:
+            # Check again right before writing: the directory may have changed since the
+            # CLI's early check, while the source was loading.
+            force = (guarded_plugins or {}).get(plugin.__class__.__name__)
+            mark = force is not None and check_output_dir(plugin_output_dir, force=force)
             plugin_output_dir.mkdir(parents=True, exist_ok=True)
-            if plugin.__class__.__name__ in (marked_plugins or set()):
+            if mark:
                 mark_output_dir(plugin_output_dir)
 
             plugin.generate(

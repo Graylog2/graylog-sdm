@@ -188,23 +188,22 @@ def _cmd_build(args: argparse.Namespace) -> int:
         return 1
 
     overrides = {}
-    marked_plugins = set()
+    guarded_plugins = {}
     if args.madcap_output_dir is not None:
+        # Check early, so an unsafe PATH fails before the source loads. The runner checks
+        # again just before MadCap writes, and only then marks a new or empty directory, so
+        # a forced write into existing content never makes it look like build-sdm output.
         try:
             madcap_dir = args.madcap_output_dir.resolve()
-            mark = check_output_dir(madcap_dir, force=args.force)
+            check_output_dir(madcap_dir, force=args.force)
         except UnsafeOutputDirError as e:
             logger.fatal("%s", e)
             return 1
         except OSError as e:
             _log_failure(e)
             return 1
-        # Mark only directories the build is about to fill from empty, so a forced write
-        # into existing content never makes that content look like build-sdm output. The
-        # runner writes the marker just before MadCap generates, not if the build fails first.
-        if mark:
-            marked_plugins.add(MADCAP_PLUGIN)
         overrides[MADCAP_PLUGIN] = madcap_dir
+        guarded_plugins[MADCAP_PLUGIN] = args.force
 
     try:
         run_build(
@@ -212,8 +211,12 @@ def _cmd_build(args: argparse.Namespace) -> int:
             config_dir,
             dry_run=args.dry_run,
             output_dir_overrides=overrides,
-            marked_plugins=marked_plugins,
+            guarded_plugins=guarded_plugins,
         )
+    except UnsafeOutputDirError as e:
+        # PATH changed after the early check: report it like the early check does.
+        logger.fatal("%s", e)
+        return 1
     except Exception as e:
         # Plugin and loader failures are fatal (ADR 0002); this is the one place they are logged.
         _log_failure(e)
