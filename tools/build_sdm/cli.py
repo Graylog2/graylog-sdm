@@ -12,6 +12,7 @@ from build_sdm.check_generated import compare_trees, format_diff
 from build_sdm.config_loader import load_script_config_files
 from build_sdm.rules import Violation
 from build_sdm.runner import run_build
+from build_sdm.utils.output_guard import UnsafeOutputDirError, check_output_dir, mark_output_dir
 from build_sdm.utils.paths import find_repo_root
 from build_sdm.validate import (
     BaseRefError,
@@ -78,7 +79,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="PATH",
         help="Write the MadCap HTML only to PATH (relative paths resolve against the current "
-        "directory). Overrides the MadCap plugin's output_dir config.",
+        "directory). Overrides the MadCap plugin's output_dir config. PATH must be empty, new, "
+        "or hold the .build-sdm-output marker from an earlier build, unless --force is given.",
+    )
+    build.add_argument(
+        "--force",
+        action="store_true",
+        help="Write to a non-empty --madcap-output-dir that has no .build-sdm-output marker, "
+        "overwriting files with the same names",
     )
 
     check = subparsers.add_parser(
@@ -175,9 +183,23 @@ def _cmd_build(args: argparse.Namespace) -> int:
     if config_dir is None:
         return 1
 
+    if args.force and args.madcap_output_dir is None:
+        logger.fatal("--force only applies to --madcap-output-dir")
+        return 1
+
     overrides = {}
     if args.madcap_output_dir is not None:
-        overrides[MADCAP_PLUGIN] = args.madcap_output_dir.resolve()
+        madcap_dir = args.madcap_output_dir.resolve()
+        try:
+            mark = check_output_dir(madcap_dir, force=args.force)
+        except UnsafeOutputDirError as e:
+            logger.fatal("%s", e)
+            return 1
+        # Mark only directories the build is about to fill from empty, so a forced write
+        # into existing content never makes that content look like build-sdm output.
+        if mark and not args.dry_run:
+            mark_output_dir(madcap_dir)
+        overrides[MADCAP_PLUGIN] = madcap_dir
 
     try:
         run_build(find_repo_root(), config_dir, dry_run=args.dry_run, output_dir_overrides=overrides)

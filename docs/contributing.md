@@ -111,7 +111,7 @@ Run all commands from the repository root.
 | Command | What it does |
 |---|---|
 | `uv run build-sdm build` | Builds every enabled output plugin |
-| `uv run build-sdm build --madcap-output-dir PATH` | Writes the MadCap HTML to `PATH` instead of its configured location |
+| `uv run build-sdm build --madcap-output-dir PATH` | Writes the MadCap HTML to `PATH` instead of its configured location. `PATH` must be new, empty or marked as build-sdm output; `--force` overrides this. |
 | `uv run build-sdm build --dry-run` | Runs the build without writing files |
 | `uv run build-sdm check-generated` | Builds into a temporary directory and compares the MadCap HTML with the committed copy |
 | `uv run build-sdm validate` | Loads the source and runs the lint rules; every violation is an error |
@@ -126,6 +126,10 @@ Every `build-sdm` command also takes `--loglevel` and `--config_dir`.
 
 - The MadCap HTML goes to `generated/MadcapHtmlOutput/` and is committed. This location comes from `output_dir` in `tools/build_sdm/configs/madcap_html_output.toml`, relative to the repository root.
 - `--madcap-output-dir PATH` overrides it, relative to the current directory. The override **replaces** the configured location: the build writes the MadCap HTML only to `PATH`.
+- Because `PATH` may be inside a Flare project, the build refuses to overwrite files it didn't write there:
+  - If `PATH` is new or empty, the build writes a `.build-sdm-output` marker into it, and later builds to the same `PATH` just work.
+  - If `PATH` is not empty and has no marker, the build exits 1 and changes nothing. Pick an empty directory, or pass `--force` to write there anyway; files with the same names as generated pages are overwritten, and other files are left alone. A forced build doesn't add the marker, so each forced build needs `--force` again.
+  - This check covers only `--madcap-output-dir`. The configured location is in the repository, where git shows every change.
 - Without either, the MadCap HTML would go to `build/sdm_artifacts/MadcapHtmlOutput/`, like the other plugins' output.
 - Always commit the regenerated default output with your source change, even if you also build to another location. CI checks that the committed copy is up to date.
 - The build never deletes files. If a change removes a page, `check-generated` reports it as stale and prints the `git rm` command for it.

@@ -32,7 +32,8 @@ uv run build-sdm build
 | `-ll`, `--loglevel` | `debug`, `info`, `warning`, `error`, or `critical` | `info` |
 | `-c`, `--config_dir` | Directory of script config files; a relative path resolves against the current directory | the package's `configs/` |
 | `--dry-run` | Log what each enabled plugin would generate, and where, without writing any files | off |
-| `--madcap-output-dir PATH` | Write the MadCap HTML only to `PATH` (relative to the current directory), instead of its configured location | unset |
+| `--madcap-output-dir PATH` | Write the MadCap HTML only to `PATH` (relative to the current directory), instead of its configured location. `PATH` must be new, empty, or hold the `.build-sdm-output` marker that the build writes into a new or empty `PATH`; otherwise the build exits 1 without writing anything. | unset |
+| `--force` | With `--madcap-output-dir`, write to a non-empty `PATH` that has no marker, overwriting files with the same names. Adds no marker. | off |
 
 Example:
 

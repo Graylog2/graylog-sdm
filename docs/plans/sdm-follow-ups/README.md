@@ -19,7 +19,7 @@ The migration is done (2026-11-20), so each Target below is for the remaining wo
 | F1 | Golden-file tests for all output plugins | High | Partly done | Fixture-based tests before tool refactors (F7 v2, F16) | No |
 | F2 | Compatibility checker + enforced `sdm_version` bump | High | Open | After F8's deprecation fields | Yes: versioning policy |
 | F3 | Minimal CI from PR 2; branch protection now | High | Partly done | Required checks before more data PRs | Yes: required checks |
-| F4 | Safe writes for the MadCap output path | High | Open | Any time | No |
+| F4 | Safe writes for the MadCap output path | High | Done | | No |
 | F5 | Robust violation fingerprints + violation ratchet | Medium | Done | | No |
 | F6 | Correct base ref for push events | Medium | Done | | No |
 | F7 | Check that pydantic v1 works on Python 3.13; schedule v2 | Medium | Partly done | v2 before F9's JSON Schema | Yes: v2 date |
@@ -51,7 +51,7 @@ The F numbers are the order the items were recorded, not the order to work them.
 F14, F16 and F20 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
 
 Suggested order:
-1. Quick, independent fixes: F4, F19.
+1. Quick, independent fixes: F4 (done), F19.
 2. The rest of F3 (required checks), before more data PRs land.
 3. F14, as a data-only PR.
 4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
@@ -120,7 +120,7 @@ Suggested order:
 
 **Done when:** running with `--madcap-output-dir` pointed at a non-empty directory without a marker exits non-zero and changes nothing.
 
-**Status:** open (2026-11-20). Planned for PR 2 but not done: the tool has no marker file and no `--force`. Only step 1 (the check) is complete.
+**Status:** done (2026-11-24). `build --madcap-output-dir` writes only into a new, empty or marked directory; the build marks a new or empty one with `.build-sdm-output`. A non-empty unmarked directory exits 1 before anything is written, unless `--force` is given, and a forced build adds no marker. No manifest was needed, because the build never deletes files. The guard covers only the flag, not the configured in-repo location. `tests/test_output_guard.py` covers the refuse, force, marker and dry-run cases; ADR 0003 records the rule.
 
 ## F5. Robust violation fingerprints and a violation ratchet
 
