@@ -6,6 +6,7 @@ drops positions. A line is for display only; entry_key stays the violation's ide
 """
 
 import re
+import tomllib
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -17,10 +18,12 @@ _PART = r"""(?:[A-Za-z0-9_-]+|"[^"]*"|'[^']*')"""
 _HEADER = re.compile(rf"^\s*(\[\[?)\s*({_PART}(?:\s*\.\s*{_PART})*)\s*\]\]?\s*(?:#.*)?$")
 _KEY = re.compile(rf"^\s*({_PART}(?:\s*\.\s*{_PART})*)\s*=\s*(.*)$")
 _PARTS = re.compile(_PART)
-_QUOTED = re.compile(r""""(?:[^"\\]|\\.)*"|'[^']*'""")
-_SCALAR = re.compile(r"""^"((?:[^"\\]|\\.)*)"|^'([^']*)'""")
+_SCALAR = re.compile(r""""(?:[^"\\]|\\.)*"|'[^']*'""")
 # A string token, or the # that starts a comment (only reached outside strings).
 _TOKEN = re.compile(r""""(?:[^"\\]|\\.)*"|'[^']*'|#""")
+# What matters for an array's extent: multiline string openers first, then single-line
+# strings (skipped), comments (end of line) and brackets.
+_ARRAY_TOKEN = re.compile(r'''"""|\'\'\'|"(?:[^"\\]|\\.)*"|'[^']*'|[#\[\]]''')
 # The end of a multiline string. In a basic string, a """ preceded by an odd number of
 # backslashes is an escaped quote, not the end; literal strings have no escapes.
 _CLOSING = {
@@ -34,9 +37,22 @@ ID_KEYS = ("field_suffix", "template_id", "type")
 KeyPath = tuple[str, ...]
 
 
+def _decode(token: str) -> str | None:
+    """Decode one single-line TOML string token, basic or literal, as TOML would.
+
+    Escapes (unicode escapes included) are decoded in basic strings and kept as text in
+    literal strings. Returns None if the token isn't a valid string.
+    """
+    try:
+        value = tomllib.loads(f"v = {token}")["v"]
+    except tomllib.TOMLDecodeError:
+        return None
+    return value if isinstance(value, str) else None
+
+
 def _split(dotted: str) -> KeyPath:
-    """Split a dotted TOML key or header into its parts, without quotes."""
-    return tuple(p.strip("\"'") for p in _PARTS.findall(dotted))
+    """Split a dotted TOML key or header into its parts, decoding quoted parts."""
+    return tuple(p if p[0] not in "\"'" else (_decode(p) or p[1:-1]) for p in _PARTS.findall(dotted))
 
 
 def _physical_lines(text: str) -> list[str]:
@@ -48,10 +64,40 @@ def _physical_lines(text: str) -> list[str]:
     return [line.removesuffix("\r") for line in text.split("\n")]
 
 
-def _bracket_depth(text: str) -> int:
-    """Return the net count of [ over ] in text, ignoring strings and comments."""
-    code = _QUOTED.sub("", text).split("#", 1)[0]
-    return code.count("[") - code.count("]")
+def _scan_array_line(text: str, depth: int, open_string: str | None) -> tuple[int, str | None]:
+    """Advance an array's bracket depth over one line.
+
+    Brackets count only outside strings and comments. A multiline string can span lines,
+    so its state carries over from one call to the next.
+
+    Args:
+        text: The line, or the rest of the key's line after "=".
+        depth: Bracket depth before the line.
+        open_string: Delimiter of a multiline string still open from an earlier line, if any.
+
+    Returns:
+        (depth, delimiter of a multiline string still open at the end of the line, or None).
+    """
+    pos = 0
+    while True:
+        if open_string is not None:
+            closing = _CLOSING[open_string].search(text[pos:])
+            if closing is None:
+                return depth, open_string
+            pos += closing.end()
+            open_string = None
+            continue
+        token = _ARRAY_TOKEN.search(text, pos)
+        if token is None or token.group() == "#":
+            return depth, None
+        pos = token.end()
+        match token.group():
+            case '"""' | "'''":
+                open_string = token.group()
+            case "[":
+                depth += 1
+            case "]":
+                depth -= 1
 
 
 @dataclass(slots=True)
@@ -110,13 +156,13 @@ class SourceIndex:
                     end = min(i, len(lines))
             elif value.startswith("["):
                 index.array_keys.add(path)
-                depth = _bracket_depth(value)
-                while depth > 0 and i < len(lines):
-                    depth += _bracket_depth(lines[i])
+                depth, open_string = _scan_array_line(value, 0, None)
+                while (depth > 0 or open_string is not None) and i < len(lines):
+                    depth, open_string = _scan_array_line(lines[i], depth, open_string)
                     i += 1
                 end = i if i > number else number
-            elif scalar := _SCALAR.match(value):
-                index.values[path] = scalar.group(1) if scalar.group(1) is not None else scalar.group(2)
+            elif (scalar := _SCALAR.match(value)) and (decoded := _decode(scalar.group())) is not None:
+                index.values[path] = decoded
             index._record(path, number, end)
         return index
 
@@ -143,7 +189,7 @@ class SourceIndex:
             for token in _TOKEN.finditer(line):
                 if token.group() == "#":
                     break
-                if token.group()[1:-1] == item:
+                if _decode(token.group()) == item:
                     return number
         return None
 
