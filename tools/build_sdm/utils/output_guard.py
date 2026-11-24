@@ -11,6 +11,11 @@ _MARKER_TEXT = (
     "Delete this file to stop build-sdm writing here without --force.\n"
 )
 
+# Files the OS file manager adds to directories it shows (macOS Finder, Windows Explorer).
+# The build never writes these names, so they can't be overwritten, and they don't make a
+# directory count as non-empty.
+_OS_METADATA_NAMES = frozenset({".DS_Store", "Thumbs.db", "desktop.ini"})
+
 
 class UnsafeOutputDirError(Exception):
     """Raised when an output directory holds files build-sdm didn't write."""
@@ -20,7 +25,8 @@ def check_output_dir(directory: Path, force: bool = False) -> bool:
     """Check that build output may be written to directory.
 
     A directory is safe when it doesn't exist, is empty, or holds the marker file
-    build-sdm writes into directories it created output in.
+    build-sdm writes into directories it created output in. A directory holding only OS
+    metadata files (.DS_Store, Thumbs.db, desktop.ini) counts as empty.
 
     Args:
         directory: The output directory.
@@ -37,7 +43,7 @@ def check_output_dir(directory: Path, force: bool = False) -> bool:
         return True
     if not directory.is_dir():
         raise UnsafeOutputDirError(f"{directory} exists and is not a directory")
-    if not any(directory.iterdir()):
+    if all(entry.name in _OS_METADATA_NAMES for entry in directory.iterdir()):
         return True
     if (directory / MARKER_NAME).is_file() or force:
         return False

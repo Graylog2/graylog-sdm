@@ -27,6 +27,23 @@ def test_empty_dir_is_safe_and_should_be_marked(tmp_path: Path) -> None:
     assert check_output_dir(tmp_path) is True
 
 
+@pytest.mark.parametrize("name", [".DS_Store", "Thumbs.db", "desktop.ini"])
+def test_dir_holding_only_os_metadata_counts_as_empty(tmp_path: Path, name: str) -> None:
+    """OS metadata files (e.g. the .DS_Store Finder adds) don't make a directory non-empty."""
+    (tmp_path / name).write_bytes(b"\x00")
+
+    assert check_output_dir(tmp_path) is True
+
+
+def test_os_metadata_does_not_hide_other_files(tmp_path: Path) -> None:
+    """A directory with OS metadata and any other file is still refused."""
+    (tmp_path / ".DS_Store").write_bytes(b"\x00")
+    (tmp_path / "hand-written.htm").write_text("keep me", encoding="utf-8")
+
+    with pytest.raises(UnsafeOutputDirError, match="--force"):
+        check_output_dir(tmp_path)
+
+
 def test_marked_dir_is_safe(tmp_path: Path) -> None:
     """A directory holding the marker and earlier output is safe; it is already marked."""
     mark_output_dir(tmp_path)
