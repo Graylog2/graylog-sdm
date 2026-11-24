@@ -75,6 +75,12 @@ def _write_gim(repo: Path, text: str) -> None:
     (repo / GIM_FILE).write_text(text, encoding="utf-8")
 
 
+def _line_of(repo: Path, text: str) -> int:
+    """Return the 1-based line of the first line in the authentication infomodel equal to text."""
+    lines = (repo / GIM_FILE).read_text(encoding="utf-8").splitlines()
+    return lines.index(text) + 1
+
+
 def _commit(repo: Path) -> None:
     """Commit everything in repo."""
     _git(repo, "add", "-A")
@@ -122,7 +128,8 @@ def test_existing_violation_is_a_warning(repo: Path, capsys: pytest.CaptureFixtu
     assert _validate("--base-ref", "HEAD") == 0
 
     out = capsys.readouterr().out
-    assert f"WARNING naming {GIM_FILE} gim:10.05/name:" in out
+    line = _line_of(repo, 'name = "credential validation"')
+    assert f"WARNING naming {GIM_FILE}:{line} gim:10.05/name:" in out
     assert "0 error(s), 1 warning(s)" in out
 
 
@@ -139,7 +146,8 @@ def test_new_bad_name_is_one_error(repo: Path, capsys: pytest.CaptureFixture[str
     assert _validate("--base-ref", "HEAD") == 1
 
     out = capsys.readouterr().out
-    assert f"ERROR naming {GIM_FILE} gim:10.10/name:" in out
+    line = _line_of(repo, 'name = "Bad-Name"')
+    assert f"ERROR naming {GIM_FILE}:{line} gim:10.10/name:" in out
     assert "1 error(s), 1 warning(s)" in out
 
 
@@ -219,7 +227,9 @@ def test_github_annotations_and_step_summary(
 
     assert _validate("--base-ref", "HEAD") == 0
 
-    assert f"::warning file={GIM_FILE},title=naming::gim:10.05/name: " in capsys.readouterr().out
+    line = _line_of(repo, 'name = "credential validation"')
+    out = capsys.readouterr().out
+    assert f"::warning file={GIM_FILE},line={line},title=naming::gim:10.05/name: " in out
     assert "| `naming` | 1 | 1 |" in summary.read_text(encoding="utf-8")
 
 

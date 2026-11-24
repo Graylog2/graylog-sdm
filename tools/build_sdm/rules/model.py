@@ -28,12 +28,15 @@ class Violation:
             GIM entries are keyed by code so a rename keeps the key, e.g. "gim:10.05/name".
         message: What is wrong, for a human.
         file: Repo-relative path of the source file, e.g. "src/sdm/infomodels/10.authentication.toml".
+        line: 1-based line of the entry in file, if it could be located. For display only: it
+            moves whenever lines above it change, so it never affects whether a violation is new.
     """
 
     rule_id: str
     entry_key: str
     message: str
     file: str
+    line: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
