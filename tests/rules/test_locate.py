@@ -205,6 +205,47 @@ def test_comments_in_arrays_are_not_items() -> None:
     assert index.find(("t", "required_fields", "user_id")) == 2
 
 
+def test_brackets_in_a_multiline_string_inside_an_array() -> None:
+    """A [ inside a multiline string in an array doesn't extend the array past its ]."""
+    text = '[t]\nsuccess = [\n    """\n    see [1\n    """,\n]\nname = "x"\n'
+    index = SourceIndex.from_text(text)
+
+    assert index.spans[("t", "success")] == (2, 6)
+    assert index.find(("t", "name")) == 7
+
+
+def test_array_with_a_multiline_string_closing_on_its_opening_line() -> None:
+    """A multiline string that opens and closes on one array line leaves the depth unchanged."""
+    text = '[t]\nsuccess = ["""a [ b""", "c"]\nname = "x"\n'
+
+    assert SourceIndex.from_text(text).find(("t", "name")) == 3
+
+
+def test_escaped_identifier_matches_its_decoded_name() -> None:
+    """A field_suffix written with a unicode escape is matched by the decoded name in the entry_key."""
+    text = (
+        '[user]\nentity_type = "top"\n\n[[user.fields]]\nfield_suffix = "na\\u006de"\ndescription = "Name."\n'
+    )
+
+    assert SourceIndex.from_text(text).find(("user", "fields", "name", "description")) == 6
+
+
+def test_escaped_list_item_matches_its_decoded_name() -> None:
+    """A list item written with a unicode escape is found at its own line, not the array's."""
+    text = '[t]\nrequired_fields = [\n    "user\\u005fname",\n]\n'
+
+    assert SourceIndex.from_text(text).find(("t", "required_fields", "user_name")) == 3
+
+
+def test_literal_strings_are_not_unescaped() -> None:
+    """A literal string keeps escapes as text, so "name" doesn't match it and falls back to the table."""
+    text = "[[t.fields]]\nfield_suffix = 'na\\u006de'\ndescription = \"x\"\n"
+    index = SourceIndex.from_text(text)
+
+    assert index.find(("t", "fields", "na\\u006de", "description")) == 3
+    assert index.find(("t", "fields", "name", "description")) == 1
+
+
 @pytest.mark.parametrize(
     ("entry_key", "file"),
     [
