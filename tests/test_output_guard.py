@@ -3,10 +3,11 @@
 import os
 import shutil
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from build_sdm import cli
+from build_sdm import cli, runner
 from build_sdm.utils.output_guard import (
     MARKER_NAME,
     UnsafeOutputDirError,
@@ -174,6 +175,45 @@ def test_unreadable_dir_fails_cleanly(tmp_path: Path, config_dir: Path) -> None:
         assert _build(config_dir, target) == 1
     finally:
         target.chmod(0o755)
+
+
+def _populate_while_loading(monkeypatch: pytest.MonkeyPatch, target: Path) -> None:
+    """Make the source loader add a hand-written file to target, after the CLI's early check."""
+    load = runner._load_and_transform_gim_config
+
+    def load_then_populate(*args: Any, **kwargs: Any) -> Any:
+        result = load(*args, **kwargs)
+        target.mkdir(parents=True, exist_ok=True)
+        (target / "hand-written.htm").write_text("keep me", encoding="utf-8")
+        return result
+
+    monkeypatch.setattr(runner, "_load_and_transform_gim_config", load_then_populate)
+
+
+def test_dir_populated_after_check_is_refused(
+    tmp_path: Path, config_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A PATH that gains unmarked files after the early check is refused before anything is written."""
+    target = tmp_path / "new"
+    _populate_while_loading(monkeypatch, target)
+
+    assert _build(config_dir, target) == 1
+
+    assert _snapshot(target) == {"hand-written.htm": b"keep me"}
+
+
+def test_dir_populated_after_check_with_force_is_not_marked(
+    tmp_path: Path, config_dir: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """With --force, a PATH that gains files after the early check is written but not marked."""
+    target = tmp_path / "new"
+    _populate_while_loading(monkeypatch, target)
+
+    assert _build(config_dir, target, "--force") == 0
+
+    assert list(target.rglob("*.html"))
+    assert (target / "hand-written.htm").read_text(encoding="utf-8") == "keep me"
+    assert not (target / MARKER_NAME).exists()
 
 
 def test_force_without_madcap_output_dir_is_an_error(config_dir: Path) -> None:
