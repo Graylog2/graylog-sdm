@@ -13,6 +13,7 @@ from build_sdm.utils.output_guard import (
     UnsafeOutputDirError,
     check_output_dir,
     mark_output_dir,
+    paths_overlap,
 )
 
 
@@ -214,6 +215,44 @@ def test_dir_populated_after_check_with_force_is_not_marked(
     assert list(target.rglob("*.html"))
     assert (target / "hand-written.htm").read_text(encoding="utf-8") == "keep me"
     assert not (target / MARKER_NAME).exists()
+
+
+@pytest.mark.parametrize(
+    ("a", "b", "expected"),
+    [
+        ("x", "x", True),
+        ("x", "x/y", True),
+        ("x/y", "x", True),
+        ("x", "y", False),
+        ("x/y", "x/z", False),
+        ("x", "xy", False),
+    ],
+)
+def test_paths_overlap(tmp_path: Path, a: str, b: str, expected: bool) -> None:
+    """Paths overlap when equal or nested; siblings and shared name prefixes don't."""
+    assert paths_overlap(tmp_path / a, tmp_path / b) is expected
+
+
+@pytest.mark.parametrize("relation", ["contains", "equals", "inside"])
+@pytest.mark.parametrize("force", [False, True])
+def test_path_overlapping_build_output_is_refused_before_writing(
+    tmp_path: Path, config_dir: Path, relation: str, force: bool
+) -> None:
+    """A PATH that contains, equals or sits inside the build's output dir exits 1, even with --force."""
+    build_output = (tmp_path / "build" / "sdm_artifacts").as_posix()
+    (config_dir / "build_sdm.toml").write_text(
+        f'[global]\nsdm_source_dir = "src/sdm"\noutput_dir = "{build_output}"\n',
+        encoding="utf-8",
+    )
+    target = {
+        "contains": tmp_path / "build",
+        "equals": tmp_path / "build" / "sdm_artifacts",
+        "inside": tmp_path / "build" / "sdm_artifacts" / "madcap",
+    }[relation]
+
+    assert _build(config_dir, target, *(["--force"] if force else [])) == 1
+
+    assert not (tmp_path / "build").exists()
 
 
 def test_force_without_madcap_output_dir_is_an_error(config_dir: Path) -> None:

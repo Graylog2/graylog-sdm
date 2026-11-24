@@ -129,6 +129,7 @@ Every `build-sdm` command also takes `--loglevel` and `--config_dir`.
 - Because `PATH` may be inside a Flare project, the build refuses to overwrite files it didn't write there:
   - If `PATH` is new or empty, the build writes a `.build-sdm-output` marker into it, and later builds to the same `PATH` just work.
   - If `PATH` is not empty and has no marker, the build exits 1 and changes nothing. Pick an empty directory, or pass `--force` to write there anyway; files with the same names as generated pages are overwritten, and other files are left alone. A forced build doesn't add the marker, so each forced build needs `--force` again.
+  - `PATH` can't be, contain, or sit inside the build's output directory (`build/sdm_artifacts/` by default), where the other plugins write. The build exits 1 before writing anything, even with `--force`.
   - This check covers only `--madcap-output-dir`. The configured location is in the repository, where git shows every change.
 - Without either, the MadCap HTML would go to `build/sdm_artifacts/MadcapHtmlOutput/`, like the other plugins' output.
 - Always commit the regenerated default output with your source change, even if you also build to another location. CI checks that the committed copy is up to date.
