@@ -223,3 +223,10 @@ __marimo__/
 .claude/settings.local.json
 .claude/.cc-writes/
 CLAUDE.local.md
+
+# MadCap Flare
+**/Output/
+**/Analyzer/
+**/Project/Users/
+**/SourceControl/
+*.mccache
