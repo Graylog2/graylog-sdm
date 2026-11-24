@@ -34,7 +34,7 @@ The migration is done (2026-11-20), so each Target below is for the remaining wo
 | F16 | Per-entity MadCap config is keyed by module path, so `alert.toml`'s block is ignored | Medium | Open | Any time | Yes: key format |
 | F17 | Decide whether to narrow `allowed_field_types` | Low | Open | After F2's versioning policy | Yes: SDM change policy |
 | F18 | Log build errors once, at the CLI, instead of at every layer | Low | Done | | No |
-| F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | Open | Any time | No |
+| F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | Done | | No |
 | F20 | MadCap pages link resources at two different depths | Low | Open | Any time | Yes: Flare project layout |
 
 ## Order and dependencies
@@ -51,7 +51,7 @@ The F numbers are the order the items were recorded, not the order to work them.
 F14, F16 and F20 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
 
 Suggested order:
-1. Quick, independent fixes: F4, F19.
+1. Quick, independent fixes: F4, F19 (done).
 2. The rest of F3 (required checks), before more data PRs land.
 3. F14, as a data-only PR.
 4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
@@ -315,6 +315,8 @@ Raised during the PR 2 review.
 - Tests: a violation in a subcategory, an event type, and a schema field each get the right line; an entry that can't be located gets none.
 
 **Decision needed:** none.
+
+**Status:** done (2026-11-24). `build_sdm/rules/locate.py` indexes each source file's tables, dotted keys, array-of-table elements (matched by `field_suffix`, `template_id` or `type`) and list items, skipping multiline strings, then resolves each `entry_key` to a line. An attribute with no line of its own, such as a subcategory's code, resolves to its table header. The text report shows `file:line` and annotations get `line=`. All 211 violations on `main` at the time were located. `tests/rules/test_locate.py` covers each entry shape, the fallbacks, unlocatable entries, and that a moved line keeps a violation existing.
 
 ## F20. MadCap pages link resources at two different depths
 

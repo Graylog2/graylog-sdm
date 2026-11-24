@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from build_sdm.rules import RULES, SdmModel, Violation, run_rules
+from build_sdm.rules.locate import add_lines
 from build_sdm.runner import _load_and_transform_gim_config
 
 __all__ = [
@@ -97,12 +98,13 @@ def check_tree(repo_dir: Path, source_dir: str = "src/sdm") -> list[Violation]:
         source_dir: SDM source directory relative to repo_dir.
 
     Returns:
-        The sorted violations.
+        The sorted violations, each with its source line where it can be located.
 
     Raises:
         StructuralError: If the source fails to load.
     """
-    return run_rules(load_model(repo_dir, source_dir))
+    model = load_model(repo_dir, source_dir)
+    return add_lines(run_rules(model), model, repo_dir)
 
 
 def _git(repo_root: Path, *args: str) -> subprocess.CompletedProcess[bytes]:
@@ -196,9 +198,14 @@ def compare(
     )
 
 
+def _location(v: Violation) -> str:
+    """Return "file:line", or just the file when the line is unknown."""
+    return v.file if v.line is None else f"{v.file}:{v.line}"
+
+
 def _line(level: str, v: Violation) -> str:
-    """Format one violation as "LEVEL rule_id file entry_key: message"."""
-    return f"{level} {v.rule_id} {v.file} {v.entry_key}: {v.message}"
+    """Format one violation as "LEVEL rule_id file[:line] entry_key: message"."""
+    return f"{level} {v.rule_id} {_location(v)} {v.entry_key}: {v.message}"
 
 
 def format_report(result: Comparison, base_ref: str | None) -> list[str]:
@@ -245,11 +252,20 @@ def _escape(value: str, *, prop: bool = False) -> str:
     return value
 
 
+def _annotation_props(v: Violation) -> str:
+    """Return the file, line (when known) and title properties of an annotation."""
+    line = "" if v.line is None else f",line={v.line}"
+    return f"file={_escape(v.file, prop=True)}{line},title={_escape(v.rule_id, prop=True)}"
+
+
 def format_github_annotations(result: Comparison) -> list[str]:
-    """Format errors and warnings as GitHub Actions ::error/::warning annotations."""
+    """Format errors and warnings as GitHub Actions ::error/::warning annotations.
+
+    An annotation with a line shows inline in the PR diff; one without shows only on the
+    Checks tab.
+    """
     return [
-        f"::{level} file={_escape(v.file, prop=True)},title={_escape(v.rule_id, prop=True)}::"
-        f"{_escape(f'{v.entry_key}: {v.message}')}"
+        f"::{level} {_annotation_props(v)}::{_escape(f'{v.entry_key}: {v.message}')}"
         for level, violations in (("warning", result.warnings), ("error", result.errors))
         for v in violations
     ]
