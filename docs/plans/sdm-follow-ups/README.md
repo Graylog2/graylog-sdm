@@ -51,7 +51,7 @@ The F numbers are the order the items were recorded, not the order to work them.
 F14, F16 and F20 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
 
 Suggested order:
-1. Quick, independent fixes: F4 (done), F19.
+1. Quick, independent fixes: F4, F19.
 2. The rest of F3 (required checks), before more data PRs land.
 3. F14, as a data-only PR.
 4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
