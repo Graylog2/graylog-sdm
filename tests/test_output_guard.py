@@ -255,6 +255,18 @@ def test_path_overlapping_build_output_is_refused_before_writing(
     assert not (tmp_path / "build").exists()
 
 
+def test_malformed_build_output_dir_fails_cleanly(tmp_path: Path, config_dir: Path) -> None:
+    """A non-string global output_dir exits 1 instead of raising, and writes nothing to PATH."""
+    (config_dir / "build_sdm.toml").write_text(
+        '[global]\nsdm_source_dir = "src/sdm"\noutput_dir = 123\n', encoding="utf-8"
+    )
+    target = tmp_path / "new"
+
+    assert _build(config_dir, target) == 1
+
+    assert not target.exists()
+
+
 def test_force_without_madcap_output_dir_is_an_error(config_dir: Path) -> None:
     """--force on its own is rejected rather than silently ignored."""
     assert cli.main(["build", "-c", str(config_dir), "-ll", "error", "--force"]) == 1

@@ -213,7 +213,8 @@ def _cmd_build(args: argparse.Namespace) -> int:
         except UnsafeOutputDirError as e:
             logger.fatal("%s", e)
             return 1
-        except OSError as e:
+        except Exception as e:
+            # Filesystem errors, or a malformed global output_dir: fail like the build does.
             _log_failure(e)
             return 1
         overrides[MADCAP_PLUGIN] = madcap_dir
