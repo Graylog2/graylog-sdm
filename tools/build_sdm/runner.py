@@ -3,12 +3,13 @@ import logging
 import importlib
 import pkgutil
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Set
 
 from build_sdm.config_loader import load_gim_config_files, load_script_config_files
 from build_sdm.gim_schema.field_types import validate_field_types
 from build_sdm.gim_schema.sub_fields import validate_applies_to
 from build_sdm.plugin_loader import load_plugins_with_config
+from build_sdm.utils.output_guard import mark_output_dir
 from build_sdm.utils.serialization import to_serializable
 from build_sdm.utils.transform import restructure_gim_config
 from build_sdm import output_plugins
@@ -21,7 +22,8 @@ def run_build(
         config_dir: Path,
         dry_run: bool = False,
         output_dir_overrides: Optional[Dict[str, Path]] = None,
-        output_root: Optional[Path] = None
+        output_root: Optional[Path] = None,
+        marked_plugins: Optional[Set[str]] = None
     ) -> None:
     '''
     Main entry point for building GIM documentation and artifacts.
@@ -34,6 +36,9 @@ def run_build(
             flag). Takes precedence over the plugin's configured and default directory.
         output_root: Replaces the configured global output_dir (e.g. a temporary
             directory, so a check build doesn't touch build/).
+        marked_plugins: Plugin class names whose output directory gets the build-sdm
+            marker just before the plugin generates. A disabled plugin, a dry run, or a
+            failure before generation leaves no marker.
     '''
     _scan_and_import_plugins()
     script_config = _load_script_config(config_dir)
@@ -49,7 +54,8 @@ def run_build(
         output_dir,
         dry_run=dry_run,
         repo_dir=repo_dir,
-        output_dir_overrides=output_dir_overrides
+        output_dir_overrides=output_dir_overrides,
+        marked_plugins=marked_plugins
     )
 
 # --- Helper functions below ---
@@ -145,7 +151,8 @@ def _run_plugins(
         output_dir: Path,
         dry_run: bool=False,
         repo_dir: Optional[Path] = None,
-        output_dir_overrides: Optional[Dict[str, Path]] = None
+        output_dir_overrides: Optional[Dict[str, Path]] = None,
+        marked_plugins: Optional[Set[str]] = None
     ) -> None:
     logger.debug('Scanning and loading output plugin modules')
     plugins = load_plugins_with_config(script_config['plugins'], mode='default_only')
@@ -162,6 +169,8 @@ def _run_plugins(
                 )
         else:
             plugin_output_dir.mkdir(parents=True, exist_ok=True)
+            if plugin.__class__.__name__ in (marked_plugins or set()):
+                mark_output_dir(plugin_output_dir)
 
             plugin.generate(
                 gim_config,
