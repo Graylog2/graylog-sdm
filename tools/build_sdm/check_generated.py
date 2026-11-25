@@ -45,7 +45,7 @@ def compare_trees(committed: Path, fresh: Path) -> TreeDiff:
     """Compare two directory trees byte for byte, in both directions.
 
     Args:
-        committed: The committed output directory (e.g. generated/MadcapHtmlOutput).
+        committed: The committed output directory (e.g. Content/SDM).
         fresh: A fresh build of the same output.
 
     Returns:

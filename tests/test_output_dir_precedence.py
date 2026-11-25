@@ -98,7 +98,7 @@ def test_build_flag_replaces_configured_dir(
     work = tmp_path / "work"
     work.mkdir()
     monkeypatch.chdir(work)
-    generated = repo_root / "generated" / "MadcapHtmlOutput"
+    generated = repo_root / "Content" / "SDM"
     before = sorted(p.stat().st_mtime_ns for p in generated.rglob("*")) if generated.exists() else []
 
     assert cli.main(["build", "-c", str(config_dir), "-ll", "error", "--madcap-output-dir", "x"]) == 0
