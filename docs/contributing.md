@@ -178,7 +178,7 @@ TOML under `src/sdm/` and `tools/build_sdm/configs/` is formatted with taplo, co
 
 Retargeting a PR to `main` doesn't start a run. Push a commit, or close and reopen the PR.
 
-`data-lint` and `python-qa` must pass before a PR can merge, and the PR's branch must be up to date with `main`. `generated-fresh` isn't required yet (follow-up F3), but don't merge while it fails: rebuild, or for pages Flare changed, update the templates or run `git restore Content/SDM`.
+`data-lint` and `python-qa` must pass before a PR can merge, and the PR's branch must be up to date with `main`. `generated-fresh` isn't required yet (follow-up F3), but don't merge while it fails. Run the fix commands from the job summary (`uv run build-sdm build`, plus `git rm` for any stale file), then commit and push. That also discards pages Flare changed, by overwriting them with the build output. To keep a Flare change instead, update the templates to produce it, then rebuild.
 
 CI tests your PR merged with `main` as it was when the run started, so when another PR merges first, GitHub marks yours out of date. To update it, either:
 
