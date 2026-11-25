@@ -1,6 +1,6 @@
 # 0003. MadCap HTML output
 
-Status: accepted
+Status: accepted; partly superseded by 0007 (output location, delivery to Flare)
 Date: 2026-11-17
 
 ## Context
