@@ -18,7 +18,7 @@ The migration is done (2026-11-20), so each Target below is for the remaining wo
 |---|---|---|---|---|---|
 | F1 | Golden-file tests for all output plugins | High | Partly done | Fixture-based tests before tool refactors (F7 v2, F16) | No |
 | F2 | Compatibility checker + enforced `sdm_version` bump | High | Open | After F8's deprecation fields | Yes: versioning policy |
-| F3 | Minimal CI from PR 2; branch protection now | High | Partly done | Required checks before more data PRs | Yes: required checks |
+| F3 | Minimal CI from PR 2; branch protection now | High | Partly done | `generated-fresh` required after the Flare integration | No |
 | F4 | Safe writes for the MadCap output path | High | Done | | No |
 | F5 | Robust violation fingerprints + violation ratchet | Medium | Done | | No |
 | F6 | Correct base ref for push events | Medium | Done | | No |
@@ -48,11 +48,11 @@ The F numbers are the order the items were recorded, not the order to work them.
 - **F7's v2 migration before F9's JSON Schema**, or plan for rework: v2 changes how JSON Schema is generated from the models. F8's new model fields are also cheaper to write once, after v2.
 - **F1's fixture-based tests before tool refactors** (F7 v2, F16), so behavior changes show up independently of data changes.
 
-F14, F16 and F20 each regenerate `generated/`. They can be worked in parallel, but every PR after the first needs a rebase and a rebuild, so merging them one at a time is simpler.
+F14 and F16 each regenerate `Content/SDM/`. They can be worked in parallel, but the second PR needs a rebase and a rebuild, so merging them one at a time is simpler.
 
 Suggested order:
-1. Quick, independent fixes: F4, F19.
-2. The rest of F3 (required checks), before more data PRs land.
+1. Quick, independent fixes: F4, F19 (done).
+2. The rest of F3 (required checks), before more data PRs land. `data-lint` and `python-qa` are required; `generated-fresh` waits for the Flare integration.
 3. F14, as a data-only PR.
 4. Decisions for the SDM owners: F2's versioning policy, F16's key format, F15, F17, F7's v2 date.
 5. F8 (deprecation fields) → F2 → F9.
@@ -107,6 +107,8 @@ Suggested order:
 **Decision needed:** whether to move CI earlier. This changes the scope of PRs 2 and 4.
 
 **Status:** partly done (2026-11-20). CI wasn't moved earlier; it arrived in PR 4 as planned. A ruleset on `main` already requires a PR with 1 approval and resolved review threads, and blocks force pushes and deletion. Still open: making `data-lint`, `generated-fresh` and `python-qa` required checks, proposed in `docs/proposals/repo-governance.md`.
+
+**Status:** partly done (2026-11-25). The `main` ruleset now requires `data-lint` and `python-qa` (source: GitHub Actions; branches need not be up to date). `generated-fresh` is on hold until the docs team finishes the Flare integration (ADR 0007): until then, Flare is expected to change pages under `Content/SDM/`, and those failures are how the templates get aligned with Flare's format, so they shouldn't block the docs team's PRs. Flare never touches TOML or Python, so the two required checks can't fail because of it. Make `generated-fresh` required when the integration is done, then close F3.
 
 ## F4. Safe writes for the MadCap output path
 
@@ -239,7 +241,7 @@ Suggested order:
 
 **Activity:**
 - After PR 3 lands, run `build-sdm validate` and fix every `ascii-meta` violation in one data PR, with ASCII equivalents (`-` or `--`, `'`, `"`).
-- Regenerate `generated/`; only the affected text changes.
+- Regenerate `Content/SDM/`; only the affected text changes.
 - Classify as additive (no meaning change).
 
 **Done when:** `build-sdm validate` with no base ref reports no `ascii-meta` violations.
@@ -267,7 +269,7 @@ Found while implementing PR 2.
 **Activity:**
 - Decide the key format. The short class name (`MadcapHtmlOutput`) matches the data and survives refactors.
 - Make the plugin read that key (optionally also the module path, with a warning, for a transition).
-- Regenerate `generated/`; the alert entity page changes column order. Update the commented examples to the chosen key.
+- Regenerate `Content/SDM/`; the alert entity page changes column order. Update the commented examples to the chosen key.
 - Add a rule in `build-sdm validate` that flags `plugin_config` keys no plugin recognizes.
 
 **Decision needed:** the key format.
