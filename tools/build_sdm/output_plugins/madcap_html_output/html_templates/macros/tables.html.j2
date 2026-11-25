@@ -1,4 +1,4 @@
-{% macro render_table(columns, rows, table_class="TableStyle-Alternate-Row-Color", resources_path="../../Resources", type="normal", label="Fields List") %}
+{% macro render_table(columns, rows, table_class="TableStyle-Alternate-Row-Color", type="normal", label="Fields List") %}
 {% import "macros/descriptions_mdsf.html.j2" as table_mdsf %}
 {% set table_html %}
 <table cellspacing="21" style="width: 100%; mc-table-style: url('{{ resources_path }}/TableStyles/Alternate-Row-Color.css');" class="{{ table_class }}">

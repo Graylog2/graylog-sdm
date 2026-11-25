@@ -20,6 +20,7 @@ from build_sdm.utils.sanitize import check_string, sanitize_string
 
 from .markdown_ext import InlineCodeClassExtension
 from .models import (
+    DEFAULT_RESOURCES_PATH,
     MadcapHtmlOutputConfig,
     MadcapHtmlOutputPluginConfig,
     MadcapTopLevelConfig,
@@ -76,7 +77,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         plugin_config = self._resolve_plugin_config(plugin_config)
 
         try:
-            self._initialize_jinja_environment()
+            self._initialize_jinja_environment(resources_path=plugin_config.resources_path)
             self._generate_top_level_pages(gim_config, output_dir)
             self._generate_category_pages(gim_config, output_dir)
             self._generate_field_schema_entity_pages(gim_config, output_dir, plugin_config)
@@ -125,7 +126,11 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
             e.add_note(f'in MadCap plugin config for category/entity [{category}]')
             raise
 
-    def _initialize_jinja_environment(self, template_dir: Path | None = None) -> None:
+    def _initialize_jinja_environment(
+        self,
+        template_dir: Path | None = None,
+        resources_path: str = DEFAULT_RESOURCES_PATH
+    ) -> None:
         '''
         Set up the Jinja2 template environment using the plugin's bundled template directory,
         and register any custom filters used in the templates.
@@ -133,6 +138,8 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         Args:
             template_dir: Path to the Jinja2 template directory. When None, defaults to
                 the html_templates/ directory bundled with this plugin.
+            resources_path: Path from a generated page to the Flare Resources/ folder. Every
+                template and macro reads it as the global resources_path.
         '''
         if template_dir is None:
             template_dir = Path(__file__).parent / 'html_templates'
@@ -149,6 +156,7 @@ class MadcapHtmlOutput(OutputPlugin[MadcapHtmlOutputConfig]):
         env.filters['markdown'] = self._render_markdown
         env.filters['regex_replace'] = self._regex_replace_filter
         env.filters['indent_lists'] = self._indent_list_items
+        env.globals['resources_path'] = resources_path
 
         self._env = env
 

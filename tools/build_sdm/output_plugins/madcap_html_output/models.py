@@ -1,5 +1,9 @@
-from pydantic import BaseModel, Field, Extra, StrictStr, constr
+from pydantic import BaseModel, Field, Extra, StrictStr, constr, validator
 from typing import Optional, Dict, List
+
+# Where generated pages find the Flare project's Content/Resources/ folder (ADR 0007): every
+# page sits one directory below the output root, which is Content/SDM/.
+DEFAULT_RESOURCES_PATH = '../../Resources'
 
 # Allow only letters, digits, and underscores
 SafeSubdir = Optional[constr(regex=r'^[A-Za-z0-9_ ]+$')]
@@ -24,6 +28,11 @@ class MadcapHtmlOutputConfig(BaseModel):
                     '<output_dir>/MadcapHtmlOutput/; a relative path resolves against the '
                     'repository root. The build-sdm --madcap-output-dir flag overrides it.'
     )
+    resources_path: StrictStr = Field(
+        DEFAULT_RESOURCES_PATH,
+        description='Path from a generated page to the Flare Resources/ folder, used for every '
+                    'stylesheet and table-style link. Relative, with forward slashes.'
+    )
     default_field_columns: Optional[List[str]] = Field(
         default_factory=lambda: ['field_suffix', 'field_type', 'description', 'example_values'],
         description='Default column order for rendering field rows in entity templates'
@@ -32,6 +41,15 @@ class MadcapHtmlOutputConfig(BaseModel):
         default_factory=lambda: ['field', 'field_type', 'description', 'example_values'],
         description='Default column order for rendering the sub-fields table on entity templates'
     )
+
+    @validator('resources_path')
+    def _relative_resources_path(cls, value: str) -> str:
+        '''
+        Require a relative, forward-slash path; drop any trailing slash.
+        '''
+        if not value or value.startswith('/') or '\\' in value or ':' in value:
+            raise ValueError('resources_path must be a relative path with forward slashes')
+        return value.rstrip('/')
 
 
 class MadcapHtmlOutputPluginConfig(BaseModel):

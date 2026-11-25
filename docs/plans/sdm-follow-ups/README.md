@@ -35,7 +35,7 @@ The migration is done (2026-11-20), so each Target below is for the remaining wo
 | F17 | Decide whether to narrow `allowed_field_types` | Low | Open | After F2's versioning policy | Yes: SDM change policy |
 | F18 | Log build errors once, at the CLI, instead of at every layer | Low | Done | | No |
 | F19 | Line numbers for `validate` violations, so annotations show inline in PR diffs | Low | Done | | No |
-| F20 | MadCap pages link resources at two different depths | Low | Open | Any time | Yes: Flare project layout |
+| F20 | MadCap pages link resources at two different depths | Low | Done | | No |
 
 ## Order and dependencies
 
@@ -332,3 +332,5 @@ At most one depth can be right for a given Flare project, so either the category
 - Regenerate `generated/` and record the layout in ADR 0003.
 
 **Decision needed:** the Flare project layout, from whoever maintains the Flare project.
+
+**Status:** done (2026-11-25). The Flare project moved into this repo (PR #14), and ADR 0007 puts the generated pages in `Content/SDM/`, one directory below it, so every page links `../../Resources`. `MadcapHtmlOutputConfig.resources_path` (default `../../Resources`, also set in `configs/madcap_html_output.toml`) is a Jinja global that every template and `render_table` read; the per-template settings are gone. Only the 21 category pages changed in the output. `tests/output_madcap/test_madcap_resource_links.py` checks that every stylesheet reference uses the configured path.
