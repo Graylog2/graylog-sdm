@@ -68,13 +68,33 @@ def test_configured_resources_path_is_used_everywhere(tmp_path: Path, gim_config
     }
 
 
+@pytest.mark.parametrize("value", ["../../Resources", "Resources", "../Shared Files/Resources_v2.1"])
+def test_resources_path_accepts_safe_relative_paths(value: str) -> None:
+    """Relative paths of letters, digits, '.', '_', '-' and spaces are accepted unchanged."""
+    assert MadcapHtmlOutputConfig(resources_path=value).resources_path == value
+
+
 def test_resources_path_trailing_slash_is_dropped() -> None:
     """A trailing slash is dropped, so links never contain '//'."""
     assert MadcapHtmlOutputConfig(resources_path="../Resources/").resources_path == "../Resources"
 
 
-@pytest.mark.parametrize("value", ["", "/Resources", "..\\Resources", "C:/Resources"])
-def test_resources_path_must_be_relative_with_forward_slashes(value: str) -> None:
-    """An empty, absolute, drive-letter or backslash path is rejected."""
+@pytest.mark.parametrize(
+    "value",
+    [
+        "",
+        "/Resources",
+        "..\\Resources",
+        "C:/Resources",
+        "..//Resources",
+        "../../R&D/Resources",
+        "../../It's/Resources",
+        '../../"Resources"',
+        "../../<Resources>",
+        "../../Re%20sources",
+    ],
+)
+def test_resources_path_must_be_relative_with_safe_characters(value: str) -> None:
+    """Empty, absolute, drive-letter, backslash and markup-breaking paths are rejected."""
     with pytest.raises(ValidationError):
         MadcapHtmlOutputConfig(resources_path=value)

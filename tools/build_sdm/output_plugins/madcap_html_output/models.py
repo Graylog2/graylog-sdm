@@ -1,9 +1,16 @@
+import re
+
 from pydantic import BaseModel, Field, Extra, StrictStr, constr, validator
 from typing import Optional, Dict, List
 
 # Where generated pages find the Flare project's Content/Resources/ folder (ADR 0007): every
 # page sits one directory below the output root, which is Content/SDM/.
 DEFAULT_RESOURCES_PATH = '../../Resources'
+
+# resources_path is inserted verbatim into href attributes and single-quoted CSS url()s, and the
+# .j2 templates aren't autoescaped. Allow only '/'-separated segments of letters, digits, '.',
+# '_', '-' and spaces, so no value can break the markup (no '&', quotes, '<', '%', backslash or ':').
+_RESOURCES_PATH_PATTERN = re.compile(r'[A-Za-z0-9._ -]+(?:/[A-Za-z0-9._ -]+)*/?')
 
 # Allow only letters, digits, and underscores
 SafeSubdir = Optional[constr(regex=r'^[A-Za-z0-9_ ]+$')]
@@ -31,7 +38,8 @@ class MadcapHtmlOutputConfig(BaseModel):
     resources_path: StrictStr = Field(
         DEFAULT_RESOURCES_PATH,
         description='Path from a generated page to the Flare Resources/ folder, used for every '
-                    'stylesheet and table-style link. Relative, with forward slashes.'
+                    'stylesheet and table-style link. Relative, with forward slashes; letters, digits, '
+                    '".", "_", "-" and spaces only.'
     )
     default_field_columns: Optional[List[str]] = Field(
         default_factory=lambda: ['field_suffix', 'field_type', 'description', 'example_values'],
@@ -45,10 +53,13 @@ class MadcapHtmlOutputConfig(BaseModel):
     @validator('resources_path')
     def _relative_resources_path(cls, value: str) -> str:
         '''
-        Require a relative, forward-slash path; drop any trailing slash.
+        Require a relative, forward-slash path of safe characters; drop any trailing slash.
         '''
-        if not value or value.startswith('/') or '\\' in value or ':' in value:
-            raise ValueError('resources_path must be a relative path with forward slashes')
+        if not _RESOURCES_PATH_PATTERN.fullmatch(value):
+            raise ValueError(
+                "resources_path must be a relative path of '/'-separated segments using only "
+                "letters, digits, '.', '_', '-' and spaces"
+            )
         return value.rstrip('/')
 
 
