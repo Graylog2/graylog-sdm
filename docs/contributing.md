@@ -178,6 +178,8 @@ TOML under `src/sdm/` and `tools/build_sdm/configs/` is formatted with taplo, co
 
 Retargeting a PR to `main` doesn't start a run. Push a commit, or close and reopen the PR.
 
+`data-lint` and `python-qa` must pass before a PR can merge, and the PR's branch must be up to date with `main`. `generated-fresh` isn't required yet, but fix it anyway (follow-up F3). CI tests your PR merged with `main` as it was when the run started, so when another PR merges first, GitHub marks yours out of date: rebase onto `origin/main` and push (or use **Update with rebase** on the PR), and CI runs again against the new `main`.
+
 ## Plans and decisions
 
 - **ADRs** in `docs/decisions/` record lasting decisions and are authoritative. To add one, copy `docs/decisions/0000-template.md` to the next number, fill in `Context`, `Decision` and `Consequences`, and set `Status: accepted` when it's agreed. To change a decision, amend the ADR and say in which PR, or supersede it with a new one.
