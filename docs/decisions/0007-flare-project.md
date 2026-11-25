@@ -13,7 +13,7 @@ The generated pages also linked `Resources/` at two depths (follow-up F20), beca
 - `Content/SDM/` holds only build output. `check-generated` compares the whole directory, so a hand-written file there, or a generated page edited or re-saved in Flare, fails CI. Hand-written topics and Flare resources go elsewhere under `Content/`.
 - Every generated page sits one directory below `Content/SDM/` and links Flare's `Content/Resources/` as `../../Resources`. The plugin takes this from one `resources_path` setting in its config, used by every template and table.
 - Flare project files (`graylog-sdm.flprj`, `Project/`, and `Content/` outside `Content/SDM/`) belong to the docs team and are maintained in Flare.
-- ADR 0003 still applies, except for where the output is committed and its statement that delivery to Flare is out of scope.
+- ADR 0003 still applies, except for where the output is committed and its statement that delivery to Flare is out of scope. ADR 0001's `generated/` directory is no longer used: the only committed build output is `Content/SDM/`.
 
 ## Consequences
 - A source change and the Flare topics it affects land in the same PR, and Flare always builds from current output.

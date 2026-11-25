@@ -15,7 +15,10 @@ CLAUDE.md                      # imports AGENTS.md and .github/copilot-instructi
   copilot-instructions.md      # repo-wide review standards
   instructions/*.instructions.md  # path-scoped review standards
 src/sdm/{infomodels,schema,config}/   # SDM source data
-generated/MadcapHtmlOutput/    # committed build output; never hand-edit
+graylog-sdm.flprj              # MadCap Flare project (docs team)
+Project/                       # Flare project files (docs team)
+Content/                       # Flare topics and resources (docs team)
+  SDM/                         # committed MadCap build output; never hand-edit
 tools/build_sdm/               # build-sdm package; configs/ incl. MadCap plugin config
 tests/
 docs/
@@ -30,7 +33,8 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 ## Source of truth rules
 
 - Edit SDM definitions only under `src/sdm/`. Never "fix" SDM content in a downstream repo.
-- Never hand-edit `generated/`. Regenerate it with `build-sdm build` whenever the source changes, and commit the result with the source change.
+- Never hand-edit `Content/SDM/`. Regenerate it with `build-sdm build` whenever the source changes, and commit the result with the source change. It holds only build output; `check-generated` fails on anything else there.
+- The Flare project (`graylog-sdm.flprj`, `Project/`, and `Content/` outside `Content/SDM/`) belongs to the docs team and is edited in Flare. See ADR 0007.
 
 ## Conventions
 
@@ -51,7 +55,7 @@ build/sdm_artifacts/<Plugin>/  # other plugin output, gitignored
 For file shapes, examples and how to fix each kind of CI failure, see `docs/contributing.md`.
 
 - Set up: `uv sync`
-- Build: `uv run build-sdm build`. Writes `generated/MadcapHtmlOutput/` (committed) and `build/sdm_artifacts/<Plugin>/` (gitignored).
+- Build: `uv run build-sdm build`. Writes `Content/SDM/` (committed) and `build/sdm_artifacts/<Plugin>/` (gitignored).
 - Check generated output is fresh: `uv run build-sdm check-generated`. If it fails, run the fix commands it prints from the repo root: a rebuild, plus `git rm` for each stale file, which the build never deletes.
 - Tests: `uv run pytest`. If a change alters plugin output on purpose, refresh the snapshots with `uv run pytest tests/test_golden_outputs.py --update-golden` and commit `tests/golden/` with the change.
 - Lint and types: `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`

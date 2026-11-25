@@ -1,6 +1,6 @@
 # 0001. Repository layout
 
-Status: accepted
+Status: accepted; partly superseded by 0007 (MadCap output location)
 Date: 2026-11-17
 
 ## Context

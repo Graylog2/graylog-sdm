@@ -45,7 +45,7 @@ Other commands:
 
 | Command | Purpose |
 |---|---|
-| `uv run build-sdm check-generated` | Builds into a temporary directory and compares the MadCap HTML byte for byte with the committed `generated/MadcapHtmlOutput/` (the MadCap plugin's `output_dir`). It exits 1 and lists every changed, stale (no longer built) or missing file. To fix: `rm -rf generated/MadcapHtmlOutput && uv run build-sdm build`, then commit the result. |
+| `uv run build-sdm check-generated` | Builds into a temporary directory and compares the MadCap HTML byte for byte with the committed `Content/SDM/` (the MadCap plugin's `output_dir`). It exits 1 and lists every changed, stale (no longer built) or missing file, and prints the fix: a rebuild, plus `git rm` for each stale file. Commit the result. |
 | `uv run build-sdm validate` | Placeholder until PR 3; it exits 2. |
 
 ## Configuration
@@ -54,7 +54,7 @@ Other commands:
 - **`configs/plugin.config.madcap.toml`** — MadCap presentation config (`type = "config_output_plugin"`), kept here rather than with the SDM data (ADR 0001). Files of this type in the config directory are loaded alongside the source data.
 - **`configs/<plugin_name>.toml`** — one file per output plugin, each with a `[plugin]` table (`name`, `enabled`, plus that plugin's own options). Set `enabled = 0`/`1` to toggle a plugin without touching code. A plugin with no config file falls back to its `enabled_by_default` class attribute.
 
-By default, output is written to `build/sdm_artifacts/<PluginClassName>/` at the repository root. A plugin can choose its own directory through its config, which replaces the default rather than adding a copy. `MadcapHtmlOutput` does this with `output_dir = "generated/MadcapHtmlOutput"` in `configs/madcap_html_output.toml`, a path relative to the repository root. The `--madcap-output-dir` flag takes precedence over that setting.
+By default, output is written to `build/sdm_artifacts/<PluginClassName>/` at the repository root. A plugin can choose its own directory through its config, which replaces the default rather than adding a copy. `MadcapHtmlOutput` does this with `output_dir = "Content/SDM"` in `configs/madcap_html_output.toml`, a path relative to the repository root, inside the Flare project. The `--madcap-output-dir` flag takes precedence over that setting. The same file sets `resources_path`, the path from every page to Flare's `Content/Resources/`; change it together with `output_dir` (ADR 0007).
 
 ## Output plugins
 

@@ -16,7 +16,7 @@ This installs Python 3.13 (from `.python-version`), the tool and its development
 
 Edit SDM data only under `src/sdm/`. After every change:
 
-1. Run `uv run build-sdm build`, and commit the regenerated `generated/MadcapHtmlOutput/` with the source change.
+1. Run `uv run build-sdm build`, and commit the regenerated `Content/SDM/` with the source change.
 2. If the change alters other plugin output (it usually does), refresh the snapshots with `uv run pytest tests/test_golden_outputs.py --update-golden` and commit `tests/golden/` too.
 3. Run `uv run build-sdm validate --base-ref origin/main` and fix anything new it reports.
 4. Classify the change as additive, deprecation or breaking. A rename, removal or type change is breaking and needs an `sdm_version` bump in `src/sdm/config/sdm_version.config.toml`. Never reuse a removed field name or GIM code for a different meaning.
@@ -124,7 +124,8 @@ Every `build-sdm` command also takes `--loglevel` and `--config_dir`.
 
 ### MadCap output
 
-- The MadCap HTML goes to `generated/MadcapHtmlOutput/` and is committed. This location comes from `output_dir` in `tools/build_sdm/configs/madcap_html_output.toml`, relative to the repository root.
+- The MadCap HTML goes to `Content/SDM/` in the Flare project and is committed. This location comes from `output_dir` in `tools/build_sdm/configs/madcap_html_output.toml`, relative to the repository root.
+- `Content/SDM/` holds only build output. Don't add files there or edit pages in Flare; `check-generated` fails on both. Pages link Flare's `Content/Resources/` through `resources_path` in the same config file, so moving the output means changing both settings.
 - `--madcap-output-dir PATH` overrides it, relative to the current directory. The override **replaces** the configured location: the build writes the MadCap HTML only to `PATH`.
 - Because `PATH` may be inside a Flare project, the build refuses to overwrite files it didn't write there:
   - If `PATH` is new or empty, the build writes a `.build-sdm-output` marker into it, and later builds to the same `PATH` just work. A `PATH` holding only OS metadata files (`.DS_Store`, `Thumbs.db`, `desktop.ini`) counts as empty.
@@ -135,7 +136,7 @@ Every `build-sdm` command also takes `--loglevel` and `--config_dir`.
 - Always commit the regenerated default output with your source change, even if you also build to another location. CI checks that the committed copy is up to date.
 - The build never deletes files. If a change removes a page, `check-generated` reports it as stale and prints the `git rm` command for it.
 
-See ADR 0003.
+See ADR 0003 and ADR 0007.
 
 ## Lint rules
 
@@ -172,7 +173,7 @@ TOML under `src/sdm/` and `tools/build_sdm/configs/` is formatted with taplo, co
 |---|---|---|
 | `data-lint` | TOML isn't formatted | `uv run taplo fmt`, then commit |
 | `data-lint` | `validate` finds a new violation, or a rule's count goes up | Run `uv run build-sdm validate --base-ref origin/main` and fix the errors it lists. Errors also show as annotations on the PR |
-| `generated-fresh` | The committed MadCap HTML doesn't match a fresh build | Run the commands in the job summary: `uv run build-sdm build`, plus `git rm` for any stale file, then commit `generated/` |
+| `generated-fresh` | The committed MadCap HTML doesn't match a fresh build | Run the commands in the job summary: `uv run build-sdm build`, plus `git rm` for any stale file, then commit `Content/SDM/` |
 | `python-qa` | ruff, ruff format, mypy or pytest fails | Run the same command locally. If a test in `tests/test_golden_outputs.py` fails because the output changed on purpose, refresh the snapshots (see [Editing the SDM](#editing-the-sdm)) |
 
 Retargeting a PR to `main` doesn't start a run. Push a commit, or close and reopen the PR.

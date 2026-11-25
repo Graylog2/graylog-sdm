@@ -12,7 +12,8 @@ This repo is the source of truth. graylog-project-illuminate keeps its own copy 
 | `src/sdm/schema/` | Field schema, one file per entity (`user.toml`) |
 | `src/sdm/config/` | SDM-wide config: `sdm_version`, allowed field types, documentation sections |
 | `tools/build_sdm/` | The `build-sdm` tool, with its output plugins and their config in `configs/` |
-| `generated/MadcapHtmlOutput/` | MadCap HTML built from the source. Committed; never edit it by hand |
+| `Content/SDM/` | MadCap HTML built from the source, inside the Flare project. Committed; never edit it by hand |
+| `graylog-sdm.flprj`, `Project/`, `Content/` | The MadCap Flare project, maintained by the docs team (ADR 0007) |
 | `build/sdm_artifacts/` | Output from the other plugins (CSV, JSON). Gitignored |
 | `tests/` | Tests for `build-sdm`, including output snapshots in `tests/golden/` |
 | `docs/decisions/` | Architecture decision records (ADRs) |
@@ -30,7 +31,7 @@ uv run build-sdm build
 uv run build-sdm validate --base-ref origin/main
 ```
 
-- `build` writes the MadCap HTML to `generated/MadcapHtmlOutput/` and the other output to `build/sdm_artifacts/`.
+- `build` writes the MadCap HTML to `Content/SDM/` and the other output to `build/sdm_artifacts/`.
 - `validate --base-ref origin/main` is the check CI runs: a violation that is new relative to `main` fails, and violations that already exist on `main` are only warnings.
 
 Plain `uv run build-sdm validate`, with no base ref, lists every known existing violation and exits 1. That is expected, not a broken checkout: without a base ref, every violation is an error (ADR 0004).
