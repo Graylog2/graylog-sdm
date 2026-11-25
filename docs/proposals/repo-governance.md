@@ -3,9 +3,11 @@
 Status: proposed; required checks partly implemented (2026-11-25)
 Date: 2026-11-20
 
-The SDM is a data contract: Illuminate's pipelines, lookups and content depend on it. This proposal covers the GitHub settings and files that keep changes to it reviewed and checked. Nothing here is implemented; each item needs a decision and a repo admin.
+The SDM is a data contract: Illuminate's pipelines, lookups and content depend on it. This proposal covers the GitHub settings and files that keep changes to it reviewed and checked. Each item needs a decision and a repo admin. Item 1 is partly implemented (2026-11-25); nothing else is.
 
-## Current state
+## State on 2026-11-20
+
+This is a historical snapshot, taken before any of this proposal was implemented. For required checks since then, see item 1 below.
 
 Checked on 2026-11-20 through the rulesets API. A classic branch-protection rule, if any, isn't visible there and needs an admin to check.
 

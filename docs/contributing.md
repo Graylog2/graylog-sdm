@@ -178,7 +178,14 @@ TOML under `src/sdm/` and `tools/build_sdm/configs/` is formatted with taplo, co
 
 Retargeting a PR to `main` doesn't start a run. Push a commit, or close and reopen the PR.
 
-`data-lint` and `python-qa` must pass before a PR can merge, and the PR's branch must be up to date with `main`. `generated-fresh` isn't required yet, but fix it anyway (follow-up F3). CI tests your PR merged with `main` as it was when the run started, so when another PR merges first, GitHub marks yours out of date: rebase onto `origin/main` and push (or use **Update with rebase** on the PR), and CI runs again against the new `main`.
+`data-lint` and `python-qa` must pass before a PR can merge, and the PR's branch must be up to date with `main`. `generated-fresh` isn't required yet (follow-up F3), but don't merge while it fails: rebuild, or for pages Flare changed, update the templates or run `git restore Content/SDM`.
+
+CI tests your PR merged with `main` as it was when the run started, so when another PR merges first, GitHub marks yours out of date. To update it, either:
+
+- use **Update with rebase** on the PR, which rebases the branch and pushes it for you, or
+- run `git fetch origin`, then `git rebase origin/main`, then `git push --force-with-lease`. Fetch first, or the rebase uses a stale `origin/main`; a rebased branch needs `--force-with-lease`, because a plain push is rejected.
+
+Either way, CI runs again against the new `main`. If you updated with the button, run `git pull --rebase` before you change the branch locally again.
 
 ## Plans and decisions
 
