@@ -5,7 +5,7 @@ This repo is the source of truth for the Graylog Security Data Model (SDM). Down
 ## What to check
 
 - **Source of truth.** SDM definitions are edited only under `src/sdm/`. Flag any PR that changes SDM meaning anywhere else.
-- **Generated output.** Files under `generated/` must never be hand-edited. If a PR changes `src/sdm/` or the build tool, it must also include the regenerated `generated/` output. If a PR changes `generated/` without a matching source or tool change, flag it.
+- **Generated output.** Files under `Content/SDM/` are build output and must never be hand-edited. If a PR changes `src/sdm/` or the build tool, it must also include the regenerated `Content/SDM/` output. If a PR changes `Content/SDM/` without a matching source or tool change, flag it. Don't review the content of generated pages.
 - **Change classification.** Every SDM change is additive, deprecation, or breaking. A rename, removal, or type change is breaking and requires an `sdm_version` bump. Scrutinize changes claimed as additive: changing a field's meaning, narrowing allowed values, or promoting a field to required is not additive. A removed field name or GIM code must never be reused for a different meaning.
 - **Descriptions.** Meta fields (`title`, `description`) must be US-ASCII printable characters only (no smart quotes, em dashes, or other Unicode) and written for a technical audience: precise, unambiguous, useful to security practitioners and engineers.
 - **Field classification.** Judge whether each required / recommended / optional assignment is justified. Required must stay conservative: only fields needed for correct event analysis (e.g. used by event definitions or alerts).
@@ -15,6 +15,7 @@ This repo is the source of truth for the Graylog Security Data Model (SDM). Down
 Do not comment on things CI enforces (the `data-lint`, `generated-fresh` and `python-qa` jobs):
 - TOML formatting (`taplo fmt --check`), Python lint, formatting and types (ruff, mypy), and test results (pytest). Missing tests are still worth flagging.
 - Generated-output freshness (`build-sdm check-generated`).
+- The MadCap Flare project files: `graylog-sdm.flprj`, `Project/`, and `Content/` outside `Content/SDM/`. The docs team is still setting up the Flare project; see `.github/instructions/flare.instructions.md`.
 - The `build-sdm validate` rules, which fail on new violations: `naming`, `ascii-meta`, `unique-names`, `default-99`, `default-baseline`, `fields-exist`, `wildcards`, `codes`. Existing violations are known and are reported as warnings; don't ask a PR to fix ones it didn't introduce.
 
 Focus on judgment calls: whether a classification is justified, description quality, and whether a change is really additive.

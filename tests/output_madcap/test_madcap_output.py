@@ -44,8 +44,8 @@ def test_generate_real_world(tmp_path: Path):
     # Run plugin generate method, injecting the temporary template directory
     plugin_config = MadcapHtmlOutputConfig()
     with patch.object(plugin, '_initialize_jinja_environment',
-                      side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
-                          plugin, template_dir=template_dir_path
+                      side_effect=lambda **kwargs: MadcapHtmlOutput._initialize_jinja_environment(
+                          plugin, template_dir=template_dir_path, **kwargs
                       )):
         plugin.generate(gim_config, tmp_path, plugin_config)
 
@@ -88,8 +88,8 @@ def test_generate_template_not_found(caplog):
 
         plugin_config = MadcapHtmlOutputConfig(enabled=True)
         with patch.object(plugin, '_initialize_jinja_environment',
-                          side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
-                              plugin, template_dir=template_dir
+                          side_effect=lambda **kwargs: MadcapHtmlOutput._initialize_jinja_environment(
+                              plugin, template_dir=template_dir, **kwargs
                           )):
             with pytest.raises(RuntimeError, match='Failed during GIM category page generation') as excinfo:
                 plugin.generate(gim_config=gim_config, output_dir=output_dir, plugin_config=plugin_config)
@@ -132,8 +132,8 @@ def test_generate_missing_plugin_config_uses_defaults(tmp_path: Path):
 
     plugin_config = MadcapHtmlOutputConfig()
     with patch.object(plugin, '_initialize_jinja_environment',
-                      side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
-                          plugin, template_dir=template_dir
+                      side_effect=lambda **kwargs: MadcapHtmlOutput._initialize_jinja_environment(
+                          plugin, template_dir=template_dir, **kwargs
                       )):
         plugin.generate(gim_config=gim_config, output_dir=tmp_path, plugin_config=plugin_config)
 

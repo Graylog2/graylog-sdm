@@ -42,7 +42,7 @@ def test_generate_invokes_internal_methods(tmp_path):
         plugin.generate(mock_gim_config, output_dir, plugin_config)
 
         mock_resolve.assert_called_once_with(plugin_config)
-        mock_init_env.assert_called_once_with()
+        mock_init_env.assert_called_once_with(resources_path=plugin_config.resources_path)
         mock_validate.assert_called_once()
         mock_load_template.assert_called_once_with('mock_template.j2', 'network')
         mock_render.assert_called_once()

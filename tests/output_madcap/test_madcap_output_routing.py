@@ -43,8 +43,8 @@ def test_plugin_output_subdir_routing(tmp_path: Path):
     }
 
     with patch.object(plugin, '_initialize_jinja_environment',
-                      side_effect=lambda: MadcapHtmlOutput._initialize_jinja_environment(
-                          plugin, template_dir=template_dir
+                      side_effect=lambda **kwargs: MadcapHtmlOutput._initialize_jinja_environment(
+                          plugin, template_dir=template_dir, **kwargs
                       )):
         plugin.generate(gim_config, tmp_path, plugin_config)
 

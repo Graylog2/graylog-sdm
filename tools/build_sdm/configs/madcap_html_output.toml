@@ -1,6 +1,10 @@
 [plugin]
 name = "MadcapHtmlOutput"
 enabled = 1
-# Committed output (ADR 0003). Relative to the repository root; replaces the default
-# build/sdm_artifacts/MadcapHtmlOutput/. `build-sdm build --madcap-output-dir PATH` overrides it.
-output_dir = "generated/MadcapHtmlOutput"
+# Committed output, inside the Flare project (ADR 0007). Holds only build output.
+# Relative to the repository root; replaces the default build/sdm_artifacts/MadcapHtmlOutput/.
+# `build-sdm build --madcap-output-dir PATH` overrides it.
+output_dir = "Content/SDM"
+# Path from every generated page to the Flare project's Content/Resources/ (ADR 0007).
+# Pages sit one directory below output_dir; change both together.
+resources_path = "../../Resources"
