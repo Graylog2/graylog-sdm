@@ -74,6 +74,8 @@ Before claiming work is done, run the commands above that are available and conf
 | `generated-fresh` | `check-generated`; on failure, the fix goes in the job summary | `uv run build-sdm check-generated` |
 | `python-qa` | ruff, ruff format, mypy, pytest | `uv run ruff check`, `uv run ruff format --check`, `uv run mypy`, `uv run pytest` |
 
+`main` requires `data-lint` and `python-qa` to pass on a branch that is up to date with `main`; `generated-fresh` is not required yet (follow-up F3). Don't merge with `generated-fresh` failing either. When another PR merges first, GitHub blocks yours as out of date. Either use "Update with rebase" on the PR, which rebases and pushes for you, or locally run `git fetch origin`, `git rebase origin/main` and `git push --force-with-lease`. Either way CI runs again.
+
 Keep the job names stable: required status checks select jobs by name. If a required job is renamed, GitHub keeps waiting for the old name and every PR stays blocked, so a rename must update the required checks in the same change.
 
 ## Plans and decisions
